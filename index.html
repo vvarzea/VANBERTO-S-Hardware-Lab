@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VanBerto's — Hardware Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Fira+Code:wght@300;400;500&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#050509;--surface:#0b0b1a;--card:#101028;--border:#1c1c40;
+  --cyan:#00e5ff;--purple:#8b5cf6;--orange:#ff6b35;--green:#00ff88;
+  --red:#ff3355;--gold:#ffd700;
+  --text:#e2e2ff;--muted:#5a5a8a;
+  --fd:'Orbitron',monospace;--fc:'Fira Code',monospace;--fb:'Rajdhani',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(5,5,9,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--fd);font-size:1.1rem;font-weight:900;letter-spacing:3px;cursor:pointer}
+.logo .v{color:var(--cyan)}.logo .b{color:var(--orange)}
+.nav-links{display:flex;gap:6px}
+.nav-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--fc);font-size:.7rem;padding:6px 12px;cursor:pointer;border-radius:4px;transition:all .2s;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.nav-btn:hover,.nav-btn.active{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
+
+/* SECTIONS */
+.section{min-height:100vh;padding:80px 20px 40px;position:relative;z-index:1;display:none}
+.section.active{display:block}
+
+/* HERO */
+#home{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:100px}
+.hero-badge{font-family:var(--fc);font-size:.7rem;color:var(--cyan);border:1px solid rgba(0,229,255,.4);padding:5px 14px;border-radius:20px;margin-bottom:28px;letter-spacing:2px;animation:badge-pulse 2.5s infinite}
+@keyframes badge-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 10px rgba(0,229,255,0)}}
+.hero-title{font-family:var(--fd);font-size:clamp(2.2rem,7vw,4.5rem);font-weight:900;line-height:1.05;margin-bottom:16px}
+.hero-title .cyan{color:var(--cyan)}.hero-title .orng{color:var(--orange)}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:520px;margin-bottom:44px;font-weight:400}
+.hero-stats{display:flex;gap:40px;margin-bottom:44px;flex-wrap:wrap;justify-content:center}
+.stat-num{font-family:var(--fd);font-size:2.2rem;font-weight:900;color:var(--cyan)}
+.stat-label{font-size:.75rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-p{background:var(--cyan);color:#000;border:none;font-family:var(--fd);font-size:.75rem;font-weight:700;padding:14px 30px;cursor:pointer;border-radius:6px;letter-spacing:2px;transition:all .2s;text-transform:uppercase}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,229,255,.35)}
+.btn-s{background:transparent;color:var(--cyan);border:2px solid var(--cyan);font-family:var(--fd);font-size:.75rem;font-weight:700;padding:12px 30px;cursor:pointer;border-radius:6px;letter-spacing:2px;transition:all .2s;text-transform:uppercase}
+.btn-s:hover{background:rgba(0,229,255,.1);transform:translateY(-3px)}
+
+/* SECTION HEADER */
+.sec-header{text-align:center;margin-bottom:44px}
+.sec-title{font-family:var(--fd);font-size:clamp(1.4rem,4vw,2.2rem);font-weight:800;margin-bottom:6px}
+.sec-title .accent{color:var(--cyan)}
+.sec-sub{font-family:var(--fc);font-size:.8rem;color:var(--muted)}
+
+/* COMP GRID */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;max-width:1100px;margin:0 auto}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 14px;cursor:pointer;transition:all .3s;text-align:center;position:relative;overflow:hidden}
+.cc::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--acc,rgba(0,229,255,.12)),transparent 70%);opacity:0;transition:opacity .3s}
+.cc:hover{transform:translateY(-5px);border-color:var(--acc,var(--cyan));box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.cc:hover::after{opacity:1}
+.cc-svg{width:100%;height:100px;margin-bottom:10px;display:flex;align-items:center;justify-content:center}
+.cc-svg svg{max-width:90px;max-height:90px;filter:drop-shadow(0 0 8px var(--acc,var(--cyan)))}
+.cc-name{font-family:var(--fd);font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc,var(--cyan));margin-bottom:3px}
+.cc-desc{font-size:.75rem;color:var(--muted);font-family:var(--fc)}
+
+/* MODAL */
+#modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px}
+#modal.open{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:min(860px,100%);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:mslide .25s ease}
+@keyframes mslide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mhead-left{display:flex;align-items:center;gap:12px}
+.mtitle{font-family:var(--fd);font-size:1rem;font-weight:700}
+.mbadge{font-family:var(--fc);font-size:.65rem;padding:3px 8px;border-radius:4px;border:1px solid}
+.mclose{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.mclose:hover{color:var(--red);border-color:var(--red)}
+.mtabs{display:flex;padding:0 22px;border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;gap:2px}
+.mtabs::-webkit-scrollbar{height:3px}
+.tb{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fc);font-size:.7rem;padding:12px 14px;cursor:pointer;white-space:nowrap;transition:all .2s;text-transform:uppercase;letter-spacing:1px}
+.tb:hover{color:var(--text)}.tb.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.mcontent{flex:1;overflow-y:auto;padding:24px}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* 3D VIEW */
+.v3d{display:flex;flex-direction:column;align-items:center;gap:20px}
+.stage-wrap{text-align:center}
+.stage-hint{font-family:var(--fc);font-size:.65rem;color:var(--muted);margin-bottom:10px;letter-spacing:1px}
+.stage3d{position:relative;width:100%;max-width:560px;height:340px;margin:0 auto;border:1px solid var(--border);border-radius:12px;background:radial-gradient(circle at 50% 35%,rgba(0,229,255,.13),transparent 65%),#06061a;overflow:hidden;cursor:grab;touch-action:none;user-select:none}
+.stage3d:active{cursor:grabbing}
+.stage3d canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
+.stage-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fc);font-size:.75rem;color:var(--muted);padding:20px;text-align:center}
+.stage-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;font-family:var(--fc);font-size:.72rem;color:var(--muted);text-align:center}
+.stage-fallback svg{max-width:220px;max-height:200px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:560px}
+.pchip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:var(--fc);font-size:.68rem;padding:6px 11px;border-radius:20px;cursor:pointer;transition:all .2s}
+.pchip:hover,.pchip.on{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
+.pi-name{display:flex;align-items:center;gap:8px;font-family:var(--fd);font-size:.8rem;font-weight:700;margin-bottom:6px}
+.layer .go{margin-left:auto;font-family:var(--fc);font-size:.62rem;color:var(--cyan);white-space:nowrap;opacity:.75}
+.layer:focus-visible,.cc:focus-visible,.pchip:focus-visible,.cbtn:focus-visible,.nav-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.cbtn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:var(--fc);font-size:.7rem;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.cbtn:hover,.cbtn.on{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
+.v3d-info{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;max-width:500px;width:100%}
+.v3d-info p{font-size:.9rem;color:var(--muted);line-height:1.7}
+
+/* FICHA */
+.specs-table{width:100%;border-collapse:collapse}
+.specs-table tr{border-bottom:1px solid var(--border)}
+.specs-table tr:last-child{border-bottom:none}
+.specs-table td{padding:11px 14px;font-size:.88rem}
+.specs-table td:first-child{font-family:var(--fc);color:var(--cyan);font-size:.78rem;width:42%;font-weight:500}
+.spec-note{margin-top:16px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:8px;padding:12px 16px;font-size:.82rem;color:var(--muted);font-family:var(--fc);border-left:3px solid var(--cyan)}
+
+/* RAIO-X */
+.xray-wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.xray-svg-box{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.xray-svg-box p{font-family:var(--fc);font-size:.7rem;color:var(--muted);text-align:center}
+.xray-layers{flex:1;min-width:200px}
+.xray-title{font-family:var(--fd);font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:12px;letter-spacing:1px}
+.layer{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.layer:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.2)}
+.ldot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.lname{font-family:var(--fc);font-size:.8rem;font-weight:500;display:block}
+.ldesc{font-size:.75rem;color:var(--muted);display:block;margin-top:2px}
+
+/* ESCALA */
+.escala-wrap{text-align:center}
+.size-grid{display:flex;justify-content:center;gap:40px;margin:28px 0;flex-wrap:wrap}
+.size-item{text-align:center}
+.size-val{font-family:var(--fd);font-size:1.4rem;font-weight:800;color:var(--cyan)}
+.size-label{font-family:var(--fc);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.scale-visual{display:flex;align-items:flex-end;justify-content:center;gap:32px;margin:24px 0;flex-wrap:wrap}
+.scale-comp{display:flex;flex-direction:column;align-items:center;gap:8px}
+.scale-label{font-family:var(--fc);font-size:.72rem;color:var(--muted)}
+.scale-note{font-family:var(--fc);font-size:.82rem;color:var(--muted);max-width:440px;margin:0 auto;line-height:1.7}
+
+/* EVOLUÇÃO */
+.timeline{position:relative;padding-left:30px;max-width:560px}
+.timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--cyan),var(--purple))}
+.titem{position:relative;margin-bottom:22px}
+.tdot{position:absolute;left:-26px;top:5px;width:12px;height:12px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan)}
+.tyear{font-family:var(--fd);font-size:.7rem;color:var(--cyan);font-weight:700;letter-spacing:2px}
+.tname{font-size:.95rem;font-weight:600;margin:2px 0}
+.tinfo{font-family:var(--fc);font-size:.78rem;color:var(--muted)}
+
+/* COMPARADOR */
+#comparador .inner{max-width:1000px;margin:0 auto}
+.comp-sel-row{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:32px}
+.csel{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--fc);font-size:.82rem;padding:12px 16px;border-radius:8px;cursor:pointer;width:100%;appearance:none}
+.csel:focus{outline:none;border-color:var(--cyan)}
+.vs{font-family:var(--fd);font-size:1.4rem;font-weight:900;color:var(--orange);text-align:center}
+.compare-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ccol{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px}
+.ccol-head{text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.ccol-name{font-family:var(--fd);font-size:.8rem;font-weight:700}
+.ccol-icon{font-size:2rem;display:block;margin-bottom:6px}
+.cmp-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:8px}
+.cmp-row:last-child{border-bottom:none}
+.cmp-key{font-family:var(--fc);font-size:.75rem;color:var(--muted)}
+.cmp-val{font-family:var(--fc);font-size:.78rem;color:var(--text);text-align:right;font-weight:500}
+.cmp-val.win{color:var(--green)}
+.cmp-empty{text-align:center;padding:40px;font-family:var(--fc);font-size:.82rem;color:var(--muted)}
+
+/* QUIZ */
+#quiz .inner{max-width:680px;margin:0 auto}
+.quiz-start{text-align:center;padding:20px 0}
+.qstart-icon{font-size:4rem;margin-bottom:16px}
+.qstart-title{font-family:var(--fd);font-size:1.5rem;font-weight:800;margin-bottom:8px}
+.qstart-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px;font-family:var(--fc)}
+.name-input{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--fc);font-size:.9rem;padding:12px 16px;border-radius:8px;width:100%;max-width:340px;margin-bottom:24px;text-align:center}
+.name-input:focus{outline:none;border-color:var(--cyan)}
+.quiz-meta{display:flex;justify-content:center;gap:32px;margin-bottom:32px;flex-wrap:wrap}
+.qmeta-item{text-align:center}
+.qmeta-num{font-family:var(--fd);font-size:1.6rem;font-weight:800;color:var(--cyan)}
+.qmeta-label{font-family:var(--fc);font-size:.7rem;color:var(--muted);text-transform:uppercase}
+.qprog{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.qbar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.qbar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px;transition:width .4s ease}
+.qnum{font-family:var(--fc);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px}
+.qcat{font-family:var(--fc);font-size:.68rem;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.qtext{font-size:1.05rem;font-weight:600;line-height:1.5;margin-bottom:22px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--fc);font-size:.83rem;padding:13px 18px;border-radius:8px;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:12px;line-height:1.4}
+.opt-l{font-family:var(--fd);font-size:.7rem;font-weight:700;color:var(--muted);min-width:18px;flex-shrink:0}
+.opt:hover:not(:disabled){border-color:var(--cyan);background:rgba(0,229,255,.05)}
+.opt:disabled{cursor:default}
+.opt.correct{border-color:var(--green)!important;background:rgba(0,255,136,.08)!important;color:var(--green)!important}
+.opt.correct .opt-l{color:var(--green)!important}
+.opt.wrong{border-color:var(--red)!important;background:rgba(255,51,85,.08)!important;color:var(--red)!important}
+.opt.wrong .opt-l{color:var(--red)!important}
+.fb{display:none;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);border-left:3px solid var(--cyan);border-radius:8px;padding:14px;font-size:.82rem;margin-top:14px;font-family:var(--fc);color:var(--muted);line-height:1.7}
+.fb.show{display:block}
+.qactions{display:flex;justify-content:flex-end;margin-top:4px}
+
+/* RESULT */
+#resultado{display:none;text-align:center;max-width:560px;margin:0 auto;padding:40px 20px}
+#resultado.show{display:block}
+.grade-big{font-family:var(--fd);font-size:7rem;font-weight:900;line-height:1;margin-bottom:4px;animation:grade-pop .6s ease}
+@keyframes grade-pop{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.grade-desc{font-family:var(--fc);font-size:1rem;margin-bottom:8px}
+.grade-sub{font-size:.85rem;color:var(--muted);margin-bottom:36px;font-family:var(--fc)}
+.res-stats{display:flex;justify-content:center;gap:40px;margin-bottom:36px;flex-wrap:wrap}
+.rs-num{font-family:var(--fd);font-size:1.8rem;font-weight:800}
+.rs-label{font-family:var(--fc);font-size:.72rem;color:var(--muted);text-transform:uppercase}
+.res-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.wrong-list{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:left}
+.wrong-title{font-family:var(--fd);font-size:.8rem;color:var(--orange);letter-spacing:2px;margin-bottom:14px;text-transform:uppercase}
+.wrong-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:.82rem;font-family:var(--fc);color:var(--muted);line-height:1.5}
+.wrong-item:last-child{border-bottom:none}
+.wrong-item .wi-q{color:var(--text);display:block;margin-bottom:2px}
+.wrong-item .wi-a{color:var(--green)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+/* MISC */
+.hidden{display:none!important}
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadein .4s ease forwards}
+@media(max-width:600px){
+  .comp-sel-row{grid-template-columns:1fr}.vs{display:none}.compare-cols{grid-template-columns:1fr}
+  .hero-stats{gap:24px}.xray-wrap{flex-direction:column}
+  .stage3d{height:290px}
+  .nav-btn{padding:6px 9px;font-size:.62rem}.logo{font-size:.9rem;letter-spacing:2px}
+  .layer .go{display:none}
+}
+
+/* ===== MONTAR O PC ===== */
+.mp-inner{max-width:1100px;margin:0 auto}
+.mp-safety{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.35);border-radius:10px;padding:12px 16px;font-family:var(--fc);font-size:.76rem;line-height:1.6;color:var(--text);max-width:720px;margin:0 auto 22px}
+.mp-levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:720px;margin:0 auto}
+.mp-lvl{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;text-align:left;color:var(--text);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all .2s}
+.mp-lvl:hover,.mp-lvl:focus-visible{border-color:var(--cyan);background:rgba(0,229,255,.06);transform:translateY(-2px);outline:none}
+.mp-lvl-n{font-family:var(--fc);font-size:.66rem;letter-spacing:2px;color:var(--orange)}
+.mp-lvl-t{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--cyan)}
+.mp-lvl-d{font-family:var(--fb);font-size:.95rem;color:var(--muted);line-height:1.4}
+.mp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+.mp-sp{flex:1}
+.mp-chip{font-family:var(--fc);font-size:.68rem;letter-spacing:1px;color:var(--cyan);border:1px solid var(--border);background:var(--card);border-radius:20px;padding:5px 12px}
+.mp-grid{display:grid;gap:12px;grid-template-columns:minmax(0,460px) minmax(0,1fr);grid-template-areas:"stage step" "stage status" "stage tray" "stage ficha";align-items:start}
+.mp-step{grid-area:step;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:12px 14px}
+.mp-step-n{font-family:var(--fc);font-size:.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.mp-step-t{font-family:var(--fd);font-size:.9rem;font-weight:700;color:var(--cyan);margin:2px 0 4px}
+.mp-step-d{font-family:var(--fb);font-size:1rem;line-height:1.45;color:var(--text)}
+.mp-status{grid-area:status;font-family:var(--fc);font-size:.76rem;line-height:1.55;border-radius:10px;padding:10px 14px;border:1px solid var(--border);background:var(--surface);color:var(--text);min-height:3.4em}
+.mp-status.ok{border-color:var(--green);background:rgba(0,255,136,.07)}
+.mp-status.bad{border-color:var(--red);background:rgba(255,51,85,.08)}
+.mp-tray{grid-area:tray;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mp-stage{grid-area:stage;background:#06061a;border:1px solid var(--border);border-radius:12px;padding:8px}
+.mp-stage svg{width:100%;height:auto;display:block}
+.mp-ficha{grid-area:ficha;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:var(--fb);font-size:.98rem;line-height:1.45}
+.mp-ficha-t{font-family:var(--fd);font-size:.72rem;letter-spacing:2px;color:var(--gold);margin-bottom:6px;text-transform:uppercase}
+.mp-ficha ul{list-style:none}.mp-ficha li{padding:3px 0;border-bottom:1px solid var(--border)}.mp-ficha li:last-child{border-bottom:none}
+.mp-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 8px 10px;color:var(--text);cursor:grab;transition:all .15s;font-family:var(--fb)}
+.mp-card:hover{border-color:var(--cyan)}
+.mp-card.on{border-color:var(--cyan);background:rgba(0,229,255,.12);box-shadow:0 0 0 2px rgba(0,229,255,.35)}
+.mp-card.rec:not(.on){border-color:var(--green)}
+.mp-card:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.mp-ic{width:52px;height:52px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.mp-ic svg{width:100%;height:100%}
+.mp-cabic{font-size:1.9rem}
+.mp-nm{font-size:.92rem;font-weight:700;line-height:1.15;pointer-events:none}
+.mp-sub{font-family:var(--fc);font-size:.6rem;color:var(--muted);pointer-events:none}
+.mp-q{position:absolute;top:4px;right:6px;font-family:var(--fc);font-size:.66rem;color:var(--orange)}
+.mp-power{grid-column:1/-1;background:linear-gradient(135deg,var(--green),#00b36b);color:#04140c;border:0;border-radius:12px;padding:16px;font-family:var(--fd);font-size:1rem;font-weight:800;letter-spacing:2px;cursor:pointer}
+.mp-power span{font-size:1.3rem;margin-right:8px}
+.mp-power:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.mp-ghost{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-50%);background:rgba(0,229,255,.18);border:1px solid var(--cyan);color:var(--text);font-family:var(--fb);font-weight:700;font-size:.9rem;padding:6px 12px;border-radius:8px;backdrop-filter:blur(4px)}
+/* peças no palco */
+.slot{cursor:pointer;outline:none}
+.slot .sbox{fill:rgba(0,229,255,.04);stroke:#3a3a6a;stroke-width:1.2;stroke-dasharray:4 3}
+.slot .slab{fill:#6a6a9a;font-size:8px;font-family:var(--fc);pointer-events:none}
+.slot .hit{fill:transparent}
+.slot.locked{opacity:.35}
+.slot.target .sbox{stroke:var(--cyan);fill:rgba(0,229,255,.16);animation:mp-pulse 1s ease-in-out infinite}
+.slot.hint .sbox{stroke:var(--green);stroke-width:2;fill:rgba(0,255,136,.12)}
+.slot:focus-visible .sbox{stroke:#fff;stroke-width:2.5}
+@keyframes mp-pulse{50%{stroke-opacity:.3}}
+.mp-fan{transform-box:fill-box;transform-origin:center}
+#mpSvg.powered .mp-fan{animation:mp-spin .6s linear infinite}
+@keyframes mp-spin{to{transform:rotate(360deg)}}
+/* arranque */
+.mp-postbox{max-width:620px;margin:22px auto 0;background:#04040c;border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.mp-post-t{font-family:var(--fd);font-size:.8rem;letter-spacing:2px;color:var(--green);margin-bottom:10px}
+.mp-post{list-style:none;font-family:var(--fc);font-size:.74rem;line-height:1.9;color:var(--text)}
+.mp-post .ok{color:var(--green);font-weight:700}
+.mp-bootbar{height:8px;background:var(--border);border-radius:6px;margin:14px 0;overflow:hidden}
+#mpBootFill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .09s linear}
+.mp-win{font-family:var(--fd);font-size:1.3rem;font-weight:800;color:var(--green);text-align:center;margin:8px 0}
+.mp-stars{text-align:center;font-size:2.2rem;color:var(--gold);letter-spacing:6px}
+.mp-stars .off{color:var(--border)}
+.mp-res-stats{display:flex;justify-content:center;gap:34px;margin:10px 0 14px;font-family:var(--fc)}
+.mp-res-stats div{text-align:center}.mp-res-stats b{display:block;font-family:var(--fd);font-size:1.3rem;color:var(--cyan)}.mp-res-stats span{font-size:.64rem;color:var(--muted);text-transform:uppercase}
+.mp-note{font-family:var(--fb);font-size:.95rem;color:var(--muted);text-align:center;max-width:520px;margin:0 auto 14px}
+@media(max-width:820px){
+  .mp-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"step" "status" "tray" "stage" "ficha"}
+  .mp-tray{display:flex;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}
+  .mp-card{min-width:132px;flex:0 0 auto;scroll-snap-align:start;cursor:pointer}
+  .mp-stage svg{max-height:62vh;margin:0 auto}
+  .mp-bar .cbtn{padding:6px 10px}
+}
+/* ===== MASCOTE ===== */
+#vb{position:fixed;right:10px;bottom:8px;z-index:250;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
+.vb-btn{pointer-events:auto;background:none;border:0;padding:0;cursor:pointer;border-radius:12px}
+.vb-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#vbCv{width:84px;height:98px;display:block}
+.vb-bubble{position:relative;max-width:230px;background:#101028;border:1px solid var(--cyan);color:var(--text);font-family:var(--fc);font-size:.72rem;line-height:1.5;padding:9px 12px;border-radius:12px;margin-bottom:8px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.vb-bubble.show{opacity:1;transform:none}
+.vb-bubble::after{content:'';position:absolute;bottom:-7px;right:30px;width:12px;height:12px;background:#101028;border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan);transform:rotate(45deg)}
+@media(max-width:600px){#vbCv{width:62px;height:72px}.vb-bubble{max-width:180px;font-size:.66rem}}
+/* ===== RODAPÉ ===== */
+.site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
+@media(max-width:600px){.site-foot{padding:18px 70px 26px}
+  .logo{display:none}.nav-links{width:100%;justify-content:space-between;gap:3px}
+  .nav-btn{padding:6px 6px;font-size:.56rem;letter-spacing:0}
+  #nav{padding:8px 10px}}
+@media(prefers-reduced-motion:reduce){#mpSvg.powered .mp-fan{animation:none}.slot.target .sbox{animation:none}.vb-bubble{transition:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo" onclick="showSection('home')">
+    <span class="v">VAN</span><span class="b">BERTO'S</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showSection('home')">Home</button>
+    <button class="nav-btn" onclick="showSection('componentes')">Componentes</button>
+    <button class="nav-btn" onclick="showSection('montar')">Montar PC</button>
+    <button class="nav-btn" onclick="showSection('comparador')">Comparador</button>
+    <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="section active">
+  <div class="hero-badge">🔬 LABORATÓRIO INTERATIVO DE HARDWARE</div>
+  <h1 class="hero-title">
+    <span class="cyan">VAN</span><span class="orng">BERTO'S</span><br>Hardware Lab
+  </h1>
+  <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores — totalmente grátis, sem registo, no browser.</p>
+  <div class="hero-stats">
+    <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
+    <div><div class="stat-num">25</div><div class="stat-label">Perguntas Quiz</div></div>
+    <div><div class="stat-num">5</div><div class="stat-label">Vistas por Peça</div></div>
+    <div><div class="stat-num">PDF</div><div class="stat-label">Certificado</div></div>
+  </div>
+  <div class="hero-btns">
+    <button class="btn-p" onclick="showSection('componentes')">Explorar Componentes</button>
+    <button class="btn-s" onclick="showSection('montar')">🔧 Montar o PC</button>
+    <button class="btn-s" onclick="showSection('quiz')">Fazer o Quiz →</button>
+  </div>
+</section>
+
+<!-- COMPONENTES -->
+<section id="componentes" class="section">
+  <div class="sec-header">
+    <h2 class="sec-title">Componentes <span class="accent">3D</span></h2>
+    <p class="sec-sub">Clica em qualquer componente para explorar em detalhe</p>
+  </div>
+  <div class="comp-grid" id="compGrid"></div>
+</section>
+
+<!-- MONTAR O PC -->
+<section id="montar" class="section"></section>
+
+<!-- MODAL -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="mbox">
+    <div class="mhead">
+      <div class="mhead-left">
+        <span class="mtitle" id="mTitle">—</span>
+        <span class="mbadge" id="mBadge"></span>
+      </div>
+      <button class="mclose" onclick="closeModal()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="mtabs">
+      <button class="tb active" data-tab="t3d">🔄 3D Interativo</button>
+      <button class="tb" data-tab="tficha">📋 Ficha Técnica</button>
+      <button class="tb" data-tab="txray">🔬 Raio-X</button>
+      <button class="tb" data-tab="tescala">📏 Escala Real</button>
+      <button class="tb" data-tab="tevolucao">📅 Evolução</button>
+    </div>
+    <div class="mcontent">
+      <div class="tab-pane active" id="t3d"></div>
+      <div class="tab-pane" id="tficha"></div>
+      <div class="tab-pane" id="txray"></div>
+      <div class="tab-pane" id="tescala"></div>
+      <div class="tab-pane" id="tevolucao"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARADOR -->
+<section id="comparador" class="section">
+  <div class="inner">
+    <div class="sec-header">
+      <h2 class="sec-title">Comparador <span class="accent">Lado a Lado</span></h2>
+      <p class="sec-sub">Seleciona dois componentes para comparar as suas especificações</p>
+    </div>
+    <div class="comp-sel-row">
+      <select class="csel" id="csel1" onchange="renderComparador()">
+        <option value="">— Escolhe o 1.º componente —</option>
+      </select>
+      <div class="vs">VS</div>
+      <select class="csel" id="csel2" onchange="renderComparador()">
+        <option value="">— Escolhe o 2.º componente —</option>
+      </select>
+    </div>
+    <div id="compareResult"></div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="section">
+  <div class="inner">
+    <div id="quizStart" class="quiz-start">
+      <div class="qstart-icon">🧠</div>
+      <h2 class="qstart-title">Quiz de Hardware</h2>
+      <p class="qstart-sub">25 perguntas · Nota de 1 a 5 · Certificado PDF</p>
+      <div class="quiz-meta">
+        <div class="qmeta-item"><div class="qmeta-num">25</div><div class="qmeta-label">Perguntas</div></div>
+        <div class="qmeta-item"><div class="qmeta-num">4</div><div class="qmeta-label">Opções cada</div></div>
+        <div class="qmeta-item"><div class="qmeta-num">1–5</div><div class="qmeta-label">Escala nota</div></div>
+      </div>
+      <input class="name-input" id="playerName" type="text" placeholder="O teu nome (para o certificado)" maxlength="40">
+      <br>
+      <button class="btn-p" onclick="startQuiz()">Começar Quiz →</button>
+    </div>
+    <div id="quizGame" class="hidden">
+      <div class="qprog">
+        <div class="qbar"><div class="qbar-fill" id="qbarFill"></div></div>
+        <span class="qnum" id="qNum">1 / 25</span>
+      </div>
+      <div class="qcard">
+        <div class="qcat" id="qCat"></div>
+        <div class="qtext" id="qText"></div>
+        <div class="opts" id="qOpts"></div>
+        <div class="fb" id="qFb"></div>
+      </div>
+      <div class="qactions">
+        <button class="btn-p hidden" id="qNext" onclick="nextQuestion()">Próxima →</button>
+      </div>
+    </div>
+    <div id="resultado">
+      <div class="grade-big" id="gradeBig"></div>
+      <div class="grade-desc" id="gradeDesc"></div>
+      <div class="grade-sub" id="gradeSub"></div>
+      <div class="res-stats">
+        <div><div class="rs-num" id="rsCorrect" style="color:var(--green)"></div><div class="rs-label">Corretas</div></div>
+        <div><div class="rs-num" id="rsWrong" style="color:var(--red)"></div><div class="rs-label">Erradas</div></div>
+        <div><div class="rs-num" id="rsPct" style="color:var(--cyan)"></div><div class="rs-label">Percentagem</div></div>
+      </div>
+      <div class="res-btns">
+        <button class="btn-p" onclick="generatePDF()">📄 Certificado PDF</button>
+        <button class="btn-s" onclick="restartQuiz()">Repetir Quiz</button>
+      </div>
+      <div id="wrongList" class="wrong-list hidden"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-foot">© Prof.ª Vanda Várzea</footer>
+
+<div id="vb">
+  <div class="vb-bubble" id="vbBubble" aria-hidden="true"></div>
+  <button class="vb-btn" id="vbBtn" aria-label="VanBerto, o robô: toca para ouvir uma curiosidade"><canvas id="vbCv" width="240" height="280"></canvas></button>
+</div>
+
+<script>
+/* =====================================================================
+   DATA — 11 COMPONENTS
+   ===================================================================== */
+
+const COMP = {
+  cpu:{
+    id:'cpu',name:'Processador (CPU)',short:'CPU',
+    color:'#00e5ff',tag:'Processamento',
+    desc:'O "cérebro" do computador — executa instruções',
+    about:'A CPU (Central Processing Unit) é o componente responsável por processar todas as instruções e dados do computador. Contém núcleos de processamento, cache integrada e controladores de memória. Quanto mais núcleos e maior a frequência, maior o desempenho.',
+    specs:{
+      'Fabricante':'Intel / AMD',
+      'Arquitetura':'x86-64',
+      'Nº de Núcleos':'8 a 24 núcleos (gama alta)',
+      'Nº de Threads':'16 a 32 threads',
+      'Frequência Base':'3,0 – 4,5 GHz',
+      'Frequência Turbo':'até ~6 GHz',
+      'Cache L3':'24 – 96 MB (os modelos X3D chegam aos 96 MB)',
+      'TDP (Consumo)':'65 W – 253 W',
+      'Socket (Intel)':'LGA 1700 / LGA 1851',
+      'Socket (AMD)':'AM5',
+      'Processo Fabrico':'Intel 7 / TSMC 3–5 nm',
+      'Interface Memória':'DDR5 (5600 – 6400 MT/s nativos)',
+      'PCIe':'PCIe 5.0 x16'
+    },
+    specNote:'TDP (Thermal Design Power) indica a potência máxima de calor que o sistema de arrefecimento deve dissipar — não é exatamente o consumo real.',
+    xray:[
+      {c:'#c8a840',n:'IHS (Heat Spreader)',d:'Tampa metálica que protege o die e distribui o calor uniformemente'},
+      {c:'#4a9eff',n:'Die de Silício (CPU)',d:'Chip com milhares de milhões de transístores — onde ocorre o processamento'},
+      {c:'#ff6b35',n:'Núcleos de Desempenho (P-cores)',d:'Núcleos potentes para tarefas exigentes'},
+      {c:'#ffd700',n:'Núcleos de Eficiência (E-cores)',d:'Núcleos mais simples para tarefas em segundo plano'},
+      {c:'#00ff88',n:'Cache L3 (LLC)',d:'Memória muito rápida integrada no processador'},
+      {c:'#8b5cf6',n:'IMC — Controlador Memória',d:'Gere a comunicação com a RAM'},
+      {c:'#1a2a1a',n:'Substrato (PCB) + contactos LGA',d:'Base que liga o chip ao socket da placa-mãe'}
+    ],
+    size:{w:'40 mm',h:'40 mm',d:'~3–4 mm',wt:'< 50 g'},
+    sizeNote:'Os processadores AMD AM5 medem 40×40 mm e os Intel LGA 1700 medem 45×37,5 mm. Um processador de gama alta contém mais de 10 mil milhões de transístores numa área de poucos centímetros quadrados.',
+    history:[
+      {y:'1971',n:'Intel 4004',i:'1.º microprocessador comercial num só chip: 2 300 transístores, 740 kHz, 10 μm'},
+      {y:'1993',n:'Intel Pentium',i:'3,1 milhões de transístores, 60–66 MHz, arquitetura P5'},
+      {y:'2002',n:'Intel Pentium 4 (Northwood)',i:'55 milhões de transístores, até 3,4 GHz, Hyper-Threading nos modelos de topo'},
+      {y:'2006',n:'Intel Core 2 Duo (Conroe)',i:'Dois núcleos, 65 nm, muito mais eficiente em termos de energia'},
+      {y:'2011',n:'Intel Sandy Bridge',i:'GPU integrada, 32 nm, maior IPC (instruções por ciclo), ring bus'},
+      {y:'2017',n:'AMD Ryzen 1000 (Zen)',i:'8 núcleos, 14 nm — reacendeu a concorrência com a Intel nos processadores de desktop'},
+      {y:'2022',n:'Intel Core i9-13900K',i:'24 núcleos (8 P + 16 E), Intel 7, até 5,8 GHz, suporta DDR5 e DDR4'},
+      {y:'2024',n:'AMD Ryzen 9 9950X',i:'16 núcleos Zen 5, TSMC 4 nm, até 5,7 GHz em Boost'}
+    ],
+    svg:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cpuM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c8a840"/><stop offset="50%" stop-color="#e5c85a"/><stop offset="100%" stop-color="#a07a28"/></linearGradient></defs><rect width="200" height="200" rx="4" fill="#0d1a0d"/><g fill="#c8a840" opacity=".8"><rect x="20" y="188" width="4" height="10"/><rect x="28" y="188" width="4" height="10"/><rect x="36" y="188" width="4" height="10"/><rect x="44" y="188" width="4" height="10"/><rect x="52" y="188" width="4" height="10"/><rect x="60" y="188" width="4" height="10"/><rect x="68" y="188" width="4" height="10"/><rect x="76" y="188" width="4" height="10"/><rect x="84" y="188" width="4" height="10"/><rect x="92" y="188" width="4" height="10"/><rect x="100" y="188" width="4" height="10"/><rect x="108" y="188" width="4" height="10"/><rect x="116" y="188" width="4" height="10"/><rect x="124" y="188" width="4" height="10"/><rect x="132" y="188" width="4" height="10"/><rect x="140" y="188" width="4" height="10"/><rect x="148" y="188" width="4" height="10"/><rect x="156" y="188" width="4" height="10"/><rect x="164" y="188" width="4" height="10"/><rect x="172" y="188" width="4" height="10"/><rect x="-2" y="20" width="10" height="4"/><rect x="-2" y="28" width="10" height="4"/><rect x="-2" y="36" width="10" height="4"/><rect x="-2" y="44" width="10" height="4"/><rect x="-2" y="52" width="10" height="4"/><rect x="-2" y="60" width="10" height="4"/><rect x="-2" y="68" width="10" height="4"/><rect x="-2" y="76" width="10" height="4"/><rect x="-2" y="84" width="10" height="4"/><rect x="-2" y="92" width="10" height="4"/><rect x="-2" y="100" width="10" height="4"/><rect x="-2" y="108" width="10" height="4"/><rect x="-2" y="116" width="10" height="4"/><rect x="-2" y="124" width="10" height="4"/><rect x="-2" y="132" width="10" height="4"/><rect x="-2" y="140" width="10" height="4"/><rect x="-2" y="148" width="10" height="4"/><rect x="-2" y="156" width="10" height="4"/><rect x="-2" y="164" width="10" height="4"/><rect x="-2" y="172" width="10" height="4"/></g><rect x="18" y="18" width="164" height="164" rx="4" fill="url(#cpuM)" stroke="#c8a840" stroke-width="1.5"/><rect x="50" y="50" width="100" height="100" rx="3" fill="#0a0f1a" stroke="#333" stroke-width="1"/><rect x="58" y="58" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#4a9eff" stroke-width="1" opacity=".8"/><rect x="100" y="58" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#ff6b35" stroke-width="1" opacity=".8"/><rect x="58" y="100" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#ff6b35" stroke-width="1" opacity=".8"/><rect x="100" y="100" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#00ff88" stroke-width="1" opacity=".8"/><text x="100" y="46" text-anchor="middle" fill="#888" font-size="8" font-family="monospace">INTEL CORE</text><text x="100" y="37" text-anchor="middle" fill="#00e5ff" font-size="11" font-family="monospace" font-weight="bold">i9-13900K</text><text x="79" y="183" text-anchor="middle" fill="#666" font-size="7" font-family="monospace">LGA1700</text><circle cx="24" cy="24" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="176" cy="24" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="24" cy="176" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="176" cy="176" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/></svg>`
+  },
+
+  ram:{
+    id:'ram',name:'Memória RAM',short:'RAM',
+    color:'#00ff88',tag:'Memória',
+    desc:'Memória de acesso rápido — temporária e volátil',
+    about:'A RAM (Random Access Memory) é a memória de trabalho do computador. Armazena temporariamente os dados dos programas em execução. É muito mais rápida que um SSD mas perde os dados quando o computador é desligado (volátil). Quanto mais RAM, mais programas em simultâneo.',
+    specs:{
+      'Tipo Atual':'DDR5',
+      'Tipo Anterior':'DDR4',
+      'Capacidade':'8 GB – 64 GB por módulo (desktop)',
+      'Velocidade DDR5':'4800 – 8000+ MT/s',
+      'Velocidade DDR4':'1600 – 3200 MT/s (padrão); mais com XMP',
+      'Latência CAS':'CL32–CL40 (DDR5)',
+      'Tensão DDR5':'1,1 V',
+      'Tensão DDR4':'1,2 – 1,35 V',
+      'Pinos (DIMM)':'288 pinos (DDR4 e DDR5)',
+      'Pinos (SO-DIMM)':'260 (DDR4) / 262 (DDR5)',
+      'Fator de Forma':'DIMM (desktop) / SO-DIMM (laptop)',
+      'Canais':'Dual / Quad Channel'
+    },
+    specNote:'Dois módulos em Dual Channel quase duplicam a largura de banda disponível para o processador — sempre preferível a um único módulo da mesma capacidade total.',
+    xray:[
+      {c:'#1a1a2a',n:'PCB (Placa de Circuito)',d:'Substrato preto/verde com várias camadas de condutores'},
+      {c:'#4a4a6a',n:'Chips DRAM',d:'Circuitos integrados que armazenam os dados em células de condensadores'},
+      {c:'#c8a840',n:'Conector de Ouro (Edge)',d:'Contactos dourados que ligam ao slot da placa-mãe'},
+      {c:'#8b5cf6',n:'SPD (Serial Presence Detect)',d:'Pequeno chip que guarda informação sobre a memória (velocidade, timings)'},
+      {c:'#ff6b35',n:'Dissipador de Calor',d:'Peça metálica (em módulos de gaming) para dissipar calor dos chips'},
+      {c:'#00e5ff',n:'XMP / EXPO Profile',d:'Perfis de overclocking guardados no SPD para ativar velocidades mais altas'}
+    ],
+    size:{w:'133 mm',h:'~31 mm',d:'~3–4 mm',wt:'~20 – 50 g'},
+    sizeNote:'Um módulo DIMM de desktop (DDR4 ou DDR5) mede cerca de 133,35 × 31,25 mm. O SO-DIMM, usado em portáteis, é bem mais pequeno: 67,6 × 30 mm.',
+    history:[
+      {y:'Anos 90',n:'FPM DRAM (Fast Page Mode)',i:'Modo de página rápida: acesso mais rápido a dados da mesma linha de memória'},
+      {y:'1996',n:'SDRAM (Synchronous)',i:'Sincronizada com o relógio do sistema, chega aos 133 MHz'},
+      {y:'2000',n:'DDR1 (Double Data Rate)',i:'Transfere dados nos dois flancos do sinal de relógio — dobra a largura de banda'},
+      {y:'2003',n:'DDR2',i:'Frequências mais altas e tensão reduzida (1,8 V)'},
+      {y:'2007',n:'DDR3',i:'1,5 V, de 800 a 2133 MT/s'},
+      {y:'2014',n:'DDR4',i:'1,2 V, de 1600 a 3200 MT/s (padrão); mais com XMP'},
+      {y:'2021',n:'DDR5',i:'1,1 V, a partir de 4800 MT/s, maior capacidade por módulo e ECC interno (on-die)'}
+    ],
+    svg:`<svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ramPCB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0a"/><stop offset="100%" stop-color="#060f06"/></linearGradient></defs><rect width="240" height="120" rx="3" fill="url(#ramPCB)"/><rect x="0" y="85" width="240" height="25" rx="1" fill="#0d200d" stroke="#1a3a1a" stroke-width="1"/><g fill="#c8a840"><rect x="4" y="87" width="3" height="20"/><rect x="9" y="87" width="3" height="20"/><rect x="14" y="87" width="3" height="20"/><rect x="19" y="87" width="3" height="20"/><rect x="24" y="87" width="3" height="20"/><rect x="29" y="87" width="3" height="20"/><rect x="34" y="87" width="3" height="20"/><rect x="39" y="87" width="3" height="20"/><rect x="44" y="87" width="3" height="20"/><rect x="49" y="87" width="3" height="20"/><rect x="54" y="87" width="3" height="20"/><rect x="59" y="87" width="3" height="20"/><rect x="64" y="87" width="3" height="20"/><rect x="69" y="87" width="3" height="20"/><rect x="77" y="87" width="3" height="20"/><rect x="82" y="87" width="3" height="20"/><rect x="87" y="87" width="3" height="20"/><rect x="92" y="87" width="3" height="20"/><rect x="97" y="87" width="3" height="20"/><rect x="102" y="87" width="3" height="20"/><rect x="107" y="87" width="3" height="20"/><rect x="112" y="87" width="3" height="20"/><rect x="117" y="87" width="3" height="20"/><rect x="122" y="87" width="3" height="20"/><rect x="127" y="87" width="3" height="20"/><rect x="132" y="87" width="3" height="20"/><rect x="140" y="87" width="3" height="20"/><rect x="145" y="87" width="3" height="20"/><rect x="150" y="87" width="3" height="20"/><rect x="155" y="87" width="3" height="20"/><rect x="160" y="87" width="3" height="20"/><rect x="165" y="87" width="3" height="20"/><rect x="170" y="87" width="3" height="20"/><rect x="175" y="87" width="3" height="20"/><rect x="180" y="87" width="3" height="20"/><rect x="185" y="87" width="3" height="20"/><rect x="190" y="87" width="3" height="20"/><rect x="195" y="87" width="3" height="20"/><rect x="200" y="87" width="3" height="20"/><rect x="205" y="87" width="3" height="20"/><rect x="210" y="87" width="3" height="20"/><rect x="215" y="87" width="3" height="20"/><rect x="220" y="87" width="3" height="20"/><rect x="225" y="87" width="3" height="20"/><rect x="230" y="87" width="3" height="20"/><rect x="235" y="87" width="3" height="20"/></g><g fill="#1a2a1a" stroke="#00ff88" stroke-width="1"><rect x="10" y="8" width="28" height="22" rx="2"/><rect x="44" y="8" width="28" height="22" rx="2"/><rect x="78" y="8" width="28" height="22" rx="2"/><rect x="112" y="8" width="28" height="22" rx="2"/><rect x="146" y="8" width="28" height="22" rx="2"/><rect x="180" y="8" width="28" height="22" rx="2"/><rect x="10" y="38" width="28" height="22" rx="2"/><rect x="44" y="38" width="28" height="22" rx="2"/><rect x="78" y="38" width="28" height="22" rx="2"/><rect x="112" y="38" width="28" height="22" rx="2"/><rect x="146" y="38" width="28" height="22" rx="2"/><rect x="180" y="38" width="28" height="22" rx="2"/></g><text x="24" y="22" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace" opacity=".8">DRAM</text><text x="120" y="22" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace" opacity=".8">DRAM</text><text x="120" y="75" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace" font-weight="bold">DDR5-6000 · 32GB</text><text x="120" y="85" text-anchor="middle" fill="#666" font-size="7" font-family="monospace">CORSAIR VENGEANCE</text></svg>`
+  },
+
+  motherboard:{
+    id:'motherboard',name:'Placa-Mãe',short:'Motherboard',
+    color:'#ffd700',tag:'Placa Principal',
+    desc:'Placa central que liga todos os componentes',
+    about:'A placa-mãe é a espinha dorsal do computador. Liga e permite a comunicação entre todos os componentes: CPU, RAM, GPU, armazenamento e periféricos. Contém o chipset, que gere as conexões, e determina que processadores e memórias são suportados.',
+    specs:{
+      'Fator de Forma':'ATX (30,5×24,4 cm) / mATX / ITX',
+      'Sockets CPU':'LGA 1851 (Intel) / AM5 (AMD)',
+      'Slots RAM':'2 a 8 slots DIMM (DDR4/DDR5)',
+      'Slots PCIe':'1–3× PCIe x16 + PCIe x1',
+      'Slots M.2':'2 a 5× M.2 (NVMe / SATA)',
+      'Portas SATA':'4 a 6× SATA III (6 Gbps)',
+      'USB Traseiros':'USB 2.0, 3.2 Gen 1/2, USB4/TB4',
+      'Rede':'1G / 2,5G LAN (10G em modelos de topo)',
+      'Áudio':'Codec Realtek ALC1220 ou superior',
+      'Chipset Intel':'Z790 / B760 / H770',
+      'Chipset AMD':'X670E / B650 / A620',
+      'BIOS':'UEFI com suporte Secure Boot'
+    },
+    specNote:'O chipset determina as funcionalidades disponíveis: overclocking (mais completo nos chipsets Z e X), número de linhas PCIe e conectividade USB/SATA. Os chipsets da série B são muito populares pela relação preço/funcionalidade.',
+    xray:[
+      {c:'#1a2a1a',n:'PCB Multicamadas',d:'4 a 12 camadas de fibra de vidro e cobre, com planos de alimentação'},
+      {c:'#ffd700',n:'Socket CPU',d:'Conector onde o processador é instalado — LGA (contactos na placa, usado pela Intel e pela AMD no AM5) ou PGA (pinos no chip, como no AM4)'},
+      {c:'#00ff88',n:'Slots DIMM (RAM)',d:'Conectores para módulos de memória — suportam Dual/Quad Channel'},
+      {c:'#4a9eff',n:'Chipset (PCH)',d:'Chip que gere PCIe, SATA, USB e outras ligações de I/O'},
+      {c:'#ff6b35',n:'VRM (Voltage Regulator)',d:'Circuito de conversão de tensão para alimentar a CPU com precisão'},
+      {c:'#8b5cf6',n:'BIOS/UEFI Flash',d:'Chip que contém o firmware de arranque do sistema'},
+      {c:'#00e5ff',n:'Slots PCIe',d:'Slots de alta velocidade para a placa gráfica e placas de expansão'}
+    ],
+    size:{w:'305 mm',h:'244 mm',d:'~1,6 mm',wt:'~0,8 – 1 kg'},
+    sizeNote:'Uma placa-mãe ATX padrão mede exatamente 305×244 mm. O fator de forma Micro-ATX é menor (244×244 mm) e o Mini-ITX ainda mais compacto (170×170 mm).',
+    history:[
+      {y:'1981',n:'IBM PC (5150)',i:'Barramento de expansão de 8 bits, sem chipset, com muitos chips discretos na placa'},
+      {y:'1993',n:'Chipsets Intel para o Pentium',i:'Chipsets que ligam o processador à memória e ao barramento PCI'},
+      {y:'1997',n:'Slot AGP',i:'Ligação dedicada para a placa gráfica'},
+      {y:'2004',n:'PCIe / LGA 775',i:'O PCIe começa a substituir o AGP e a Intel lança o socket LGA 775'},
+      {y:'2011',n:'Z68 / Sandy Bridge',i:'GPU integrada no processador; a UEFI começa a substituir a BIOS tradicional'},
+      {y:'2017',n:'Ryzen na plataforma AM4',i:'Uma só plataforma para várias gerações de processadores Ryzen'},
+      {y:'2022',n:'AMD AM5 (Ryzen 7000)',i:'Socket LGA da AMD, só com DDR5 e com PCIe 5.0'}
+    ],
+    svg:`<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg"><rect width="240" height="200" rx="4" fill="#0a160a"/><rect x="2" y="2" width="236" height="196" rx="3" fill="none" stroke="#1a3a1a" stroke-width="1" stroke-dasharray="4,3"/><rect x="60" y="15" width="80" height="80" rx="3" fill="#0d200d" stroke="#ffd700" stroke-width="2"/><rect x="70" y="25" width="60" height="60" rx="2" fill="#0a0a1a" stroke="#888" stroke-width="1"/><text x="100" y="57" text-anchor="middle" fill="#ffd700" font-size="8" font-family="monospace" font-weight="bold">CPU SOCKET</text><text x="100" y="68" text-anchor="middle" fill="#888" font-size="6" font-family="monospace">LGA 1851</text><rect x="155" y="15" width="16" height="60" rx="2" fill="#0d200d" stroke="#00ff88" stroke-width="1.5"/><rect x="175" y="15" width="16" height="60" rx="2" fill="#0d200d" stroke="#1a3a1a" stroke-width="1.5"/><rect x="195" y="15" width="16" height="60" rx="2" fill="#0d200d" stroke="#1a3a1a" stroke-width="1.5"/><rect x="215" y="15" width="16" height="60" rx="2" fill="#0d200d" stroke="#1a3a1a" stroke-width="1.5"/><text x="163" y="82" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">DDR5</text><rect x="10" y="110" width="200" height="12" rx="2" fill="#0d200d" stroke="#4a9eff" stroke-width="1.5"/><rect x="10" y="128" width="200" height="8" rx="2" fill="#0d200d" stroke="#333" stroke-width="1"/><rect x="10" y="142" width="200" height="8" rx="2" fill="#0d200d" stroke="#333" stroke-width="1"/><text x="15" y="120" fill="#4a9eff" font-size="7" font-family="monospace">PCIe x16 (GPU)</text><rect x="10" y="158" width="30" height="20" rx="2" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1"/><rect x="45" y="158" width="30" height="20" rx="2" fill="#1a1a2a" stroke="#333" stroke-width="1"/><rect x="80" y="158" width="30" height="20" rx="2" fill="#1a1a2a" stroke="#333" stroke-width="1"/><text x="10" y="152" fill="#8b5cf6" font-size="6" font-family="monospace">M.2 NVMe</text><rect x="150" y="100" width="36" height="30" rx="3" fill="#1a2a1a" stroke="#ffd700" stroke-width="1.5"/><text x="168" y="118" text-anchor="middle" fill="#ffd700" font-size="7" font-family="monospace">PCH</text><rect x="10" y="15" width="44" height="80" rx="3" fill="#0d180d" stroke="#ff6b35" stroke-width="1.5"/><text x="32" y="58" text-anchor="middle" fill="#ff6b35" font-size="7" font-family="monospace">VRM</text><text x="32" y="68" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">PWM</text><g fill="#333"><rect x="10" y="182" width="6" height="12"/><rect x="20" y="182" width="6" height="12"/><rect x="30" y="182" width="6" height="12"/><rect x="40" y="182" width="6" height="12"/><rect x="52" y="182" width="6" height="12"/><rect x="62" y="182" width="6" height="12"/></g><text x="88" y="192" fill="#444" font-size="6" font-family="monospace">SATA III × 6</text></svg>`
+  },
+
+  gpu:{
+    id:'gpu',name:'Placa Gráfica (GPU)',short:'GPU',
+    color:'#ff6b35',tag:'Gráficos',
+    desc:'Processa imagens, vídeo e cálculos paralelos',
+    about:'A GPU (Graphics Processing Unit) é especializada em processamento paralelo massivo. Originalmente criada para renderizar gráficos, hoje é também usada para IA, machine learning e computação científica. Contém milhares de pequenos núcleos de computação (CUDA/Stream Processors) e VRAM dedicada.',
+    specs:{
+      'Fabricante Chip':'NVIDIA / AMD / Intel',
+      'Arquitetura':'Blackwell / Ada Lovelace / RDNA 4 / RDNA 3',
+      'CUDA Cores (NVIDIA)':'4096 – 21 760 cores',
+      'VRAM':'8 GB – 32 GB (GDDR6 / GDDR6X / GDDR7)',
+      'Interface Memória':'128-bit – 512-bit',
+      'Largura Banda':'250 – 1800 GB/s',
+      'TDP':'115 W – 575 W',
+      'Interface Placa':'PCIe 4.0/5.0 x16',
+      'Saídas Vídeo':'Tipicamente 3× DisplayPort + 1× HDMI 2.1',
+      'Resolução Max':'Até 8K (modelos de topo)',
+      'API Suportadas':'DirectX 12 Ultimate, Vulkan',
+      'Ray Tracing':'RT Cores dedicados (NVIDIA)'
+    },
+    specNote:'VRAM (Video RAM) é a memória dedicada da GPU. Para 1080p, 8 GB pode bastar; para 1440p, 4K, texturas de alta resolução ou IA, convém ter 12–16 GB ou mais.',
+    xray:[
+      {c:'#ff6b35',n:'GPU Die (Chip Gráfico)',d:'Chip principal com milhares de shader processors em paralelo'},
+      {c:'#4a9eff',n:'VRAM (GDDR)',d:'Memória de vídeo extremamente rápida — mais de 1 TB/s de largura de banda nos modelos de topo'},
+      {c:'#00ff88',n:'Ventoinhas (Fans)',d:'Arrefecimento ativo — 2 ou 3 ventoinhas na maioria das GPUs'},
+      {c:'#8b5cf6',n:'Dissipador de Calor',d:'Heatpipes de cobre + alumínio que transportam e dissipam calor'},
+      {c:'#ffd700',n:'VRM (Alimentação GPU)',d:'Converte a tensão dos conectores de alimentação para o chip'},
+      {c:'#1a1a2a',n:'PCB da GPU',d:'Placa base com todas as ligações entre GPU, VRAM e PCIe'},
+      {c:'#c8a840',n:'Backplate',d:'Placa traseira metálica que protege e adiciona rigidez'}
+    ],
+    size:{w:'~310 mm',h:'~130 mm',d:'~50 mm',wt:'~1 – 2,5 kg'},
+    sizeNote:'As GPUs modernas de topo são enormes — algumas ultrapassam 360 mm de comprimento (GPU de triplo slot). Verifica sempre as dimensões antes de comprar.',
+    history:[
+      {y:'1981',n:'MDA (Monochrome Display Adapter)',i:'Apenas texto, sem gráficos — o adaptador do IBM PC original'},
+      {y:'1995',n:'NVIDIA NV1',i:'Primeiro chip gráfico da NVIDIA (2D, 3D e áudio numa só placa)'},
+      {y:'1999',n:'NVIDIA GeForce 256',i:'Primeira placa vendida como "GPU": transformação e iluminação (T&L) feitas em hardware'},
+      {y:'2006',n:'NVIDIA GeForce 8800 GTX',i:'Primeira GPU de PC com shaders unificados e suporte a CUDA'},
+      {y:'2016',n:'NVIDIA GTX 1080 (Pascal)',i:'FinFET de 16 nm e memória GDDR5X'},
+      {y:'2018',n:'NVIDIA RTX 2080 (Turing)',i:'Primeiras placas de consumo com RT Cores (ray tracing em hardware) e Tensor Cores'},
+      {y:'2020',n:'NVIDIA RTX 3090 (Ampere)',i:'24 GB de GDDR6X, RT Cores e Tensor Cores de nova geração, DLSS 2'},
+      {y:'2022',n:'NVIDIA RTX 4090 (Ada)',i:'76 mil milhões de transístores, TSMC 4N, DLSS 3'},
+      {y:'2025',n:'NVIDIA RTX 5090 (Blackwell)',i:'92 mil milhões de transístores, 32 GB de GDDR7, DLSS 4'}
+    ],
+    svg:`<svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gpuBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0a0a"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="280" height="150" rx="4" fill="url(#gpuBack)"/><rect x="4" y="4" width="272" height="100" rx="3" fill="#120808" stroke="#ff6b35" stroke-width="1.5"/><circle cx="70" cy="54" r="38" fill="#0a0a0a" stroke="#ff6b35" stroke-width="2"/><circle cx="70" cy="54" r="30" fill="#111" stroke="#555" stroke-width="1"/><circle cx="70" cy="54" r="5" fill="#333"/><g stroke="#ff6b35" stroke-width="1" fill="none" opacity=".6"><line x1="70" y1="24" x2="70" y2="34"/><line x1="70" y1="74" x2="70" y2="84"/><line x1="40" y1="54" x2="50" y2="54"/><line x1="90" y1="54" x2="100" y2="54"/><line x1="49" y1="33" x2="56" y2="40"/><line x1="84" y1="68" x2="91" y2="75"/><line x1="91" y1="33" x2="84" y2="40"/><line x1="56" y1="68" x2="49" y2="75"/></g><circle cx="180" cy="54" r="38" fill="#0a0a0a" stroke="#ff6b35" stroke-width="2"/><circle cx="180" cy="54" r="30" fill="#111" stroke="#555" stroke-width="1"/><circle cx="180" cy="54" r="5" fill="#333"/><g stroke="#ff6b35" stroke-width="1" fill="none" opacity=".6" transform="translate(110,0)"><line x1="70" y1="24" x2="70" y2="34"/><line x1="70" y1="74" x2="70" y2="84"/><line x1="40" y1="54" x2="50" y2="54"/><line x1="90" y1="54" x2="100" y2="54"/><line x1="49" y1="33" x2="56" y2="40"/><line x1="84" y1="68" x2="91" y2="75"/><line x1="91" y1="33" x2="84" y2="40"/><line x1="56" y1="68" x2="49" y2="75"/></g><rect x="240" y="10" width="34" height="88" rx="2" fill="#0d0808" stroke="#444" stroke-width="1"/><rect x="244" y="15" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="30" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="45" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="60" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><text x="257" y="22" text-anchor="middle" fill="#666" font-size="5" font-family="monospace">DP</text><text x="257" y="92" text-anchor="middle" fill="#666" font-size="5" font-family="monospace">HDMI</text><rect x="4" y="108" width="272" height="16" rx="2" fill="#1a0808" stroke="#ff6b35" stroke-width="1"/><g fill="#ff6b35" opacity=".6"><rect x="10" y="110" width="3" height="12"/><rect x="15" y="110" width="3" height="12"/><rect x="20" y="110" width="3" height="12"/><rect x="25" y="110" width="3" height="12"/><rect x="30" y="110" width="3" height="12"/><rect x="36" y="110" width="3" height="12"/><rect x="41" y="110" width="3" height="12"/><rect x="46" y="110" width="3" height="12"/></g><text x="140" y="120" text-anchor="middle" fill="#ff6b35" font-size="7" font-family="monospace">PCIe x16</text><text x="125" y="140" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="monospace" font-weight="bold">RTX 4090 · 24 GB GDDR6X</text></svg>`
+  },
+
+  psu:{
+    id:'psu',name:'Fonte de Alimentação',short:'PSU',
+    color:'#ffd700',tag:'Energia',
+    desc:'Converte corrente da tomada para os componentes',
+    about:'A PSU (Power Supply Unit) converte a corrente alternada (AC) da tomada doméstica em corrente contínua (DC), nas tensões corretas para os componentes do computador: +12 V (CPU/GPU), +5 V e +3,3 V (placas e periféricos). A eficiência energética é certificada pelo programa 80 PLUS.',
+    specs:{
+      'Potência Típica':'550 W – 1600 W',
+      'Tensão Entrada':'100–240 V AC, 50/60 Hz',
+      'Tensão Saída +12V':'12 V (principal)',
+      'Tensão Saída +5V':'5 V',
+      'Tensão Saída +3,3V':'3,3 V',
+      'Certificação':'80 PLUS (White / Bronze / Silver / Gold / Platinum / Titanium)',
+      'Eficiência':'80% – 94% (a 50% de carga)',
+      'Conector CPU':'4+4 pin EPS12V',
+      'Conector GPU':'6+2 pin PCIe / 12VHPWR (16-pin)',
+      'Conector SATA':'SATA Power',
+      'Fator de Forma':'ATX / SFX',
+      'Modulabilidade':'Não-modular / Semi / Full Modular'
+    },
+    specNote:'Uma fonte 80 PLUS Gold tem uma eficiência mínima de 90% quando trabalha a 50% da carga (rede de 115 V). Mais eficiência = menos calor gerado e menor fatura de eletricidade.',
+    xray:[
+      {c:'#ffd700',n:'Transformador Principal',d:'Reduz a tensão e isola eletricamente a entrada (rede elétrica) da saída (componentes) — um dos maiores componentes internos'},
+      {c:'#ff6b35',n:'Condensadores de Filtragem',d:'Filtram ruído e armazenam energia — qualidade define fiabilidade'},
+      {c:'#4a9eff',n:'MOSFET de Comutação',d:'Transístores que comutam muito rapidamente para regular a tensão'},
+      {c:'#00ff88',n:'Ventilador Interno',d:'Arrefece componentes internos — muitas PSUs de qualidade têm modo semi-passivo'},
+      {c:'#8b5cf6',n:'PFC (Power Factor Correction)',d:'Circuito que melhora o fator de potência (o aproveitamento da energia da rede) e reduz as harmónicas'},
+      {c:'#c8a840',n:'PCB e Feixes de Cabos',d:'Cabos modulares ou fixos para todos os conectores do sistema'}
+    ],
+    size:{w:'150 mm',h:'86 mm',d:'140–180 mm',wt:'~1 – 2 kg'},
+    sizeNote:'As PSUs ATX têm dimensões padronizadas de 150×86 mm na secção. O comprimento varia (140–180 mm). PSUs SFX são mais compactas para caixas mini-ITX.',
+    history:[
+      {y:'1981',n:'Fonte do IBM PC',i:'63,5 W, formato próprio da IBM'},
+      {y:'1995',n:'Padrão ATX',i:'Introduzido pela Intel — o padrão ainda hoje em uso'},
+      {y:'2003',n:'Conector SATA de alimentação',i:'Substitui os antigos conectores Molex de 4 pinos nos discos'},
+      {y:'2004',n:'Conector PCIe de alimentação (6 pinos)',i:'Conector dedicado para placas gráficas exigentes'},
+      {y:'2008',n:'80 PLUS Bronze / Silver / Gold',i:'As certificações de eficiência tornam-se uma referência na indústria'},
+      {y:'2012',n:'80 PLUS Titanium',i:'Eficiência mínima de 94% a 50% de carga'},
+      {y:'2022',n:'ATX 3.0 + conector de 16 pinos',i:'Conector de até 600 W para placas gráficas, usado pela RTX 4090 (450 W)'}
+    ],
+    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="psuGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1600"/><stop offset="100%" stop-color="#0a0d00"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#psuGrad)"/><rect x="10" y="10" width="200" height="160" rx="4" fill="#111100" stroke="#ffd700" stroke-width="1.5"/><rect x="160" y="20" width="42" height="140" rx="3" fill="#0a0a00" stroke="#333" stroke-width="1"/><g fill="none" stroke="#444" stroke-width=".8"><line x1="164" y1="30" x2="198" y2="30"/><line x1="164" y1="38" x2="198" y2="38"/><line x1="164" y1="46" x2="198" y2="46"/><line x1="164" y1="54" x2="198" y2="54"/><line x1="164" y1="62" x2="198" y2="62"/><line x1="164" y1="70" x2="198" y2="70"/><line x1="164" y1="78" x2="198" y2="78"/><line x1="164" y1="86" x2="198" y2="86"/><line x1="164" y1="94" x2="198" y2="94"/><line x1="164" y1="102" x2="198" y2="102"/><line x1="164" y1="110" x2="198" y2="110"/><line x1="164" y1="118" x2="198" y2="118"/><line x1="164" y1="126" x2="198" y2="126"/><line x1="164" y1="134" x2="198" y2="134"/><line x1="164" y1="142" x2="198" y2="142"/><line x1="164" y1="150" x2="198" y2="150"/></g><text x="181" y="167" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">FAN</text><circle cx="90" cy="90" r="50" fill="#0d0d00" stroke="#ffd700" stroke-width="1.5"/><circle cx="90" cy="90" r="40" fill="#0a0a00" stroke="#444" stroke-width="1"/><circle cx="90" cy="90" r="8" fill="#1a1a00" stroke="#ffd700" stroke-width="1.5"/><g stroke="#ffd700" stroke-width="1.5" fill="none" opacity=".5"><line x1="90" y1="50" x2="90" y2="60"/><line x1="90" y1="120" x2="90" y2="130"/><line x1="50" y1="90" x2="60" y2="90"/><line x1="120" y1="90" x2="130" y2="90"/><line x1="62" y1="62" x2="69" y2="69"/><line x1="111" y1="111" x2="118" y2="118"/><line x1="118" y1="62" x2="111" y2="69"/><line x1="69" y1="111" x2="62" y2="118"/></g><rect x="20" y="20" width="24" height="16" rx="2" fill="#1a1600" stroke="#ffd700" stroke-width="1"/><text x="32" y="31" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">ON</text><rect x="20" y="42" width="60" height="16" rx="2" fill="#0d0d00" stroke="#444" stroke-width="1"/><text x="50" y="53" text-anchor="middle" fill="#888" font-size="6" font-family="monospace">100-240V~</text><text x="90" y="162" text-anchor="middle" fill="#ffd700" font-size="9" font-family="monospace" font-weight="bold">850W · 80+ GOLD</text></svg>`
+  },
+
+  hdd:{
+    id:'hdd',name:'Disco Rígido (HDD)',short:'HDD',
+    color:'#8b5cf6',tag:'Armazenamento',
+    desc:'Armazenamento magnético com pratos rotativos',
+    about:'O HDD (Hard Disk Drive) usa pratos metálicos rotativos revestidos de material magnético para armazenar dados. A cabeça de leitura/escrita flutua nanómetros acima do prato em rotação. Oferece grande capacidade a baixo custo mas é muito mais lento que um SSD e mais frágil a impactos.',
+    specs:{
+      'Capacidade':'500 GB – 30 TB ou mais',
+      'Velocidade Rotação':'5400 RPM / 7200 RPM',
+      'Interface':'SATA III (6 Gbps)',
+      'Velocidade Leitura':'100 – 280 MB/s (sequencial)',
+      'Velocidade Escrita':'100 – 280 MB/s',
+      'Latência':'~10 ms (vs. <0,1 ms no SSD)',
+      'Cache (Buffer)':'32 MB – 512 MB',
+      'Fator de Forma':'3.5" (desktop) / 2.5" (laptop)',
+      'MTBF':'1 – 2 milhões de horas',
+      'Consumo':'2 – 10 W (ativo)',
+      'Tecnologia':'CMR ou SMR',
+      'Ruído':'~25 – 35 dB (em operação)'
+    },
+    specNote:'Os HDDs SMR (Shingled Magnetic Recording) têm maior capacidade, mas são mais lentos em escritas prolongadas e aleatórias. Os CMR (Conventional Magnetic Recording) são mais fiáveis em NAS e em uso intensivo.',
+    xray:[
+      {c:'#c8a840',n:'Pratos Magnéticos (Platters)',d:'Discos metálicos revestidos com material magnético — giram a 5400–7200 RPM'},
+      {c:'#4a9eff',n:'Cabeça de Leitura/Escrita',d:'Flutua nanómetros acima do prato — usa campo magnético para ler/escrever'},
+      {c:'#ff6b35',n:'Motor do eixo (spindle)',d:'Motor que gira os pratos com precisão constante'},
+      {c:'#00ff88',n:'Atuador (Actuator Arm)',d:'Braço que posiciona a cabeça rapidamente sobre a pista correta'},
+      {c:'#8b5cf6',n:'PCB de Controlo',d:'Placa eletrónica na base que controla o motor e a cabeça'},
+      {c:'#1a1a2a',n:'Caixa Selada',d:'Invólucro metálico fechado, com ar filtrado (nalguns modelos, hélio) — as partículas de pó danificariam o disco'}
+    ],
+    size:{w:'101,6 mm',h:'147 mm',d:'26,1 mm',wt:'~650 g'},
+    sizeNote:'Um HDD de 3.5" (desktop) tem dimensões padronizadas de 101,6×147×26,1 mm. Os de 2.5" (portáteis) medem 69,9×100,45×9,5 mm.',
+    history:[
+      {y:'1956',n:'IBM 350 (RAMAC)',i:'Primeiro HDD: cerca de 5 MB em 50 pratos de 24", do tamanho de um frigorífico'},
+      {y:'1980',n:'Seagate ST-506',i:'Primeiro HDD de 5,25" para microcomputadores: 5 MB'},
+      {y:'1983',n:'Rodime RO352',i:'Primeiro HDD de 3,5": 10 MB'},
+      {y:'2003',n:'SATA (Serial ATA)',i:'Interface em série que substitui o PATA (IDE); chegam os primeiros discos SATA'},
+      {y:'2011',n:'HDDs de 4 TB',i:'Capacidades de vários terabytes tornam-se comuns nos discos de desktop'},
+      {y:'2019',n:'Seagate Exos 2X14 (Mach.2)',i:'14 TB com dois atuadores independentes para maior desempenho'},
+      {y:'2024',n:'Tecnologia HAMR (Seagate)',i:'Gravação magnética assistida por calor: um laser aquece o prato e permite discos de 30 TB ou mais'}
+    ],
+    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hddGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0820"/><stop offset="100%" stop-color="#05050f"/></linearGradient><linearGradient id="platGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#333"/><stop offset="50%" stop-color="#888"/><stop offset="100%" stop-color="#444"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#hddGrad)"/><rect x="8" y="8" width="204" height="164" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="60" fill="url(#platGrad)" stroke="#555" stroke-width="2"/><circle cx="110" cy="85" r="48" fill="url(#platGrad)" stroke="#444" stroke-width="1" opacity=".6"/><circle cx="110" cy="85" r="36" fill="url(#platGrad)" stroke="#333" stroke-width="1" opacity=".5"/><circle cx="110" cy="85" r="18" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="6" fill="#333"/><circle cx="110" cy="85" r="2" fill="#8b5cf6"/><line x1="110" y1="25" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="50" y1="85" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="68" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="152" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><rect x="14" y="20" width="50" height="14" rx="2" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1"/><line x1="39" y1="34" x2="80" y2="75" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="82" cy="77" r="3" fill="#8b5cf6"/><text x="38" y="30" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">READ HEAD</text><rect x="155" y="150" width="50" height="12" rx="2" fill="#0d0b1e" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840"><rect x="158" y="153" width="3" height="6"/><rect x="163" y="153" width="3" height="6"/><rect x="168" y="153" width="3" height="6"/><rect x="173" y="153" width="3" height="6"/><rect x="178" y="153" width="3" height="6"/></g><text x="110" y="168" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">4 TB · 7200 RPM · SATA</text></svg>`
+  },
+
+  ssd:{
+    id:'ssd',name:'Disco SSD',short:'SSD',
+    color:'#00e5ff',tag:'Armazenamento',
+    desc:'Armazenamento de estado sólido — rápido e silencioso',
+    about:'O SSD (Solid State Drive) usa memória flash NAND para armazenar dados sem partes móveis. É dramaticamente mais rápido, silencioso, mais resistente a impactos e mais leve que um HDD. Existe em formato 2.5" SATA ou M.2 NVMe (muito mais rápido).',
+    specs:{
+      'Tipo':'NVMe PCIe 4.0/5.0 ou SATA III',
+      'Fator de Forma':'M.2 2280 / 2.5" SATA',
+      'Leitura Seq. (NVMe)':'4 000 – 14 500 MB/s',
+      'Escrita Seq. (NVMe)':'3 500 – 12 700 MB/s',
+      'Leitura Seq. (SATA)':'~550 MB/s',
+      'Escrita Seq. (SATA)':'~520 MB/s',
+      'Latência':'< 0,1 ms',
+      'Capacidade':'250 GB – 8 TB',
+      'Tipo NAND':'TLC / QLC / MLC',
+      'Controlador':'Phison / Samsung / Marvell',
+      'DRAM Cache':'Sim (gama alta) / Não (alguns modelos)',
+      'Resistência':'Tipicamente 150 – 700 TBW (modelos de 1 TB)'
+    },
+    specNote:'TBW (Terabytes Written) indica a durabilidade total do SSD. Um SSD de 1 TB com 600 TBW aguenta escrever 600 TB de dados ao longo da vida útil — muito mais que o uso doméstico normal.',
+    xray:[
+      {c:'#00e5ff',n:'Controlador NVMe',d:'Chip que gere todas as operações de leitura/escrita na memória NAND'},
+      {c:'#4a9eff',n:'Chips NAND Flash',d:'Memória de estado sólido onde os dados são guardados como cargas elétricas'},
+      {c:'#00ff88',n:'Cache DRAM',d:'Pequena quantidade de RAM volátil que serve como buffer de alta velocidade'},
+      {c:'#8b5cf6',n:'Conector M.2 (PCIe/NVMe)',d:'Conector compacto (M.2, chave M) para ligação à placa-mãe através de PCIe'},
+      {c:'#1a1a2a',n:'PCB do SSD',d:'Placa fina onde todos os componentes estão montados'},
+      {c:'#ff6b35',n:'Dissipador Térmico',d:'Em SSDs de alto desempenho — evita throttling por temperatura'}
+    ],
+    size:{w:'22 mm',h:'80 mm',d:'~2,5 – 4 mm',wt:'~7 g'},
+    sizeNote:'Um SSD M.2 2280 mede apenas 22×80 mm e pesa cerca de 7 g — mais de 90 vezes menos do que um HDD de 3,5" (~650 g)! "2280" significa 22 mm de largura e 80 mm de comprimento.',
+    history:[
+      {y:'1991',n:'SSD flash da SanDisk',i:'20 MB, custava cerca de 1000 USD — um dos primeiros SSD de memória flash'},
+      {y:'2008',n:'Intel X25-M',i:'Um dos primeiros SSD SATA populares entre os consumidores'},
+      {y:'2011',n:'NVMe 1.0',i:'Protocolo desenhado para memória flash sobre PCIe, com muito menos latência do que o AHCI'},
+      {y:'2015',n:'Samsung 950 Pro (M.2 NVMe)',i:'Cerca de 2,5 GB/s de leitura — SSD M.2 NVMe de topo'},
+      {y:'2020',n:'PCIe 4.0 NVMe',i:'Cerca de 7 GB/s sequenciais — Samsung 980 Pro, WD Black SN850'},
+      {y:'2023',n:'PCIe 5.0 NVMe',i:'Cerca de 12 GB/s em 2023 (Crucial T700) e até 14,5 GB/s em 2024 (Crucial T705)'}
+    ],
+    svg:`<svg viewBox="0 0 240 110" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ssdPCB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0f1a"/><stop offset="100%" stop-color="#050a12"/></linearGradient></defs><rect width="240" height="110" rx="4" fill="url(#ssdPCB)"/><rect x="4" y="15" width="232" height="80" rx="3" fill="#080d18" stroke="#00e5ff" stroke-width="1.5"/><rect x="15" y="25" width="50" height="60" rx="3" fill="#0d1525" stroke="#00e5ff" stroke-width="1.5"/><text x="40" y="52" text-anchor="middle" fill="#00e5ff" font-size="7" font-family="monospace" font-weight="bold">NVMe</text><text x="40" y="62" text-anchor="middle" fill="#00e5ff" font-size="6" font-family="monospace">CTRL</text><text x="40" y="72" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">PS5021</text><rect x="80" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="120" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="160" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="200" y="25" width="24" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><text x="97" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><text x="97" y="46" text-anchor="middle" fill="#333" font-size="5" font-family="monospace">TLC</text><text x="137" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><text x="177" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><rect x="80" y="63" width="20" height="20" rx="2" fill="#0d1525" stroke="#00ff88" stroke-width="1.5"/><text x="90" y="75" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">DRAM</text><rect x="2" y="80" width="18" height="25" rx="1" fill="#0a0f1a" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840" opacity=".8"><rect x="5" y="83" width="2" height="18"/><rect x="9" y="83" width="2" height="18"/><rect x="13" y="83" width="2" height="18"/></g><text x="120" y="99" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="monospace" font-weight="bold">1 TB NVMe PCIe 4.0 · 7400 MB/s</text></svg>`
+  },
+
+  cooler:{
+    id:'cooler',name:'Cooler de CPU',short:'Cooler',
+    color:'#4a9eff',tag:'Arrefecimento',
+    desc:'Dissipa o calor gerado pelo processador',
+    about:'O cooler de CPU remove o calor produzido pelo processador para evitar o thermal throttling (redução automática de desempenho por sobreaquecimento). Existem dois tipos principais: arrefecimento a ar (heatsink + ventoinhas) e arrefecimento líquido (AIO ou custom loop).',
+    specs:{
+      'Tipo':'Air Cooler / AIO Liquid',
+      'TDP Suportado (Air)':'Depende do modelo (os de topo: ~250 W)',
+      'TDP Suportado (AIO)':'Depende do modelo (os de topo: 300 W ou mais)',
+      'Heatpipes (Air)':'4 a 8 tubos de cobre',
+      'Ventoinhas':'1–3 × 120 mm ou 140 mm',
+      'RPM Ventoinha':'300 – 2200 RPM',
+      'Ruído':'15 – 35 dB(A)',
+      'Radiador (AIO)':'120 mm / 240 mm / 360 mm',
+      'Base':'Cobre direto / Soldado',
+      'Pasta Térmica':'Incluída ou pré-aplicada',
+      'Socket Compatível':'LGA 1700, AM5 (c/ brackets)',
+      'Altura (Air Tower)':'135 – 170 mm'
+    },
+    specNote:'A pasta térmica preenche as micro-imperfeições entre a base do cooler e o IHS do processador, melhorando a transferência de calor. Só é preciso voltar a aplicá-la ao trocar de cooler ou se as temperaturas subirem (normalmente passados vários anos).',
+    xray:[
+      {c:'#4a9eff',n:'Base de Cobre',d:'Em contacto direto com o IHS da CPU — cobre excelente condutor térmico'},
+      {c:'#c8a840',n:'Heatpipes de Cobre',d:'Tubos de cobre selados com um pouco de líquido (normalmente água) que evapora e condensa, transportando calor'},
+      {c:'#888',n:'Aletas de Alumínio',d:'Torre de aletas finas que dissipa o calor para o ar circundante'},
+      {c:'#00e5ff',n:'Ventoinha (Fan)',d:'Força ar através das aletas — velocidade controlada por PWM ou DC'},
+      {c:'#ff6b35',n:'Pasta Térmica',d:'Composto que preenche as micro-imperfeições entre o processador e o cooler — elimina microbolhas de ar'},
+      {c:'#8b5cf6',n:'Sistema de Montagem',d:'Backplate e parafusos para fixar o cooler ao socket da placa-mãe'}
+    ],
+    size:{w:'~140 mm',h:'~160 mm',d:'~120 mm',wt:'~1 kg'},
+    sizeNote:'Coolers de torre dupla, como o Noctua NH-D15, medem 150 mm de largura, 165 mm de altura e 161 mm de profundidade. Verifica sempre se cabe na tua caixa e se não interfere com os slots de RAM.',
+    history:[
+      {y:'Anos 90',n:'Cooler de origem (stock) Intel/AMD',i:'Simples: alumínio + ventoinha — suficiente para processadores de baixo TDP'},
+      {y:'Anos 2000',n:'Torres com heatpipes',i:'As heatpipes de cobre chegam aos coolers de desktop — grande salto na capacidade de dissipar calor'},
+      {y:'2006',n:'Thermalright Ultra-120',i:'Um dos coolers de torre que marcaram o início dos coolers de alto desempenho a ar'},
+      {y:'2009',n:'AIO Liquid Coolers',i:'Corsair H50 populariza a refrigeração líquida all-in-one'},
+      {y:'2014',n:'Noctua NH-D15',i:'Referência entre os coolers a ar de torre dupla'},
+      {y:'2021',n:'AIO de 360 mm',i:'Os radiadores de 360 mm tornam-se acessíveis para uso doméstico'},
+      {y:'2022',n:'Processadores de 250 W+',i:'CPUs de topo, como o Intel i9-13900K, chegam aos 253 W em turbo e pedem coolers potentes'}
+    ],
+    svg:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="220" rx="4" fill="#050a18"/><rect x="65" y="130" width="70" height="20" rx="2" fill="#1a2a1a" stroke="#4a9eff" stroke-width="1.5"/><text x="100" y="144" text-anchor="middle" fill="#4a9eff" font-size="7" font-family="monospace">BASE COBRE</text><g fill="none" stroke="#4a9eff" stroke-width="1.5"><line x1="75" y1="130" x2="60" y2="30"/><line x1="85" y1="130" x2="75" y2="30"/><line x1="100" y1="130" x2="100" y2="30"/><line x1="115" y1="130" x2="125" y2="30"/><line x1="125" y1="130" x2="140" y2="30"/></g><g fill="#0d1a2a" stroke="#4a9eff" stroke-width="1"><rect x="40" y="20" width="120" height="8" rx="1"/><rect x="40" y="32" width="120" height="8" rx="1"/><rect x="40" y="44" width="120" height="8" rx="1"/><rect x="40" y="56" width="120" height="8" rx="1"/><rect x="40" y="68" width="120" height="8" rx="1"/><rect x="40" y="80" width="120" height="8" rx="1"/><rect x="40" y="92" width="120" height="8" rx="1"/><rect x="40" y="104" width="120" height="8" rx="1"/><rect x="40" y="116" width="120" height="8" rx="1"/></g><rect x="10" y="10" width="120" height="130" rx="6" fill="none" stroke="#4a9eff" stroke-width="2" opacity=".5"/><circle cx="70" cy="75" r="4" fill="#4a9eff" opacity=".4"/><circle cx="70" cy="75" r="2" fill="#4a9eff"/><g fill="none" stroke="#4a9eff" stroke-width="1.2" opacity=".5"><line x1="70" y1="40" x2="70" y2="55"/><line x1="70" y1="95" x2="70" y2="110"/><line x1="35" y1="75" x2="50" y2="75"/><line x1="90" y1="75" x2="105" y2="75"/></g><text x="100" y="170" text-anchor="middle" fill="#4a9eff" font-size="9" font-family="monospace" font-weight="bold">AIR TOWER · 280W TDP</text><rect x="20" y="180" width="160" height="30" rx="4" fill="#0a1020" stroke="#4a9eff" stroke-width="1"/><text x="100" y="200" text-anchor="middle" fill="#666" font-size="8" font-family="monospace">140mm PWM · 19 dBA</text></svg>`
+  },
+
+  case_pc:{
+    id:'case_pc',name:'Caixa (Case)',short:'Case',
+    color:'#e2e2ff',tag:'Estrutura',
+    desc:'Aloja e protege todos os componentes internos',
+    about:'A case (caixa ou chassi) é a estrutura que aloja e protege todos os componentes do computador. Determina os fatores de forma suportados (ATX, mATX, ITX), o número de baías disponíveis e o fluxo de ar interno. Tem também impacto na estética e no ruído do sistema.',
+    specs:{
+      'Fator de Forma':'Full Tower / Mid Tower / Mini-ITX',
+      'Motherboards':'ATX / Micro-ATX / Mini-ITX',
+      'GPU Max Comprimento':'350 – 420 mm',
+      'Cooler Max Altura':'160 – 185 mm',
+      'Radiador Frontal':'240 mm / 360 mm',
+      'Baías 3.5" (HDD)':'2 a 6 baías',
+      'Baías 2.5" (SSD)':'2 a 4 baías',
+      'Porta USB Frontal':'USB 3.0 / USB-C',
+      'Filtros de Pó':'Frontal, inferior, superior',
+      'Material':'Aço / Alumínio / Vidro Temperado',
+      'Ventoinhas Incluídas':'2 a 5 ventoinhas ARGB',
+      'Cabos':'Gestão de cabos traseira'
+    },
+    specNote:'O fluxo de ar correto é essencial: ventoinhas frontais e inferiores como entrada (intake), traseiras e superiores como saída (exhaust). Pressão positiva leve reduz acumulação de pó.',
+    xray:[
+      {c:'#888',n:'Chassi de Aço',d:'Estrutura metálica principal — aço SGCC 0,8–1,0 mm'},
+      {c:'#4a9eff',n:'Painel de Vidro Temperado',d:'Vidro de 3–4 mm para mostrar o interior iluminado'},
+      {c:'#ff6b35',n:'Ventoinhas ARGB',d:'Ventoinhas com iluminação endereçável sincronizável com o sistema'},
+      {c:'#00ff88',n:'Filtros de Pó',d:'Malha magnética ou plástica que impede acumulação de pó nos componentes'},
+      {c:'#ffd700',n:'Painel I/O Frontal',d:'Botão de power, reset, USB 3.0, USB-C, jack áudio'},
+      {c:'#1a1a2a',n:'Gestão de Cabos',d:'Espaço traseiro para organizar cabos — temperatura e estética melhoram'}
+    ],
+    size:{w:'~210 mm',h:'~480 mm',d:'~440 mm',wt:'~7–12 kg'},
+    sizeNote:'Uma case Mid Tower típica mede ~210×480×440 mm. Full Towers podem ultrapassar 250×600 mm. Mini-ITX são drasticamente mais compactas mas limitam componentes.',
+    history:[
+      {y:'1981',n:'IBM PC (5150)',i:'Caixa desktop horizontal, com unidade de disquetes na frente'},
+      {y:'Anos 80–90',n:'Caixas em torre',i:'As caixas verticais ganham espaço — mais fáceis de expandir'},
+      {y:'1995',n:'Padrão ATX',i:'A Intel define o ATX: um formato padronizado, ainda hoje em uso'},
+      {y:'Anos 90',n:'Caixas bege',i:'As caixas bege genéricas dominam o mercado, sem preocupação estética'},
+      {y:'2010',n:'Caixas gaming',i:'Surge o mercado de caixas premium, com foco em estética e fluxo de ar'},
+      {y:'2015',n:'Vidro temperado',i:'As caixas com painel lateral de vidro tornam-se muito comuns'},
+      {y:'2020',n:'Caixas de alto fluxo de ar',i:'Frente em malha e iluminação ARGB, como a Fractal Design Torrent'}
+    ],
+    svg:`<svg viewBox="0 0 180 240" xmlns="http://www.w3.org/2000/svg"><rect width="180" height="240" rx="4" fill="#0a0a14"/><rect x="20" y="10" width="140" height="220" rx="5" fill="#111120" stroke="#e2e2ff" stroke-width="1.5"/><rect x="22" y="12" width="95" height="216" rx="4" fill="#0d0d1e" stroke="#1a1a3a" stroke-width=".5"/><rect x="120" y="12" width="38" height="216" rx="3" fill="#080818" stroke="#1a1a3a" stroke-width=".5"/><rect x="125" y="20" width="28" height="20" rx="2" fill="#0a0a20" stroke="#e2e2ff" stroke-width="1"/><text x="139" y="33" text-anchor="middle" fill="#e2e2ff" font-size="6" font-family="monospace">POWER</text><g fill="#333" stroke="#e2e2ff" stroke-width=".5"><rect x="124" y="50" width="8" height="5" rx="1"/><rect x="135" y="50" width="8" height="5" rx="1"/><rect x="124" y="60" width="8" height="5" rx="1"/></g><text x="139" y="75" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">USB 3.0</text><g fill="#444" stroke="#666" stroke-width=".5"><rect x="25" y="50" width="85" height="60" rx="3"/><circle cx="36" cy="80" r="18" fill="#333" stroke="#555"/><circle cx="36" cy="80" r="13" fill="#222"/><circle cx="36" cy="80" r="4" fill="#333"/><circle cx="72" cy="80" r="18" fill="#333" stroke="#555"/><circle cx="72" cy="80" r="13" fill="#222"/><circle cx="72" cy="80" r="4" fill="#333"/></g><text x="66" y="127" text-anchor="middle" fill="#666" font-size="6" font-family="monospace">FRONTAIS 140mm</text><rect x="25" y="135" width="85" height="20" rx="2" fill="#0d0d1e" stroke="#4a9eff" stroke-width="1"/><text x="67" y="148" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">GPU SLOT</text><rect x="25" y="162" width="85" height="55" rx="2" fill="#0a0a18" stroke="#333" stroke-width=".5"/><text x="67" y="193" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">MOTHERBOARD</text><text x="90" y="230" text-anchor="middle" fill="#e2e2ff" font-size="8" font-family="monospace" font-weight="bold">MID TOWER ATX</text></svg>`
+  },
+
+  nic:{
+    id:'nic',name:'Placa de Rede',short:'NIC',
+    color:'#00ff88',tag:'Conectividade',
+    desc:'Liga o computador a redes locais e à internet',
+    about:'A NIC (Network Interface Card) permite ao computador comunicar em redes locais (LAN) e aceder à internet. A maioria das placas-mãe inclui uma NIC integrada (onboard). Placas dedicadas oferecem maior velocidade (2,5G/10G) ou funcionalidades Wi-Fi 6E/7.',
+    specs:{
+      'Tipo':'Ethernet (LAN) / Wi-Fi',
+      'Velocidade (integrada)':'1 Gbps / 2,5 Gbps',
+      'Velocidade (dedicada)':'5 Gbps / 10 Gbps',
+      'Wi-Fi':'Wi-Fi 6E (802.11ax) / Wi-Fi 7 (802.11be)',
+      'Velocidade Wi-Fi 7':'até 5,8 Gbps (2×2) · máximo do padrão: 46 Gbps',
+      'Interface':'PCIe x1 (1G / 2,5G) · PCIe x4 (10G)',
+      'Conector':'RJ-45 (Ethernet) / Antenas (Wi-Fi)',
+      'Protocolos':'TCP/IP, IPv4/IPv6',
+      'Offloading':'Checksum, Large Send Offload',
+      'Wake-on-LAN':'Suportado',
+      'Bluetooth (Wi-Fi combo)':'BT 5.4',
+      'Chip Comum':'Intel I226-V / Realtek 8125'
+    },
+    specNote:'Os chips Ethernet mais comuns nas placas-mãe são da Intel e da Realtek. Para uso doméstico, ambos funcionam bem — o que mais conta é a velocidade do teu plano de internet e do router.',
+    xray:[
+      {c:'#00ff88',n:'Controlador Ethernet',d:'Chip principal que processa pacotes de rede e gere o protocolo MAC/PHY'},
+      {c:'#4a9eff',n:'Conector RJ-45',d:'Porta padrão de 8 pinos para cabos Ethernet Cat5e/Cat6/Cat6a'},
+      {c:'#ffd700',n:'Transformadores de Isolação',d:'Isolam galvanicamente a rede da placa para proteção contra surtos'},
+      {c:'#8b5cf6',n:'Conector PCIe x1',d:'Ligação à placa-mãe — o x1 chega para 1 e 2,5 Gbps; para 10 Gbps é preciso x4'},
+      {c:'#ff6b35',n:'LED de Estado',d:'Indicadores de ligação ativa (verde) e tráfego de dados (âmbar)'},
+      {c:'#1a1a2a',n:'PCB Dedicado',d:'Placa pequena que pode ser adicionada quando a NIC integrada não é suficiente'}
+    ],
+    size:{w:'~120 mm',h:'~70 mm',d:'~20 mm',wt:'~60 g'},
+    sizeNote:'Uma placa de rede PCIe x1 é um dos componentes mais pequenos do PC. Ocupa um slot PCIe x1 e a abertura correspondente na traseira da caixa.',
+    history:[
+      {y:'1973',n:'Ethernet (Xerox PARC)',i:'Bob Metcalfe inventa a Ethernet — 2,94 Mbps, cabo coaxial'},
+      {y:'1983',n:'10BASE5 (Thick Ethernet)',i:'Primeiro padrão IEEE 802.3 — 10 Mbps'},
+      {y:'1995',n:'Fast Ethernet 100 Mbps',i:'O 100BASE-TX torna-se o padrão das redes de escritório'},
+      {y:'1999',n:'Gigabit Ethernet (1 Gbps)',i:'1000BASE-T sobre cabo Cat5e — ainda hoje o padrão doméstico'},
+      {y:'2009',n:'Wi-Fi 4 (802.11n)',i:'Até 600 Mbps teóricos, antenas MIMO'},
+      {y:'2019',n:'Wi-Fi 6 (802.11ax)',i:'9,6 Gbps teóricos, OFDMA, MU-MIMO melhorado'},
+      {y:'2024',n:'Wi-Fi 7 (802.11be)',i:'Multi-Link Operation, até 46 Gbps teóricos, menor latência'}
+    ],
+    svg:`<svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><rect width="220" height="130" rx="4" fill="#050f0a"/><rect x="4" y="10" width="212" height="90" rx="3" fill="#080f0a" stroke="#00ff88" stroke-width="1.5"/><rect x="50" y="25" width="50" height="55" rx="3" fill="#0d1a10" stroke="#00ff88" stroke-width="1.5"/><text x="75" y="50" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace" font-weight="bold">INTEL</text><text x="75" y="60" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">I226-V</text><text x="75" y="70" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">2.5GbE</text><rect x="155" y="15" width="52" height="80" rx="2" fill="#0a1a0a" stroke="#444" stroke-width="1"/><rect x="162" y="22" width="38" height="30" rx="2" fill="#0d200d" stroke="#00ff88" stroke-width="1.5"/><text x="181" y="40" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">RJ45</text><circle cx="165" cy="65" r="4" fill="#00ff88" opacity=".6"/><circle cx="178" cy="65" r="4" fill="#ffd700" opacity=".6"/><text x="172" y="76" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">LINK</text><rect x="120" y="25" width="25" height="20" rx="2" fill="#0d1a0d" stroke="#333" stroke-width="1"/><text x="132" y="38" text-anchor="middle" fill="#666" font-size="6" font-family="monospace">XFMR</text><rect x="15" y="25" width="25" height="18" rx="2" fill="#0d1a0d" stroke="#ffd700" stroke-width="1"/><text x="27" y="37" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">PWR</text><rect x="4" y="100" width="212" height="22" rx="2" fill="#0a1a0a" stroke="#00ff88" stroke-width="1"/><g fill="#00ff88" opacity=".6"><rect x="10" y="103" width="3" height="16"/><rect x="15" y="103" width="3" height="16"/><rect x="20" y="103" width="3" height="16"/><rect x="25" y="103" width="3" height="16"/></g><text x="130" y="115" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace" font-weight="bold">NIC 2.5GbE · PCIe x1</text></svg>`
+  },
+
+  soundcard:{
+    id:'soundcard',name:'Placa de Som',short:'Sound',
+    color:'#8b5cf6',tag:'Áudio',
+    desc:'Processa e reproduz áudio de alta qualidade',
+    about:'A placa de som converte sinais digitais em áudio analógico (DAC) e vice-versa (ADC). As placas-mãe modernas incluem chips de áudio integrados (onboard) como o Realtek ALC1220. Placas dedicadas oferecem DACs de alta qualidade, melhor relação sinal-ruído e funcionalidades profissionais.',
+    specs:{
+      'Tipo':'Integrada (onboard) / PCIe dedicada',
+      'Canais':'2.0 / 5.1 / 7.1 surround',
+      'Resolução DAC':'24-bit / 32-bit',
+      'Frequência Amostragem':'44.1 / 96 / 192 kHz',
+      'SNR Onboard':'~100 – 120 dB (conforme o codec)',
+      'SNR Dedicada':'até ~130 dB',
+      'Interface':'PCIe x1',
+      'Saídas':'3,5 mm Jack / RCA / S/PDIF óptico',
+      'Entradas':'Microfone / Linha',
+      'Chipset popular':'ESS Sabre / AKM / Cirrus Logic',
+      'Latência ASIO':'< 3 ms',
+      'Compatibilidade':'ASIO, WASAPI, DirectSound'
+    },
+    specNote:'Para uso casual, o áudio onboard da placa-mãe é mais que suficiente. Placas dedicadas fazem diferença em estúdio, produção musical, ou com auscultadores de alta-fidelidade (Hi-Fi).',
+    xray:[
+      {c:'#8b5cf6',n:'DAC (Digital-to-Analog Converter)',d:'Converte dados digitais em sinal elétrico analógico de alta qualidade'},
+      {c:'#4a9eff',n:'ADC (Analog-to-Digital Converter)',d:'Converte sinal analógico (microfone) em digital para o computador'},
+      {c:'#00ff88',n:'Amplificador de Auscultadores',d:'Circuito dedicado para amplificar o sinal para auscultadores de alta impedância'},
+      {c:'#c8a840',n:'Condensadores de Áudio',d:'Condensadores de alta qualidade para filtrar ruído e suavizar o sinal'},
+      {c:'#ff6b35',n:'Jacks de 3,5mm (dourados)',d:'Conectores banhados a ouro para melhor contacto e resistência à oxidação'},
+      {c:'#1a1a2a',n:'Isolamento Eletromagnético',d:'Blindagem que protege o circuito de interferências da GPU e placa-mãe'}
+    ],
+    size:{w:'~180 mm',h:'~100 mm',d:'~18 mm',wt:'~100 g'},
+    sizeNote:'A maioria das placas de som PCIe ocupa um slot de expansão completo na caixa. Existem também modelos externos USB/Thunderbolt que evitam interferências eletromagnéticas internas.',
+    history:[
+      {y:'1987',n:'AdLib Music Synthesizer Card',i:'Primeira placa de som popular para PC — síntese FM'},
+      {y:'1989',n:'Sound Blaster (Creative)',i:'Revolucionou o áudio nos PCs — padrão nos jogos durante anos'},
+      {y:'1992',n:'Sound Blaster 16',i:'Áudio estéreo de 16 bits, com qualidade de CD'},
+      {y:'1998',n:'Sound Blaster Live!',i:'EAX (Environmental Audio Extensions) e som surround 4.1'},
+      {y:'2005',n:'Sound Blaster X-Fi',i:'Processador de áudio dedicado (EMU20K1)'},
+      {y:'2008',n:'Asus Xonar Essence STX',i:'DAC Burr-Brown PCM1792A, 124 dB de SNR — referência Hi-Fi para PC'},
+      {y:'2019',n:'Sound BlasterX AE-9',i:'DAC ESS ES9038Pro e amplificador de auscultadores dedicado'}
+    ],
+    svg:`<svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg"><rect width="220" height="140" rx="4" fill="#08050f"/><rect x="4" y="8" width="212" height="90" rx="3" fill="#0a0718" stroke="#8b5cf6" stroke-width="1.5"/><rect x="15" y="20" width="45" height="45" rx="3" fill="#0d0a20" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="37" cy="42" r="14" fill="#0a0820" stroke="#8b5cf6" stroke-width="1"/><circle cx="37" cy="42" r="8" fill="#0d0b22" stroke="#555" stroke-width=".5"/><circle cx="37" cy="42" r="3" fill="#8b5cf6" opacity=".6"/><text x="37" y="75" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">DAC/ADC</text><rect x="75" y="20" width="30" height="20" rx="2" fill="#0d0a20" stroke="#4a9eff" stroke-width="1"/><text x="90" y="33" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">AMP</text><rect x="115" y="20" width="35" height="20" rx="2" fill="#0d0a20" stroke="#00ff88" stroke-width="1"/><text x="132" y="33" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">OP-AMP</text><g fill="#0d0a20" stroke="#c8a840" stroke-width="1"><circle cx="87" cy="60" r="7"/><circle cx="103" cy="60" r="7"/><circle cx="119" cy="60" r="7"/><circle cx="135" cy="60" r="7"/></g><text x="111" y="80" text-anchor="middle" fill="#c8a840" font-size="6" font-family="monospace">CAPS AUDIO</text><rect x="165" y="15" width="42" height="78" rx="2" fill="#0a0718" stroke="#444" stroke-width="1"/><g fill="#0a0818" stroke="#8b5cf6" stroke-width="1"><circle cx="186" cy="28" r="8"/><circle cx="186" cy="48" r="8"/><circle cx="186" cy="68" r="8"/><circle cx="186" cy="88" r="8"/></g><text x="186" y="30" text-anchor="middle" fill="#8b5cf6" font-size="5" font-family="monospace">OUT</text><text x="186" y="50" text-anchor="middle" fill="#8b5cf6" font-size="5" font-family="monospace">IN</text><text x="186" y="70" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">MIC</text><text x="186" y="90" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">OPT</text><rect x="4" y="102" width="212" height="20" rx="2" fill="#0a0718" stroke="#8b5cf6" stroke-width="1"/><g fill="#8b5cf6" opacity=".6"><rect x="8" y="104" width="3" height="16"/><rect x="13" y="104" width="3" height="16"/><rect x="18" y="104" width="3" height="16"/><rect x="23" y="104" width="3" height="16"/></g><text x="130" y="117" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">7.1 · 32-bit · 192kHz</text><text x="110" y="133" text-anchor="middle" fill="#666" font-size="8" font-family="monospace">127 dB SNR · PCIe x1</text></svg>`
+  }
+};
+
+/* =====================================================================
+   QUIZ — 25 QUESTIONS
+   ===================================================================== */
+const QUESTIONS = [
+  {cat:'Processador',q:'Qual é o componente principal responsável pelo processamento de dados num computador?',opts:['Memória RAM','GPU (placa gráfica)','CPU (processador)','Disco SSD'],ans:2,exp:'A CPU (Central Processing Unit) é o "cérebro" do computador. É ela que executa as instruções dos programas e processa todos os dados.'},
+  {cat:'Processador',q:'O que significa a sigla CPU?',opts:['Central Power Unit','Core Processing Utility','Central Processing Unit','Computer Primary Unit'],ans:2,exp:'CPU = Central Processing Unit — Unidade Central de Processamento. É o termo técnico oficial para o processador.'},
+  {cat:'Memória',q:'Qual tipo de memória perde os seus dados quando o computador é desligado?',opts:['SSD NVMe','HDD SATA','ROM (BIOS)','RAM (memória principal)'],ans:3,exp:'A RAM é uma memória volátil: sem energia, os dados desaparecem. É por isso que tens de guardar os teus ficheiros antes de desligar o PC.'},
+  {cat:'Armazenamento',q:'O que diferencia um SSD NVMe de um SSD SATA?',opts:['O NVMe tem mais capacidade','O NVMe é muito mais rápido (até 14 GB/s vs. ~550 MB/s)','O SATA é mais caro','O NVMe usa mais energia'],ans:1,exp:'Os SSDs NVMe usam o protocolo PCIe que oferece largura de banda muito superior: até 14 GB/s nos melhores PCIe 5.0, vs. ~550 MB/s máximos do SATA.'},
+  {cat:'Energia',q:'Qual componente fornece energia elétrica a todos os outros?',opts:['Motherboard','Chipset','PSU (Fonte de Alimentação)','CMOS Battery'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
+  {cat:'Processador',q:'O que é o "socket" de uma CPU?',opts:['O ventilador do processador','O conector onde a CPU é instalada na placa-mãe','A memória cache do processador','O controlador de I/O integrado'],ans:1,exp:'O socket é o encaixe físico na placa-mãe onde o processador é instalado. Exemplos: LGA 1700 (Intel) e AM5 (AMD). CPU e socket têm de ser compatíveis.'},
+  {cat:'Memória',q:'O que significa DDR em memórias RAM?',opts:['Direct Data Rate','Double Data Rate','Dual Dynamic Register','Dynamic Data Ram'],ans:1,exp:'DDR = Double Data Rate — transfere dados em ambos os flancos (subida E descida) do sinal de clock, dobrando efetivamente a largura de banda.'},
+  {cat:'Gráficos',q:'Qual é a função principal de uma GPU?',opts:['Gerir a memória RAM','Controlar os discos de armazenamento','Distribuir energia pelos componentes','Processar dados gráficos e renderizar imagens'],ans:3,exp:'A GPU (Graphics Processing Unit) é especializada em processamento paralelo — essencial para renderizar gráficos, mas também usada para IA e computação científica.'},
+  {cat:'Processador',q:'O que é o TDP de um processador?',opts:['Temperatura mínima de funcionamento','Velocidade máxima de transferência de dados','Thermal Design Power — calor máximo que o sistema de arrefecimento deve dissipar','Total Drive Performance — desempenho de disco'],ans:2,exp:'TDP (Thermal Design Power) indica a potência de calor máxima que o cooler precisa de dissipar. Um TDP de 125W significa que o cooler deve aguentar 125 Watts de calor.'},
+  {cat:'Armazenamento',q:'Que tecnologia usa pratos magnéticos rotativos para armazenar dados?',opts:['SSD SATA','NVMe M.2','Flash NAND','HDD (Disco Rígido)'],ans:3,exp:'O HDD (Hard Disk Drive) usa pratos metálicos que giram a 5400–7200 RPM com uma cabeça de leitura/escrita magnética — tecnologia com cerca de 70 anos.'},
+  {cat:'Armazenamento',q:'O que é NVMe?',opts:['Non-Volatile Memory Express — protocolo para SSDs rápidos via PCIe','New Video Memory Extension','Network Virtual Media','Next Version Memory Express'],ans:0,exp:'NVMe (Non-Volatile Memory Express) é um protocolo de comunicação otimizado para memória flash. Usa PCIe em vez de SATA, reduzindo dramaticamente a latência.'},
+  {cat:'Avançado',q:'O que é overclocking?',opts:['Reduzir a frequência do processador para poupar energia','Atualizar o BIOS da placa-mãe','Aumentar a frequência acima dos valores de fábrica para mais desempenho','Desligar núcleos inativos automaticamente'],ans:2,exp:'Overclocking é forçar o componente (CPU, GPU, RAM) a funcionar a frequências superiores ao padrão de fábrica. Aumenta o desempenho mas gera mais calor e pode reduzir a longevidade.'},
+  {cat:'Motherboard',q:'Qual é a função do BIOS/UEFI?',opts:['Gerir a memória RAM','Acelerar a GPU durante os jogos','Formatar o disco de armazenamento','Firmware que inicializa o hardware e arranca o sistema operativo'],ans:3,exp:'O BIOS/UEFI é o firmware gravado num chip da placa-mãe. É o primeiro software a executar quando ligas o PC — deteta os componentes e passa controlo ao sistema operativo.'},
+  {cat:'Processador',q:'O que é a cache de CPU?',opts:['Memória lenta para guardar ficheiros temporários','Memória ultrarrápida integrada no próprio processador','Disco virtual criado pelo sistema operativo','Ventilador interno do processador'],ans:1,exp:'A cache é memória integrada no die do processador (L1, L2, L3) com latências de nanosegundos. É muito mais rápida que a RAM e guarda dados frequentemente usados.'},
+  {cat:'Motherboard',q:'O que significa PCIe?',opts:['Peripheral Component Interconnect Express','Primary Computer Interface Extended','Parallel Core Integration Express','Personal Computer Internet Express'],ans:0,exp:'PCIe (Peripheral Component Interconnect Express) é o padrão de barramento série de alta velocidade para ligação de GPUs, SSDs NVMe, placas de rede e outros componentes à placa-mãe.'},
+  {cat:'Motherboard',q:'Qual é o fator de forma de placa-mãe mais comum em computadores desktop?',opts:['Mini-ITX (17×17 cm)','Micro-ATX (24×24 cm)','ATX (30,5×24,4 cm)','E-ATX (30,5×33 cm)'],ans:2,exp:'ATX (Advanced Technology eXtended) é o fator de forma mais comum. Define o tamanho (305×244 mm), a posição dos parafusos e a localização do conector de energia.'},
+  {cat:'Memória',q:'O que é memória ECC (Error-Correcting Code)?',opts:['Memória mais rápida para gaming','Memória que deteta e corrige automaticamente erros de bit','Extended Cache Controller — gere a cache L3','Enhanced Clock Cycle — overclock automático'],ans:1,exp:'ECC RAM usa bits adicionais de verificação para detetar e corrigir erros de memória de 1 bit em tempo real. Essencial em servidores e workstations onde a integridade de dados é crítica.'},
+  {cat:'Gráficos',q:'O que é VRAM?',opts:['Memória virtual do sistema operativo','Virtual RAM — extensão da RAM no SSD','Memória de vídeo dedicada integrada na GPU','Variante de RAM para overclocking'],ans:2,exp:'VRAM (Video RAM) é memória de alta velocidade integrada na placa gráfica, usada para guardar texturas, framebuffers e dados de render. Mais VRAM = suporte para texturas de maior resolução.'},
+  {cat:'Armazenamento',q:'Qual unidade mede a velocidade de rotação de um HDD?',opts:['GHz (Gigahertz)','MB/s (Megabytes por segundo)','RPM — Rotações Por Minuto','kbps (Kilobits por segundo)'],ans:2,exp:'RPM (Rotações Por Minuto) mede a velocidade de rotação dos pratos do HDD. Um HDD de 7200 RPM é mais rápido que um de 5400 RPM, com menor latência de acesso.'},
+  {cat:'Arrefecimento',q:'Qual é a função de um cooler de CPU?',opts:['Arrefecer a memória RAM','Arrefecer a placa gráfica GPU','Dissipar o calor gerado pelo processador para evitar sobreaquecimento','Ventilar a fonte de alimentação'],ans:2,exp:'O cooler de CPU dissipa o calor produzido pelo processador. Sem arrefecimento adequado, a CPU ativa o thermal throttling (reduz frequência automaticamente) ou pode danificar-se.'},
+  {cat:'Motherboard',q:'O que é uma placa de som onboard (integrada)?',opts:['Placa PCIe dedicada de alto desempenho','Coluna USB externa','Interface MIDI para instrumentos','Chip de áudio soldado diretamente na placa-mãe'],ans:3,exp:'Áudio onboard significa que o codec de áudio (ex.: Realtek ALC1220) está integrado na própria placa-mãe, sem necessidade de placa adicional. Suficiente para uso geral.'},
+  {cat:'Memória',q:'O que é a memória virtual?',opts:['Memória RAM adicional instalável por software','Cache do processador','Memória dedicada da GPU','Espaço em disco rígido/SSD utilizado como extensão da RAM'],ans:3,exp:'A memória virtual (swap/page file) usa espaço no disco como extensão da RAM quando esta está cheia. É muito mais lenta que a RAM real — o PC fica lento quando a usa ativamente.'},
+  {cat:'Energia',q:'O que indica a certificação 80 PLUS Gold numa fonte de alimentação?',opts:['A fonte tem 80 W de potência máxima','A fonte é dourada por fora','A fonte tem pelo menos 90% de eficiência energética a 50% de carga (rede de 115 V)','A fonte tem 80 conectores de alimentação'],ans:2,exp:'80 PLUS Gold certifica uma eficiência de, pelo menos, 87% a 20% e a 100% de carga, e de 90% a 50% de carga (valores para rede de 115 V). Menos calor gerado e menor fatura de eletricidade.'},
+  {cat:'Processador',q:'Qual é a função dos núcleos de eficiência (E-cores) nos processadores Intel de 12.ª geração em diante?',opts:['Substituir os P-cores para poupar energia','Tratar tarefas em segundo plano com menor consumo, libertando P-cores para tarefas principais','Controlar exclusivamente a memória RAM','Gerir as ligações PCIe'],ans:1,exp:'Os E-cores (Efficiency cores) são núcleos mais simples e energeticamente eficientes, ideais para tarefas em background. Os P-cores (Performance cores) ficam disponíveis para aplicações exigentes.'},
+  {cat:'Armazenamento',q:'O que é TBW (Total Bytes Written) num SSD?',opts:['Velocidade máxima de escrita em TB/s','Temperatura máxima de funcionamento','Indicador de durabilidade — total de dados que o SSD pode escrever ao longo da vida útil','Capacidade total do SSD em terabytes'],ans:2,exp:'TBW indica a resistência total de escrita do SSD. Um SSD de 1 TB com 600 TBW pode escrever 600 TB de dados dentro do limite garantido pelo fabricante — muito mais do que o uso normal requer.'}
+];
+
+/* =====================================================================
+   APP STATE
+   ===================================================================== */
+let currentComp = null;
+let activeTab = 't3d';
+let qIdx = 0, qScore = 0, answered = false;
+let playerName = '';
+let wrongAnswers = [];
+
+/* =====================================================================
+   NAVIGATION
+   ===================================================================== */
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = ['home','componentes','montar','comparador','quiz'].indexOf(id);
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  if(id==='comparador') buildComparatorSelects();
+  if(id!=='montar'&&MP.tick){clearInterval(MP.tick);MP.tick=0;if(!MP.pausedAt)MP.pausedAt=Date.now();}
+  if(id==='montar'&&MP.pausedAt&&(MP.phase==='parts'||MP.phase==='cables'||MP.phase==='ready')){
+    MP.t0+=Date.now()-MP.pausedAt;MP.pausedAt=0;MP.tick=setInterval(mpTick,1000);
+  }
+  window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   COMPONENTS GRID
+   ===================================================================== */
+function buildGrid(){
+  const g = document.getElementById('compGrid');
+  Object.values(COMP).forEach(c=>{
+    const d = document.createElement('div');
+    d.className = 'cc';
+    d.style.setProperty('--acc', c.color);
+    d.innerHTML = `<div class="cc-svg">${c.svg}</div>
+      <div class="cc-name">${c.short}</div>
+      <div class="cc-desc">${c.desc}</div>`;
+    d.onclick = ()=>openModal(c.id);
+    d.tabIndex = 0; d.setAttribute('role','button'); d.setAttribute('aria-label',c.name);
+    d.onkeydown = e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openModal(c.id); } };
+    g.appendChild(d);
+  });
+}
+
+/* =====================================================================
+   MODAL
+   ===================================================================== */
+/* ---------- MODAL / SEPARADORES ---------- */
+let lastFocus=null;
+function showTab(t){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id===t));
+  activeTab=t;
+  if(t==='t3d') start3D(); else stop3D();
+}
+
+function openModal(id){
+  currentComp = COMP[id];
+  const c = currentComp;
+  lastFocus = document.activeElement;
+  document.getElementById('mTitle').textContent = c.name;
+  const badge = document.getElementById('mBadge');
+  badge.textContent = c.tag;
+  badge.style.color = c.color;
+  badge.style.borderColor = c.color;
+  badge.style.background = c.color+'22';
+  T3.ok=false; stop3D();
+  buildTab3D(c);
+  buildTabFicha(c);
+  buildTabXray(c);
+  buildTabEscala(c);
+  buildTabEvolucao(c);
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  showTab('t3d');
+  mount3D(c);
+  document.querySelector('.mclose').focus();
+}
+
+function closeModal(){
+  const m=document.getElementById('modal');
+  if(!m.classList.contains('open')) return;
+  m.classList.remove('open');
+  document.body.style.overflow='';
+  stop3D();
+  if(lastFocus&&lastFocus.focus) lastFocus.focus();
+}
+
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal')) closeModal();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+
+/* =====================================================================
+   3D TAB  (Three.js — modelos construídos com geometria procedural)
+   ===================================================================== */
+function buildTab3D(c){
+  const short=n=>n.replace(/\s*\([^)]*\)/g,'');
+  const chips=c.xray.map((l,i)=>`<button class="pchip" onclick="selectPart(${i})"><span class="ldot" style="background:${l.c};box-shadow:0 0 6px ${l.c}88"></span>${short(l.n)}</button>`).join('');
+  document.getElementById('t3d').innerHTML=`
+  <div class="v3d">
+    <div class="stage-wrap">
+      <div class="stage-hint">ARRASTA para rodar · RODA / PINÇA para zoom · CLICA numa peça</div>
+      <div class="stage3d" id="stage3d"><div class="stage-msg">A preparar o modelo 3D…</div></div>
+    </div>
+    <div class="ctrls">
+      <button class="cbtn" id="btnSpin" onclick="toggleSpin()">⟳ Auto-Rodar</button>
+      <button class="cbtn" id="btnExplode" onclick="toggleExplode()">✦ Explodir</button>
+      <button class="cbtn" onclick="resetView()">⊙ Reset</button>
+      <button class="cbtn" onclick="zoom3D(.85)">＋ Zoom</button>
+      <button class="cbtn" onclick="zoom3D(1.18)">－ Zoom</button>
+    </div>
+    <div class="pchips" id="pchips">${chips}</div>
+    <div class="v3d-info" id="partInfo"><p>${c.about}</p></div>
+  </div>`;
+}
+
+const T3={renderer:null,scene:null,camera:null,root:null,parts:[],decor:[],spin:[],
+  raf:0,last:0,running:false,ok:false,rotX:.35,rotY:-.6,dist:9,fit:1,ex:0,exT:0,
+  userEx:false,auto:false,sel:-1,ro:null,ptrs:new Map(),moved:0,pinch:0};
+const clampDist=d=>Math.max(4,Math.min(16,d));
+function pinchDist(){const a=[...T3.ptrs.values()];return a.length<2?0:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);}
+
+function disposeRoot(){
+  if(!T3.root) return;
+  T3.scene.remove(T3.root);
+  T3.root.traverse(o=>{
+    if(o.geometry) o.geometry.dispose();
+    if(o.material) (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());
+  });
+  T3.root=null;T3.parts=[];T3.decor=[];T3.spin=[];
+}
+
+function initRenderer(){
+  if(T3.renderer) return;
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  r.setClearColor(0x000000,0);
+  T3.renderer=r;
+  T3.scene=new THREE.Scene();
+  T3.camera=new THREE.PerspectiveCamera(38,1,.1,100);
+  const S=T3.scene;
+  S.add(new THREE.HemisphereLight(0xaabbff,0x222233,.7));
+  const dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(5,8,6);S.add(dl);
+  const dl2=new THREE.DirectionalLight(0x8899ff,.4);dl2.position.set(-6,2,-5);S.add(dl2);
+  const pl=new THREE.PointLight(0x00e5ff,.6,30);pl.position.set(-4,3,4);S.add(pl);
+  const grid=new THREE.GridHelper(14,14,0x00e5ff,0x1c1c40);
+  grid.position.y=-2.7;grid.material.transparent=true;grid.material.opacity=.35;S.add(grid);
+  bindStageEvents(r.domElement);
+}
+
+function mount3D(c){
+  const st=document.getElementById('stage3d'); if(!st) return;
+  try{
+    if(typeof THREE==='undefined') throw new Error('Three.js não carregou');
+    initRenderer();
+    disposeRoot();
+    const built=buildModel(c.id);
+    const root=new THREE.Group();
+    built.decor.forEach(d=>root.add(d));
+    built.parts.forEach(p=>root.add(p));
+    root.updateMatrixWorld(true);
+    const box=new THREE.Box3().setFromObject(root);
+    const size=box.getSize(new THREE.Vector3()),ctr=box.getCenter(new THREE.Vector3());
+    const s=4.2/Math.max(size.x,size.y,size.z);
+    root.scale.setScalar(s);
+    root.position.copy(ctr).multiplyScalar(-s);
+    T3.scene.add(root);
+    T3.root=root;T3.parts=built.parts;T3.decor=built.decor;T3.spin=built.spin;
+    T3.rotX=.35;T3.rotY=-.6;T3.dist=9;T3.ex=0;T3.exT=0;T3.userEx=false;T3.auto=false;T3.sel=-1;
+    st.innerHTML='';
+    st.appendChild(T3.renderer.domElement);
+    if(T3.ro) T3.ro.disconnect();
+    T3.ro=new ResizeObserver(resize3D);T3.ro.observe(st);
+    T3.ok=true;
+    resize3D();
+    start3D();
+  }catch(err){
+    console.warn('3D indisponível:',err);
+    T3.ok=false;
+    st.innerHTML=`<div class="stage-fallback">${c.svg}<p>O 3D não está disponível neste dispositivo — a mostrar a vista 2D.</p></div>`;
+  }
+}
+
+function resize3D(){
+  const st=document.getElementById('stage3d');
+  if(!st||!T3.renderer) return;
+  const w=st.clientWidth,h=st.clientHeight;
+  if(!w||!h) return;
+  T3.renderer.setSize(w,h,false);
+  T3.camera.aspect=w/h;
+  T3.camera.updateProjectionMatrix();
+  T3.fit=Math.max(1,1.5/(w/h));
+}
+
+function bindStageEvents(cv){
+  cv.addEventListener('pointerdown',e=>{
+    cv.setPointerCapture(e.pointerId);
+    T3.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    T3.moved=0;
+    if(T3.auto){T3.auto=false;syncBtns();}
+    if(T3.ptrs.size===2) T3.pinch=pinchDist();
+  });
+  cv.addEventListener('pointermove',e=>{
+    const p=T3.ptrs.get(e.pointerId); if(!p) return;
+    const dx=e.clientX-p.x,dy=e.clientY-p.y;
+    p.x=e.clientX;p.y=e.clientY;
+    if(T3.ptrs.size===1){
+      T3.rotY+=dx*.01;
+      T3.rotX=Math.max(-1.3,Math.min(1.3,T3.rotX+dy*.01));
+      T3.moved+=Math.abs(dx)+Math.abs(dy);
+    }else if(T3.ptrs.size===2){
+      const d=pinchDist();
+      if(T3.pinch&&d) T3.dist=clampDist(T3.dist*T3.pinch/d);
+      T3.pinch=d;T3.moved+=10;
+    }
+  });
+  const up=e=>{
+    if(!T3.ptrs.has(e.pointerId)) return;
+    const tap=T3.ptrs.size===1&&T3.moved<5&&e.type==='pointerup';
+    T3.ptrs.delete(e.pointerId);T3.pinch=0;
+    if(tap) pick3D(e);
+  };
+  cv.addEventListener('pointerup',up);
+  cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    T3.dist=clampDist(T3.dist*(1+Math.sign(e.deltaY)*.08));
+  },{passive:false});
+}
+
+function pick3D(e){
+  const r=T3.renderer.domElement.getBoundingClientRect();
+  const m=new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  const rc=new THREE.Raycaster();rc.setFromCamera(m,T3.camera);
+  const hits=rc.intersectObjects(T3.parts,true);
+  let idx=-1;
+  for(const h of hits){
+    let o=h.object;
+    while(o&&o.userData.partIndex===undefined) o=o.parent;
+    if(o){idx=o.userData.partIndex;break;}
+  }
+  selectPart(idx===T3.sel?-1:idx);
+}
+
+function applySel(){
+  const sel=T3.sel;
+  const handle=(obj,state)=>obj.traverse(o=>{
+    if(!o.material) return;
+    (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
+      const u=m.userData;
+      if(u.o===undefined){u.o=m.opacity;u.t=m.transparent;u.e=m.emissive?m.emissive.getHex():0;u.ei=m.emissiveIntensity;}
+      m.opacity=u.o;m.transparent=u.t;
+      if(m.emissive){m.emissive.setHex(u.e);m.emissiveIntensity=u.ei;}
+      if(state==='hi'&&m.emissive){m.emissive.setHex(0x00e5ff);m.emissiveIntensity=.45;}
+      if(state==='dim'){m.transparent=true;m.opacity=Math.min(u.o,.14);}
+      m.needsUpdate=true;
+    });
+  });
+  T3.parts.forEach((p,i)=>handle(p,sel<0?'normal':(i===sel?'hi':'dim')));
+  T3.decor.forEach(d=>handle(d,sel<0?'normal':'dim'));
+}
+
+function selectPart(i){
+  T3.sel=i;
+  T3.exT=(T3.userEx||i>=0)?1:0;
+  applySel();
+  const c=currentComp,info=document.getElementById('partInfo');
+  if(info){
+    if(i>=0&&c.xray[i]){
+      const l=c.xray[i];
+      info.innerHTML=`<div class="pi-name"><span class="ldot" style="background:${l.c};box-shadow:0 0 6px ${l.c}88"></span>${l.n}</div><p>${l.d}</p>`;
+    }else info.innerHTML=`<p>${c.about}</p>`;
+  }
+  document.querySelectorAll('.pchip').forEach((b,j)=>b.classList.toggle('on',j===i));
+  syncBtns();
+}
+
+function goToPart(i){
+  showTab('t3d');
+  selectPart(i);
+  const m=document.querySelector('.mcontent'); if(m) m.scrollTop=0;
+}
+
+function syncBtns(){
+  const s=document.getElementById('btnSpin'),x=document.getElementById('btnExplode');
+  if(s) s.classList.toggle('on',T3.auto);
+  if(x) x.classList.toggle('on',T3.exT>0);
+}
+function toggleSpin(){T3.auto=!T3.auto;syncBtns();}
+function toggleExplode(){T3.userEx=!T3.userEx;T3.exT=(T3.userEx||T3.sel>=0)?1:0;syncBtns();}
+function resetView(){T3.rotX=.35;T3.rotY=-.6;T3.dist=9;T3.auto=false;T3.userEx=false;selectPart(-1);}
+function zoom3D(f){T3.dist=clampDist(T3.dist*f);}
+
+function start3D(){
+  if(!T3.ok||T3.running) return;
+  T3.running=true;T3.last=performance.now();
+  resize3D();
+  T3.raf=requestAnimationFrame(loop3D);
+}
+function stop3D(){
+  T3.running=false;
+  if(T3.raf) cancelAnimationFrame(T3.raf);
+  T3.raf=0;
+}
+function loop3D(t){
+  if(!T3.running) return;
+  T3.raf=requestAnimationFrame(loop3D);
+  const dt=Math.min(.05,(t-T3.last)/1000||.016);T3.last=t;
+  if(T3.auto) T3.rotY+=dt*.7;
+  T3.ex+=(T3.exT-T3.ex)*Math.min(1,dt*6);
+  T3.parts.forEach(p=>p.position.copy(p.userData.base).addScaledVector(p.userData.dir,T3.ex));
+  T3.spin.forEach(s=>{s.o.rotation[s.axis]+=dt*s.speed;});
+  const r=T3.dist*T3.fit,cx=Math.cos(T3.rotX);
+  T3.camera.position.set(r*Math.sin(T3.rotY)*cx,r*Math.sin(T3.rotX),r*Math.cos(T3.rotY)*cx);
+  T3.camera.lookAt(0,0,0);
+  T3.renderer.render(T3.scene,T3.camera);
+}
+
+/*MODELS-START*/
+const C={pcb:0x0e4a33,pcbDark:0x15161f,black:0x16161e,gold:0xd4af37,alu:0xb9c2cf,steel:0x6f7885,dark:0x2a2f3a,copper:0xc2773a};
+const _m=(hex,o)=>new THREE.MeshStandardMaterial(Object.assign({color:hex,metalness:.3,roughness:.5},o||{}));
+const _glow=(hex,i)=>_m(hex,{emissive:hex,emissiveIntensity:i||.8});
+const _bx=(w,h,d,mat,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x||0,y||0,z||0);return m;};
+const _cy=(rt,rb,h,mat,x,y,z,rx,rz)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,28),mat);m.position.set(x||0,y||0,z||0);if(rx)m.rotation.x=rx;if(rz)m.rotation.z=rz;return m;};
+const _pt=(dx,dy,dz)=>{const g=new THREE.Group();g.userData.dir=new THREE.Vector3(dx,dy,dz);return g;};
+function _inst(geo,mat,pts){
+  const im=new THREE.InstancedMesh(geo,mat,pts.length),d=new THREE.Object3D();
+  pts.forEach((p,i)=>{d.position.set(p[0],p[1],p[2]);d.updateMatrix();im.setMatrixAt(i,d.matrix);});
+  im.instanceMatrix.needsUpdate=true;return im;
+}
+function _tube(pts,col,r){
+  const cv=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(p[0],p[1],p[2])));
+  return new THREE.Mesh(new THREE.TubeGeometry(cv,24,r,8,false),_m(col,{roughness:.7}));
+}
+function _edges(geo,col,op){return new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op||.7}));}
+/* ventoinha virada para +Z; devolve {g, rotor} (rotor gira em Z) */
+function _fan(r,n,bladeCol,frameCol,glow){
+  const g=new THREE.Group(),rotor=new THREE.Group();
+  rotor.add(_cy(r*.2,r*.2,.07,_m(0x1b1b26),0,0,0,Math.PI/2));
+  for(let i=0;i<n;i++){
+    const pv=new THREE.Group();pv.rotation.z=i*2*Math.PI/n;
+    const b=_bx(r*.72,r*.3,.018,_m(bladeCol,{roughness:.6}),r*.55,0,0);b.rotation.x=.55;
+    pv.add(b);rotor.add(pv);
+  }
+  g.add(rotor);
+  g.add(new THREE.Mesh(new THREE.TorusGeometry(r,.035,8,48),_m(frameCol)));
+  if(glow){const gl=new THREE.Mesh(new THREE.TorusGeometry(r*.93,.022,8,48),_glow(glow,.9));gl.position.z=.03;g.add(gl);}
+  return {g,rotor};
+}
+const _gold=()=>_m(C.gold,{metalness:.5,roughness:.35});
+const _alu=()=>_m(C.alu,{metalness:.5,roughness:.35});
+
+const MODELS={
+
+cpu(){
+  const sub=_pt(0,-1.3,0),die=_pt(0,.9,0),pc=_pt(0,1.7,0),ec=_pt(0,1.7,0),l3=_pt(0,1.7,0),imc=_pt(0,1.7,0),ihs=_pt(0,2.7,0);
+  sub.add(_bx(3.2,.12,3.2,_m(C.pcb,{roughness:.6,metalness:.1})));
+  const pins=[];for(let i=0;i<12;i++)for(let j=0;j<12;j++)pins.push([(i-5.5)*.24,-.13,(j-5.5)*.24]);
+  sub.add(_inst(new THREE.BoxGeometry(.1,.14,.1),_gold(),pins));
+  [[-1.3,-1.3],[1.3,-1.3],[-1.3,1.3],[1.3,1.3],[0,-1.4],[0,1.4]].forEach(p=>sub.add(_bx(.22,.07,.13,_m(0x3b3326),p[0],.09,p[1])));
+  die.add(_bx(1.5,.07,1.5,_m(0x1a2a52,{roughness:.3}),0,.17,0));
+  [[-.58,-.40],[-.18,-.40],[-.58,.02],[-.18,.02]].forEach(p=>pc.add(_bx(.36,.05,.36,_glow(0xff6b35,.35),p[0],.22,p[1])));
+  [[.38,-.45],[.62,-.45],[.38,-.20],[.62,-.20]].forEach(p=>ec.add(_bx(.2,.05,.2,_glow(0xffd700,.3),p[0],.22,p[1])));
+  l3.add(_bx(1.3,.05,.22,_glow(0x00ff88,.3),0,.22,.55));
+  imc.add(_bx(.5,.05,.3,_glow(0x8b5cf6,.4),.5,.22,.2));
+  ihs.add(_bx(2.5,.12,2.5,_m(C.alu,{metalness:.5,roughness:.3}),0,.38,0),_bx(2.1,.04,2.1,_m(0xd8dde6,{metalness:.5,roughness:.25}),0,.46,0));
+  return {parts:[ihs,die,pc,ec,l3,imc,sub],decor:[],spin:[]};
+},
+
+ram(){
+  const pcb=_pt(0,0,-.6),chips=_pt(0,0,.9),gold=_pt(0,-1.0,0),spd=_pt(1.2,.4,.8),hs=_pt(0,1.1,2.0),xmp=_pt(0,1.9,1.0);
+  pcb.add(_bx(4.6,1.05,.07,_m(C.pcbDark,{roughness:.6})));
+  for(let i=0;i<8;i++)chips.add(_bx(.42,.42,.05,_m(C.black,{roughness:.4}),-1.7+i*.46,.08,.06));
+  const f=[];for(let i=0;i<44;i++){const x=-2.1+i*.1;if(Math.abs(x-.4)<.1)continue;f.push([x,-.48,0]);}
+  gold.add(_inst(new THREE.BoxGeometry(.065,.14,.09),_gold(),f));
+  spd.add(_bx(.3,.22,.05,_m(C.black),1.95,.12,.06));
+  hs.add(_bx(4.5,.88,.05,_m(C.dark,{roughness:.4}),0,.04,.13),_bx(4.5,.12,.2,_alu(),0,.5,.13),_bx(1.7,.3,.01,_glow(0xff6b35,.4),-1.1,.04,.16));
+  xmp.add(_bx(3.4,.04,.08,_glow(0x00e5ff,1),0,.56,.13));
+  return {parts:[pcb,chips,gold,spd,hs,xmp],decor:[],spin:[]};
+},
+
+motherboard(){
+  const pcb=_pt(0,-.8,0),sock=_pt(0,1.0,0),dimm=_pt(1.0,1.1,0),chip=_pt(.5,1.0,.6),vrm=_pt(-.7,1.2,-.5),bios=_pt(0,.9,.8),pcie=_pt(0,.8,1.0);
+  pcb.add(_bx(4.0,.07,3.2,_m(C.pcb,{roughness:.6,metalness:.1})),_bx(1.2,.36,.45,_m(C.steel),-1.3,.2,-1.45));
+  [[-1.8,-1.4],[1.8,-1.4],[-1.8,1.4],[1.8,1.4]].forEach(p=>pcb.add(_cy(.07,.07,.09,_gold(),p[0],.06,p[1])));
+  sock.add(_bx(1.0,.1,1.0,_alu(),-.45,.09,-.35),_bx(.76,.12,.76,_m(0x1b1b24),-.45,.1,-.35),_bx(.66,.05,.66,_gold(),-.45,.17,-.35));
+  [1.0,1.22,1.44,1.66].forEach((x,i)=>dimm.add(_bx(.12,.14,1.9,_m(i%2?0x3a3a4a:0x23232e),x,.1,-.2)));
+  chip.add(_bx(.5,.07,.5,_alu(),.55,.07,.9));
+  for(let i=0;i<4;i++)chip.add(_bx(.46,.12,.04,_m(C.dark),.55,.15,.72+i*.12));
+  vrm.add(_bx(.28,.2,1.3,_m(C.dark),-1.05,.14,-.25),_bx(1.5,.2,.28,_m(C.dark),-.4,.14,-1.15));
+  for(let i=0;i<3;i++)vrm.add(_cy(.09,.09,.13,_alu(),.45+i*.19,.1,-1.15));
+  bios.add(_bx(.3,.08,.2,_m(C.black),1.4,.08,1.2),_cy(.04,.04,.02,_gold(),1.3,.13,1.15));
+  [[.45,2.5,-.45],[.9,1.0,-1.2],[1.35,2.5,-.45]].forEach((s,i)=>pcie.add(_bx(s[1],.13,.14,_m(i===1?0x23232e:0x1e4d6b),s[2],.1,s[0])));
+  return {parts:[pcb,sock,dimm,chip,vrm,bios,pcie],decor:[],spin:[]};
+},
+
+gpu(){
+  const die=_pt(0,0,.6),vram=_pt(0,1.4,.3),fans=_pt(0,0,2.2),hs=_pt(0,0,1.0),vrm=_pt(0,-1.4,.3),pcb=_pt(0,0,-.5),back=_pt(0,0,-1.6);
+  const spin=[];
+  die.add(_bx(.55,.55,.08,_m(0x20202a,{roughness:.3}),.2,0,.07),_bx(.4,.4,.01,_glow(0xff6b35,.4),.2,0,.115));
+  [[-.5,.45],[.2,.6],[.9,.45],[-.5,-.45],[.2,-.6],[.9,-.45]].forEach(p=>vram.add(_bx(.32,.32,.05,_m(C.black,{roughness:.4}),p[0],p[1],.06)));
+  for(let i=0;i<4;i++)vrm.add(_bx(.22,.26,.14,_m(C.dark),-1.5,-.55+i*.37,.1));
+  for(let i=0;i<17;i++)hs.add(_bx(.03,1.3,.34,_alu(),-2+i*.25,0,.3));
+  [-.4,0,.4].forEach(y=>hs.add(_cy(.05,.05,4.2,_m(C.copper,{metalness:.5,roughness:.4}),0,y,.2,0,Math.PI/2)));
+  const sh=_m(C.dark,{roughness:.55});
+  fans.add(_bx(4.5,.14,.2,sh,0,.75,.55),_bx(4.5,.14,.2,sh,0,-.75,.55),_bx(.14,1.6,.2,sh,-2.25,0,.55),_bx(.14,1.6,.2,sh,2.25,0,.55),_bx(.1,1.5,.18,sh,-.78,0,.55),_bx(.1,1.5,.18,sh,.78,0,.55));
+  [-1.5,0,1.5].forEach(x=>{const f=_fan(.62,9,0x3a3a4a,0x111118,0xff6b35);f.g.position.set(x,0,.56);fans.add(f.g);spin.push({o:f.rotor,axis:'z',speed:5});});
+  pcb.add(_bx(4.4,1.55,.06,_m(0x1a1b24)),_bx(1.8,.1,.07,_gold(),-.9,-.83,0),_bx(.05,1.7,.7,_alu(),-2.35,0,.2));
+  [-.5,-.17,.17,.5].forEach(y=>pcb.add(_bx(.03,.15,.3,_m(C.black),-2.38,y,.25)));
+  back.add(_bx(4.45,1.6,.05,_m(C.dark,{roughness:.4}),0,0,-.1),_bx(2.2,.06,.06,_glow(0xff6b35,.7),.4,.3,-.13));
+  return {parts:[die,vram,fans,hs,vrm,pcb,back],decor:[],spin};
+},
+
+psu(){
+  const tr=_pt(-1.5,.9,0),cap=_pt(1.4,1.0,-.5),mos=_pt(0,1.6,0),fan=_pt(0,0,1.8),pfc=_pt(-1.2,.6,1.0),pcb=_pt(0,-.9,0);
+  const spin=[];
+  tr.add(_bx(.9,.7,.9,_m(C.dark),-.8,-.25,-.4),_cy(.33,.33,1.05,_m(C.copper,{roughness:.4}),-.8,-.25,-.4,0,Math.PI/2));
+  [[.5,-.9],[1.0,-.9],[.5,-.4]].forEach(p=>cap.add(_cy(.28,.28,.9,_m(0xff6b35,{roughness:.4}),p[0],-.2,p[1])));
+  for(let i=0;i<5;i++)mos.add(_bx(.04,.55,.9,_m(0x3b7fd0),-.2+i*.1,-.3,-.1));
+  const f=_fan(.7,7,0x2a8f5a,0x1a1a22,0x00ff88);f.g.position.set(.75,0,1.2);fan.add(f.g);spin.push({o:f.rotor,axis:'z',speed:4});
+  const tor=new THREE.Mesh(new THREE.TorusGeometry(.3,.13,14,28),_m(0x8b5cf6,{roughness:.5}));
+  tor.rotation.x=Math.PI/2;tor.position.set(-1.0,-.5,.7);pfc.add(tor);
+  pcb.add(_bx(2.8,.06,2.7,_m(C.pcb),0,-.8,0));
+  [[0xffd700,-.6,-.35],[0xff3355,-.3,-.6],[0x222222,0,-.35],[0xff6b35,.3,-.6],[0x3b7fd0,.6,-.35]].forEach(k=>{
+    pcb.add(_cy(.055,.055,1.6,_m(k[0],{roughness:.7}),k[1],k[2],-2.1,Math.PI/2),_bx(.18,.14,.1,_m(C.black),k[1],k[2],-2.95));
+  });
+  const sg=new THREE.BoxGeometry(3.0,1.7,2.9),shell=new THREE.Group();
+  shell.add(new THREE.Mesh(sg,_m(0x8c93a0,{transparent:true,opacity:.16,depthWrite:false,roughness:.4})),_edges(sg,0x9fb0c8,.7));
+  return {parts:[tr,cap,mos,fan,pfc,pcb],decor:[shell],spin};
+},
+
+hdd(){
+  const plat=_pt(0,1.0,0),head=_pt(0,1.5,0),spl=_pt(0,.5,0),act=_pt(0,1.2,0),pcb=_pt(0,-1.2,0),lid=_pt(0,2.8,0);
+  const spin=[];
+  const pl=new THREE.Group();pl.position.set(-.35,0,0);
+  const dm=_m(0xc8ccd6,{metalness:.5,roughness:.2});
+  pl.add(_cy(.85,.85,.03,dm,0,.05,0),_cy(.85,.85,.03,dm,0,.2,0),_cy(.25,.25,.2,_m(0x555d6a),0,.12,0));
+  plat.add(pl);spin.push({o:pl,axis:'y',speed:2});
+  spl.add(_cy(.2,.2,.42,_m(0xff6b35),-.35,.06,0),_cy(.08,.08,.04,_gold(),-.35,.29,0));
+  const armM=_m(0x00ff88,{roughness:.5});
+  act.add(_cy(.14,.14,.3,armM,1.0,.12,.7),_bx(.5,.14,.36,_m(C.dark),1.3,.12,.82));
+  const bar=_bx(1.1,.03,.09,armM,.51,.28,.447);bar.rotation.y=2.66;act.add(bar);
+  head.add(_bx(.14,.04,.08,_glow(0x4a9eff,.5),.02,.25,.19));
+  pcb.add(_bx(2.7,.05,1.8,_m(C.pcb),0,-.4,0),_bx(.5,.07,.5,_m(C.black),-.5,-.35,.2),_bx(.4,.07,.4,_m(C.black),.4,-.35,-.2),_bx(.9,.15,.25,_m(C.dark),1.3,-.35,.4));
+  const st=_m(0x8f98a5,{roughness:.35});
+  lid.add(_bx(2.9,.05,2.0,st,0,.36,0),_bx(1.5,.006,1.0,_m(0xdfe3ea,{roughness:.8}),.1,.39,0),
+    _bx(2.9,.5,.06,st,0,.1,-.97),_bx(2.9,.5,.06,st,0,.1,.97),_bx(.06,.5,2.0,st,-1.42,.1,0),_bx(.06,.5,2.0,st,1.42,.1,0));
+  const base=_bx(2.9,.1,2.0,_m(0x7d8693,{roughness:.4}),0,-.25,0);
+  return {parts:[plat,head,spl,act,pcb,lid],decor:[base],spin};
+},
+
+ssd(){
+  const ctrl=_pt(0,1.0,0),nand=_pt(0,.6,0),dram=_pt(0,.9,0),conn=_pt(-1.2,0,0),pcb=_pt(0,-.8,0),heat=_pt(0,2.0,0);
+  ctrl.add(_bx(.55,.07,.55,_m(0x20202a),-.95,.07,0),_bx(.3,.01,.3,_glow(0x00e5ff,.7),-.95,.115,0));
+  [.7,1.6].forEach(x=>nand.add(_bx(.8,.05,.7,_m(0x1a2a3a),x,.07,0)));
+  dram.add(_bx(.45,.06,.4,_m(0x20202a),-.25,.07,0));
+  const f=[];for(let i=0;i<12;i++){const z=-.47+i*.085;if(Math.abs(z-.2)<.04)continue;f.push([-1.82,0,z]);}
+  conn.add(_inst(new THREE.BoxGeometry(.32,.045,.05),_gold(),f));
+  pcb.add(_bx(4.0,.06,1.1,_m(0x14201e)));
+  heat.add(_bx(3.5,.07,1.0,_alu(),.05,.2,0),_bx(1.0,.01,.4,_glow(0x00e5ff,.6),.5,.26,0));
+  for(let i=0;i<9;i++)heat.add(_bx(.06,.05,.95,_m(0xd8dde6,{metalness:.5,roughness:.3}),-1.4+i*.35,.25,0));
+  return {parts:[ctrl,nand,dram,conn,pcb,heat],decor:[],spin:[]};
+},
+
+cooler(){
+  const base=_pt(0,0,0),pipes=_pt(0,.7,0),fins=_pt(0,1.2,0),fan=_pt(0,0,1.6),paste=_pt(0,-.7,0),mount=_pt(0,-1.4,0);
+  const spin=[];
+  base.add(_bx(1.3,.2,1.3,_m(C.copper,{metalness:.5,roughness:.35}),0,.1,0));
+  [[-.45,-.2],[-.15,.2],[.15,-.2],[.45,.2]].forEach(p=>pipes.add(_cy(.07,.07,2.3,_m(C.copper,{metalness:.5,roughness:.35}),p[0],1.25,p[1])));
+  for(let i=0;i<22;i++)fins.add(_bx(1.9,2.0,.03,_alu(),0,1.45,-.9+i*.085));
+  const fr=_m(0x20202a);
+  fan.add(_bx(1.95,.12,.25,fr,0,2.42,1.15),_bx(1.95,.12,.25,fr,0,.48,1.15),_bx(.12,1.95,.25,fr,-.915,1.45,1.15),_bx(.12,1.95,.25,fr,.915,1.45,1.15));
+  const f=_fan(.8,9,0x2c3a4a,0x14141c,0x00e5ff);f.g.position.set(0,1.45,1.15);fan.add(f.g);spin.push({o:f.rotor,axis:'z',speed:5});
+  paste.add(_cy(.42,.42,.03,_m(0x9aa0aa,{roughness:.3}),0,-.08,0,0,0));
+  mount.add(_bx(2.2,.07,.35,_m(C.steel),0,-.42,0),_bx(.35,.07,2.2,_m(C.steel),0,-.42,0));
+  [[.95,0],[-.95,0],[0,.95],[0,-.95]].forEach(p=>mount.add(_cy(.07,.07,.5,_alu(),p[0],-.2,p[1])));
+  return {parts:[base,pipes,fins,fan,paste,mount],decor:[],spin};
+},
+
+case_pc(){
+  const chas=_pt(1.6,0,-.4),glass=_pt(-1.8,0,0),fans=_pt(0,0,1.4),filt=_pt(0,0,2.4),io=_pt(0,1.4,.6),cab=_pt(1.8,0,-.8);
+  const spin=[];
+  const sm=_m(0x3a4150,{roughness:.5});
+  chas.add(_bx(.05,4.2,4.0,sm,1.0,0,0),_bx(.04,3.9,3.6,_m(C.dark),.82,0,0),_bx(2.0,.06,4.0,sm,0,-2.1,0),_bx(2.0,.06,4.0,sm,0,2.1,0),_bx(2.0,4.2,.06,sm,0,0,-2.0),
+    _bx(.1,4.2,.1,sm,-.95,0,2.0),_bx(.1,4.2,.1,sm,.95,0,2.0));
+  glass.add(_bx(.04,4.0,3.9,_m(0x4a9eff,{transparent:true,opacity:.22,roughness:.05,depthWrite:false}),-1.0,0,0));
+  [[-1.25,0x00e5ff],[0,0xff6b35],[1.25,0x8b5cf6]].forEach(k=>{const f=_fan(.55,7,0x222230,0x14141c,k[1]);f.g.position.set(0,k[0],1.7);fans.add(f.g);spin.push({o:f.rotor,axis:'z',speed:5});});
+  const fl=_m(0x00ff88,{transparent:true,opacity:.2,depthWrite:false});
+  filt.add(_bx(1.8,3.8,.03,fl,0,0,2.05),_bx(1.5,.03,1.4,fl,0,-2.15,-.9));
+  io.add(_bx(1.6,.28,.4,_m(C.dark),0,2.2,1.7),_cy(.1,.1,.05,_alu(),-.5,2.38,1.7),_bx(.22,.05,.16,_m(0x1b6ea8),.1,2.38,1.7),_bx(.22,.05,.16,_m(0x1b6ea8),.45,2.38,1.7),_cy(.03,.03,.04,_glow(0x00e5ff,1),.7,2.38,1.7));
+  [[0x222222,0],[0x222222,.08],[0xff3355,.16],[0xffd700,.24],[0x333344,.32]].forEach(k=>cab.add(_tube([[.9,-1.5,-1.6+k[1]],[.9,-1.2,-.4+k[1]],[.9,.4,-.9+k[1]],[.9,1.5,-.9+k[1]]],k[0],.045)));
+  const dec=new THREE.Group();
+  dec.add(_bx(.04,3.0,2.7,_m(C.pcb),.74,.35,-.05),_bx(1.0,.38,2.4,_m(0x1b1c24),.22,-.35,-.1),_bx(.55,.8,.7,_alu(),.45,1.0,-.55),
+    _bx(.35,1.3,.07,_m(C.dark),.5,.9,.35),_bx(.35,1.3,.07,_m(C.dark),.5,.9,.5),_bx(1.7,.7,2.0,_m(C.dark),0,-1.7,-1.0));
+  return {parts:[chas,glass,fans,filt,io,cab],decor:[dec],spin};
+},
+
+nic(){
+  const ctrl=_pt(0,.9,1.0),rj=_pt(-1.3,0,.6),tr=_pt(0,-1.0,.7),x1=_pt(0,-1.3,0),led=_pt(0,1.2,1.0),pcb=_pt(0,0,-1.2);
+  pcb.add(_bx(2.7,1.5,.06,_m(C.pcb)),_bx(.05,1.7,.7,_alu(),-1.4,0,.25));
+  ctrl.add(_bx(.55,.55,.07,_m(0x20202a),.45,.05,.06),_bx(.3,.3,.01,_glow(0x00ff88,.5),.45,.05,.105));
+  rj.add(_bx(.9,.75,.62,_alu(),-.85,.2,.36),_bx(.05,.5,.45,_m(C.black),-1.32,.2,.36));
+  tr.add(_bx(.35,.3,.25,_m(0x6b5a2a),-.15,.4,.17),_bx(.35,.3,.25,_m(0x6b5a2a),-.15,-.05,.17));
+  x1.add(_bx(.8,.14,.07,_gold(),.8,-.82,0));
+  led.add(_bx(.1,.06,.1,_glow(0x00ff88,1),-1.0,.7,.1),_bx(.1,.06,.1,_glow(0xff9d00,1),-.8,.7,.1));
+  return {parts:[ctrl,rj,tr,x1,led,pcb],decor:[],spin:[]};
+},
+
+soundcard(){
+  const dac=_pt(0,.9,.9),adc=_pt(0,.5,.9),amp=_pt(.4,.9,.9),caps=_pt(.4,-.4,1.0),jacks=_pt(-1.4,0,.3),shield=_pt(0,0,2.0);
+  dac.add(_bx(.55,.55,.07,_m(0x20202a),.1,.4,.07),_bx(.3,.3,.01,_glow(0x8b5cf6,.6),.1,.4,.115));
+  adc.add(_bx(.5,.5,.07,_m(0x20202a),.1,-.35,.07),_bx(.28,.28,.01,_glow(0x4a9eff,.6),.1,-.35,.115));
+  amp.add(_bx(.6,.4,.07,_m(0x20202a),1.15,.35,.07),_bx(.5,.25,.15,_alu(),1.15,.35,.17));
+  [.95,1.2,1.45].forEach(x=>[-.35,-.7].forEach(y=>caps.add(_cy(.1,.1,.22,_m(0xc8a840,{roughness:.4}),x,y,.15,Math.PI/2))));
+  [.5,0,-.5].forEach(y=>jacks.add(_cy(.15,.15,.55,_gold(),-1.9,y,.3,0,Math.PI/2)));
+  const sg=new THREE.BoxGeometry(1.15,1.7,.28);
+  shield.add(new THREE.Mesh(sg,_m(0xa8b2c0,{transparent:true,opacity:.4,roughness:.3,depthWrite:false})),_edges(sg,0xd8dde6,.8));
+  shield.children.forEach(o=>o.position.set(.1,0,.16));
+  const dec=new THREE.Group();
+  dec.add(_bx(3.2,1.8,.06,_m(0x14312a)),_bx(.05,1.9,.8,_alu(),-1.65,0,.25),_bx(.9,.14,.07,_gold(),.9,-.97,0));
+  return {parts:[dac,adc,amp,caps,jacks,shield],decor:[dec],spin:[]};
+}
+
+};
+/*MODELS-END*/
+
+function buildModel(id){
+  const f=MODELS[id];
+  if(!f) throw new Error('Sem modelo 3D para '+id);
+  const m=f();
+  m.parts.forEach((p,i)=>{p.userData.partIndex=i;p.userData.base=p.position.clone();});
+  return m;
+}
+
+/* =====================================================================
+   FICHA TÉCNICA TAB
+   ===================================================================== */
+function buildTabFicha(c){
+  let rows='';
+  Object.entries(c.specs).forEach(([k,v])=>{
+    rows+=`<tr><td>${k}</td><td>${v}</td></tr>`;
+  });
+  document.getElementById('tficha').innerHTML=`
+    <table class="specs-table">${rows}</table>
+    ${c.specNote?`<div class="spec-note">💡 ${c.specNote}</div>`:''}`;
+}
+
+/* =====================================================================
+   RAIO-X TAB
+   ===================================================================== */
+function buildTabXray(c){
+  const layers=c.xray.map((l,i)=>`
+    <div class="layer" role="button" tabindex="0" onclick="goToPart(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToPart(${i})}">
+      <div class="ldot" style="background:${l.c};box-shadow:0 0 6px ${l.c}88"></div>
+      <div><span class="lname">${l.n}</span><span class="ldesc">${l.d}</span></div>
+      <span class="go">ver em 3D →</span>
+    </div>`).join('');
+  document.getElementById('txray').innerHTML=`
+    <div class="xray-wrap">
+      <div class="xray-svg-box">
+        <div style="width:180px;height:180px;display:flex;align-items:center;justify-content:center;border:1px solid ${c.color}44;border-radius:8px;padding:10px;background:${c.color}08">
+          ${c.svg}
+        </div>
+        <p>Clica numa camada para a ver<br>destacada no modelo 3D →</p>
+      </div>
+      <div class="xray-layers">
+        <div class="xray-title">🔬 CAMADAS INTERNAS</div>
+        ${layers}
+      </div>
+    </div>`;
+}
+
+/* =====================================================================
+   ESCALA REAL TAB
+   ===================================================================== */
+function mmOf(s){const m=String(s).match(/\d+(?:[.,]\d+)?/);return m?parseFloat(m[0].replace(',','.')):NaN;}
+function buildTabEscala(c){
+  const s=c.size,W=mmOf(s.w),H=mmOf(s.h),CW=85.6,CH=54;
+  let visual='';
+  if(isFinite(W)&&isFinite(H)){
+    const gap=34,k=Math.min((270-gap)/(W+CW),120/Math.max(H,CH));
+    const bx=14,base=150;
+    const cx=bx+W*k+gap;
+    const ratio=(W*H)/(CW*CH);
+    const rt=ratio>=10?ratio.toFixed(0):ratio.toFixed(1).replace('.',',');
+    visual=`<svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${c.name} comparado com um cartão de crédito, à mesma escala">
+      <rect x="${bx}" y="${base-H*k}" width="${W*k}" height="${H*k}" rx="3" fill="${c.color}22" stroke="${c.color}" stroke-width="1.5"/>
+      <rect x="${cx}" y="${base-CH*k}" width="${CW*k}" height="${CH*k}" rx="3" fill="none" stroke="#8888aa" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="${bx}" y1="${base+10}" x2="${bx+W*k}" y2="${base+10}" stroke="#555" stroke-width="1"/>
+      <text x="${bx+W*k/2}" y="${base+23}" text-anchor="middle" fill="${c.color}" font-size="9" font-family="monospace">${s.w}</text>
+      <line x1="${cx}" y1="${base+10}" x2="${cx+CW*k}" y2="${base+10}" stroke="#555" stroke-width="1"/>
+      <text x="${cx+CW*k/2}" y="${base+23}" text-anchor="middle" fill="#8888aa" font-size="9" font-family="monospace">85,6 mm</text>
+      <text x="${bx+W*k/2}" y="${base+36}" text-anchor="middle" fill="${c.color}" font-size="8" font-family="monospace">${c.short.toUpperCase()}</text>
+      <text x="${cx+CW*k/2}" y="${base+36}" text-anchor="middle" fill="#8888aa" font-size="8" font-family="monospace">CARTÃO DE CRÉDITO</text>
+      <text x="150" y="14" text-anchor="middle" fill="#5a5a8a" font-size="8" font-family="monospace">VISTA DE FRENTE · MESMA ESCALA · ÁREA ≈ ${rt}× O CARTÃO</text>
+    </svg>`;
+  }
+  document.getElementById('tescala').innerHTML=`
+    <div class="escala-wrap">
+      <div style="margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto">${visual}</div>
+      <div class="size-grid">
+        <div class="size-item"><div class="size-val">${s.w}</div><div class="size-label">Largura</div></div>
+        <div class="size-item"><div class="size-val">${s.h}</div><div class="size-label">Altura</div></div>
+        <div class="size-item"><div class="size-val">${s.d}</div><div class="size-label">Espessura</div></div>
+        <div class="size-item"><div class="size-val">${s.wt}</div><div class="size-label">Peso</div></div>
+      </div>
+      <p class="scale-note">${c.sizeNote}</p>
+    </div>`;
+}
+
+/* =====================================================================
+   EVOLUÇÃO TAB
+   ===================================================================== */
+function buildTabEvolucao(c){
+  const items=c.history.map(h=>`
+    <div class="titem">
+      <div class="tdot"></div>
+      <div class="tyear">${h.y}</div>
+      <div class="tname">${h.n}</div>
+      <div class="tinfo">${h.i}</div>
+    </div>`).join('');
+  document.getElementById('tevolucao').innerHTML=`<div class="timeline">${items}</div>`;
+}
+
+/* =====================================================================
+   COMPARADOR
+   ===================================================================== */
+function buildComparatorSelects(){
+  ['csel1','csel2'].forEach(id=>{
+    const s=document.getElementById(id);
+    const v=s.value;
+    s.innerHTML='<option value="">— Escolhe um componente —</option>';
+    Object.values(COMP).forEach(c=>{
+      s.innerHTML+=`<option value="${c.id}">${c.name}</option>`;
+    });
+    s.value=v;
+  });
+}
+
+function renderComparador(){
+  const r=document.getElementById('compareResult');
+  const id1=document.getElementById('csel1').value;
+  const id2=document.getElementById('csel2').value;
+  if(!id1||!id2){r.innerHTML=`<div class="cmp-empty">Seleciona dois componentes acima para comparar</div>`;return;}
+  if(id1===id2){r.innerHTML=`<div class="cmp-empty">Escolhe dois componentes diferentes 😄</div>`;return;}
+  const c1=COMP[id1],c2=COMP[id2];
+  const allKeys=[...new Set([...Object.keys(c1.specs),...Object.keys(c2.specs)])];
+  const rows1=allKeys.map(k=>`<div class="cmp-row"><span class="cmp-key">${k}</span><span class="cmp-val">${c1.specs[k]||'—'}</span></div>`).join('');
+  const rows2=allKeys.map(k=>`<div class="cmp-row"><span class="cmp-key">${k}</span><span class="cmp-val">${c2.specs[k]||'—'}</span></div>`).join('');
+  r.innerHTML=`<div class="compare-cols">
+    <div class="ccol">
+      <div class="ccol-head">
+        <div style="width:60px;margin:0 auto 8px">${c1.svg}</div>
+        <div class="ccol-name" style="color:${c1.color}">${c1.name}</div>
+        <div style="font-family:var(--fc);font-size:.7rem;color:var(--muted);margin-top:4px">${c1.tag}</div>
+      </div>${rows1}
+    </div>
+    <div class="ccol">
+      <div class="ccol-head">
+        <div style="width:60px;margin:0 auto 8px">${c2.svg}</div>
+        <div class="ccol-name" style="color:${c2.color}">${c2.name}</div>
+        <div style="font-family:var(--fc);font-size:.7rem;color:var(--muted);margin-top:4px">${c2.tag}</div>
+      </div>${rows2}
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   QUIZ
+   ===================================================================== */
+function startQuiz(){
+  playerName=document.getElementById('playerName').value.trim()||'Aluno';
+  qIdx=0;qScore=0;wrongAnswers=[];
+  // Fisher-Yates: baralha perguntas e a ordem das opções
+  const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  window._quizQ=shuf(QUESTIONS).slice(0,25).map(q=>{
+    const order=shuf(q.opts.map((_,i)=>i));
+    return {...q,opts:order.map(i=>q.opts[i]),ans:order.indexOf(q.ans)};
+  });
+  document.getElementById('quizStart').classList.add('hidden');
+  document.getElementById('quizGame').classList.remove('hidden');
+  document.getElementById('resultado').classList.remove('show');
+  showQuestion();
+}
+
+function showQuestion(){
+  answered=false;
+  const q=window._quizQ[qIdx];
+  const pct=Math.round((qIdx/25)*100);
+  document.getElementById('qbarFill').style.width=pct+'%';
+  document.getElementById('qNum').textContent=`${qIdx+1} / 25`;
+  document.getElementById('qCat').textContent=q.cat;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qFb').className='fb';
+  document.getElementById('qNext').classList.add('hidden');
+  const letters=['A','B','C','D'];
+  const opts=q.opts.map((o,i)=>`
+    <button class="opt" onclick="answerQ(${i})">
+      <span class="opt-l">${letters[i]}</span><span>${o}</span>
+    </button>`).join('');
+  document.getElementById('qOpts').innerHTML=opts;
+}
+
+function answerQ(i){
+  if(answered) return;
+  answered=true;
+  const q=window._quizQ[qIdx];
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.ans].classList.add('correct');
+  if(i===q.ans){
+    qScore++;
+  } else {
+    btns[i].classList.add('wrong');
+    wrongAnswers.push({q:q.q,correct:q.opts[q.ans]});
+  }
+  const fb=document.getElementById('qFb');
+  fb.textContent=q.exp;
+  fb.className='fb show';
+  document.getElementById('qNext').classList.remove('hidden');
+}
+
+function nextQuestion(){
+  qIdx++;
+  if(qIdx>=25){
+    showResult();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResult(){
+  document.getElementById('quizGame').classList.add('hidden');
+  const res=document.getElementById('resultado');
+  res.classList.add('show');
+  const pct=Math.round((qScore/25)*100);
+  let grade,desc,col;
+  if(pct>=90){grade=5;desc='Muito Bom 🌟';col='var(--green)'}
+  else if(pct>=75){grade=4;desc='Bom ✅';col='#4a9eff'}
+  else if(pct>=50){grade=3;desc='Suficiente 👍';col='var(--gold)'}
+  else if(pct>=25){grade=2;desc='Insuficiente ⚠️';col='var(--orange)'}
+  else{grade=1;desc='Insuficiente ❌';col='var(--red)'}
+  document.getElementById('gradeBig').textContent=grade;
+  document.getElementById('gradeBig').style.color=col;
+  document.getElementById('gradeDesc').textContent=desc;
+  document.getElementById('gradeSub').textContent=`${qScore} respostas corretas em 25 perguntas`;
+  document.getElementById('rsCorrect').textContent=qScore;
+  document.getElementById('rsWrong').textContent=25-qScore;
+  document.getElementById('rsPct').textContent=pct+'%';
+  if(wrongAnswers.length>0){
+    const wl=document.getElementById('wrongList');
+    wl.classList.remove('hidden');
+    wl.innerHTML=`<div class="wrong-title">Perguntas a rever (${wrongAnswers.length})</div>`+
+      wrongAnswers.map(w=>`<div class="wrong-item"><span class="wi-q">${w.q}</span><span class="wi-a">✓ ${w.correct}</span></div>`).join('');
+  }
+}
+
+function restartQuiz(){
+  document.getElementById('resultado').classList.remove('show');
+  document.getElementById('quizStart').classList.remove('hidden');
+  document.getElementById('wrongList').classList.add('hidden');
+}
+
+/* =====================================================================
+   PDF CERTIFICATE
+   ===================================================================== */
+function generatePDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,H=297;
+  // Background
+  doc.setFillColor(5,5,9);doc.rect(0,0,W,H,'F');
+  // Border
+  doc.setDrawColor(0,229,255);doc.setLineWidth(1.5);doc.rect(10,10,W-20,H-20);
+  doc.setDrawColor(0,150,170);doc.setLineWidth(0.5);doc.rect(14,14,W-28,H-28);
+  // Header
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(28);doc.setTextColor(0,229,255);
+  doc.text("VanBerto's",W/2,40,{align:'center'});
+  doc.setFontSize(12);doc.setTextColor(255,107,53);
+  doc.text('Hardware Lab — Certificado de Conclusão',W/2,50,{align:'center'});
+  // Divider
+  doc.setDrawColor(0,229,255);doc.setLineWidth(0.5);doc.line(30,56,W-30,56);
+  // Body
+  doc.setFontSize(13);doc.setTextColor(180,180,220);
+  doc.text('Certificamos que',W/2,72,{align:'center'});
+  doc.setFontSize(26);doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');
+  doc.text(playerName,W/2,87,{align:'center'});
+  doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(150,150,200);
+  doc.text('concluiu com sucesso o Quiz de Hardware do VanBerto\'s Lab',W/2,97,{align:'center'});
+  // Score box
+  const grade=document.getElementById('gradeBig').textContent;
+  const desc=document.getElementById('gradeDesc').textContent.replace(/[^\w\s]/g,'').trim();
+  const pct=document.getElementById('rsPct').textContent;
+  const correct=document.getElementById('rsCorrect').textContent;
+  doc.setFillColor(17,17,40);doc.roundedRect(50,105,W-100,52,4,4,'F');
+  doc.setDrawColor(0,229,255);doc.setLineWidth(0.7);doc.roundedRect(50,105,W-100,52,4,4,'S');
+  doc.setFontSize(40);doc.setTextColor(0,229,255);doc.setFont('helvetica','bold');
+  doc.text(grade,W/2,135,{align:'center'});
+  doc.setFontSize(10);doc.setTextColor(150,150,200);doc.setFont('helvetica','normal');
+  doc.text('NOTA FINAL',W/2,143,{align:'center'});
+  doc.setFontSize(9);
+  doc.text(`${correct}/25 corretas · ${pct} · ${desc}`,W/2,152,{align:'center'});
+  // Details
+  doc.setFontSize(10);doc.setTextColor(130,130,180);
+  doc.text('25 perguntas sobre: Processadores, Memória RAM, GPUs, Placas-mãe,',W/2,170,{align:'center'});
+  doc.text('Armazenamento (HDD/SSD), Arrefecimento e Periféricos de expansão',W/2,177,{align:'center'});
+  // Divider
+  doc.setDrawColor(0,150,170);doc.setLineWidth(0.3);doc.line(30,185,W-30,185);
+  // Footer
+  const today=new Date().toLocaleDateString('pt-PT',{year:'numeric',month:'long',day:'numeric'});
+  doc.setFontSize(9);doc.setTextColor(80,80,120);
+  doc.text(`Data: ${today}`,W/2,195,{align:'center'});
+  doc.text('VanBerto\'s Hardware Lab · Recurso Educativo Gratuito · 100% Browser',W/2,202,{align:'center'});
+  doc.text('Sem registo · Sem dados pessoais · Corre no browser',W/2,209,{align:'center'});
+  // Seal
+  doc.setDrawColor(0,229,255);doc.setLineWidth(1);doc.circle(W/2,235,20);
+  doc.setFontSize(7);doc.setTextColor(0,229,255);
+  doc.text('VanBerto\'s',W/2,230,{align:'center'});
+  doc.text('HARDWARE LAB',W/2,236,{align:'center'});
+  doc.text('CERTIFICADO',W/2,242,{align:'center'});
+  doc.setFontSize(11);doc.setTextColor(150,150,200);doc.setFont('helvetica','normal');
+  doc.text('\u00A9 Prof.\u00AA Vanda V\u00E1rzea',W/2,274,{align:'center'});
+  doc.save(`VanBertos_Certificado_${playerName.replace(/\s+/g,'_')}.pdf`);
+}
+
+/* =====================================================================
+   MASCOTE — ROBÔ VANBERTO'S
+   O desenho está todo em drawVanBerto(): é o único sítio a trocar
+   para usar o desenho oficial do robô dos outros jogos.
+   ===================================================================== */
+const VB_TIPS=[
+  'A RAM é volátil: quando desligas o PC, perde tudo o que lá estava.',
+  'DDR significa Double Data Rate: transfere dados nos dois flancos do sinal de relógio.',
+  'Dois módulos de RAM iguais em dual channel aumentam a largura de banda disponível para o processador.',
+  'O TDP indica o calor que o cooler tem de dissipar — não é exatamente o consumo do processador.',
+  'A pasta térmica preenche as micro-imperfeições entre o processador e o cooler.',
+  'A fonte converte a corrente alternada da tomada em corrente contínua para os componentes.',
+  'Um SSD não tem partes móveis, por isso resiste melhor a quedas do que um HDD.',
+  'Uma placa-mãe ATX mede 305 × 244 mm.',
+  'O Intel 4004, de 1971, tinha 2 300 transístores. Hoje há processadores com milhares de milhões!',
+  'Antes de mexeres nos componentes, desliga o PC da tomada e toca numa parte metálica da caixa para descarregares a eletricidade estática.',
+  'Os SSD NVMe ligam-se por PCIe e são muito mais rápidos do que os SSD SATA.',
+  'A BIOS/UEFI é o primeiro software a correr quando ligas o PC.'
+];
+
+const VB={cv:null,ctx:null,W:240,H:280,t:0,mood:'idle',moodEnd:0,jumpAt:-9,blinkAt:2.5,raf:0,bub:null,bubT:0,tipI:Math.floor(Math.random()*VB_TIPS.length),idleT:0};
+
+function drawVanBerto(ctx,W,H,t,mood,jump){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.scale(W/120,H/140);
+  const dance=mood==='dance', happy=mood==='happy'||dance, oops=mood==='oops';
+  const bob=dance?Math.sin(t*9)*3:Math.sin(t*2)*1.2;
+  const lift=jump>0?-Math.sin((1-jump)*Math.PI)*20:0;
+  const sway=dance?Math.sin(t*9)*0.12:oops?Math.sin(t*30)*0.04:0;
+  // sombra
+  ctx.fillStyle='rgba(0,0,0,.35)';
+  ctx.beginPath();ctx.ellipse(60,134,26+lift*0.2,5,0,0,Math.PI*2);ctx.fill();
+  ctx.translate(60,70+bob+lift);ctx.rotate(sway);ctx.translate(-60,-70);
+  // pernas
+  ctx.fillStyle='#2a2f3a';
+  const l=dance?Math.sin(t*9)*4:0;
+  ctx.fillRect(46,106,10,18+l);ctx.fillRect(64,106,10,18-l);
+  ctx.fillStyle='#ff6b35';
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(42,122+l,18,8,3):ctx.rect(42,122+l,18,8);ctx.fill();
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(60,122-l,18,8,3):ctx.rect(60,122-l,18,8);ctx.fill();
+  // braços
+  ctx.strokeStyle='#ff6b35';ctx.lineWidth=6;ctx.lineCap='round';
+  const aL=happy?(dance?-1.9+Math.sin(t*9)*0.5:-2.2):oops?0.4:0.5+Math.sin(t*2)*0.06;
+  const aR=happy?(dance?-1.9-Math.sin(t*9)*0.5:-2.2):oops?0.4:0.5-Math.sin(t*2)*0.06;
+  ctx.beginPath();ctx.moveTo(38,84);ctx.lineTo(38-Math.sin(aL)*22,84+Math.cos(aL)*22);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(82,84);ctx.lineTo(82+Math.sin(aR)*22,84+Math.cos(aR)*22);ctx.stroke();
+  // corpo
+  ctx.fillStyle='#ff6b35';
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(38,76,44,34,8):ctx.rect(38,76,44,34);ctx.fill();
+  ctx.fillStyle='#0b0b1a';
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(48,84,24,16,4):ctx.rect(48,84,24,16);ctx.fill();
+  ctx.fillStyle='#00e5ff';ctx.fillRect(52,89,16,3);ctx.fillRect(52,94,10,3);
+  // antena
+  ctx.strokeStyle='#8a93a6';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(60,24);ctx.lineTo(60,10);ctx.stroke();
+  ctx.fillStyle=happy?'#00ff88':oops?'#ff3355':'#00e5ff';
+  ctx.beginPath();ctx.arc(60,8,5,0,Math.PI*2);ctx.fill();
+  // cabeça
+  ctx.fillStyle='#0b0b1a';ctx.strokeStyle='#00e5ff';ctx.lineWidth=3;
+  ctx.beginPath();ctx.roundRect?ctx.roundRect(30,24,60,50,14):ctx.rect(30,24,60,50);ctx.fill();ctx.stroke();
+  // olhos
+  const blink=(t%4.2)>4.05;
+  ctx.fillStyle='#00e5ff';ctx.strokeStyle='#00e5ff';ctx.lineWidth=3.5;
+  if(happy){
+    ctx.beginPath();ctx.arc(46,48,6,Math.PI,0);ctx.stroke();
+    ctx.beginPath();ctx.arc(74,48,6,Math.PI,0);ctx.stroke();
+  }else if(oops){
+    ctx.beginPath();ctx.moveTo(40,44);ctx.lineTo(52,52);ctx.moveTo(52,44);ctx.lineTo(40,52);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(68,44);ctx.lineTo(80,52);ctx.moveTo(80,44);ctx.lineTo(68,52);ctx.stroke();
+  }else if(blink){
+    ctx.beginPath();ctx.moveTo(40,48);ctx.lineTo(52,48);ctx.moveTo(68,48);ctx.lineTo(80,48);ctx.stroke();
+  }else{
+    ctx.beginPath();ctx.arc(46,48,6.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(74,48,6.5,0,Math.PI*2);ctx.fill();
+  }
+  // boca
+  ctx.strokeStyle='#00e5ff';ctx.lineWidth=3;
+  ctx.beginPath();
+  if(happy)ctx.arc(60,56,10,0.15*Math.PI,0.85*Math.PI);
+  else if(oops)ctx.arc(60,68,8,1.15*Math.PI,1.85*Math.PI);
+  else ctx.arc(60,57,8,0.2*Math.PI,0.8*Math.PI);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function vbFrame(ts){
+  VB.raf=requestAnimationFrame(vbFrame);
+  const now=ts/1000;VB.t=now;
+  if(VB.mood!=='idle'&&now>VB.moodEnd)VB.mood='idle';
+  let j=0;
+  if(now-VB.jumpAt<0.7)j=1-(now-VB.jumpAt)/0.7;
+  drawVanBerto(VB.ctx,VB.W,VB.H,now,VB.mood,j);
+  // dicas ocasionais, só na página inicial e nos componentes
+  if(!VB.bubT&&now-VB.idleT>28){
+    VB.idleT=now;
+    const sec=document.querySelector('.section.active');
+    if(sec&&(sec.id==='home'||sec.id==='componentes')&&!document.hidden)vbTip();
+  }
+}
+
+function vbMood(m,ms){VB.mood=m;VB.moodEnd=(VB.t||performance.now()/1000)+(ms||2.5);vbDrawOnce();}
+function vbJump(){VB.jumpAt=VB.t||performance.now()/1000;vbDrawOnce();}
+function vbDrawOnce(){
+  if(VB.raf||!VB.ctx)return;
+  drawVanBerto(VB.ctx,VB.W,VB.H,performance.now()/1000,VB.mood,0);
+}
+function vbSay(text,ms,mood){
+  if(!VB.bub)return;
+  VB.bub.textContent=text;
+  VB.bub.classList.add('show');
+  clearTimeout(VB.bubT);
+  VB.bubT=setTimeout(()=>{VB.bub.classList.remove('show');VB.bubT=0;VB.idleT=VB.t;},ms||4500);
+  if(mood){vbMood(mood,(ms||4500)/1000);}
+}
+function vbTip(){
+  VB.tipI=(VB.tipI+1)%VB_TIPS.length;
+  vbSay('Sabias que… '+VB_TIPS[VB.tipI],7000);
+}
+function vbInit(){
+  VB.cv=document.getElementById('vbCv');
+  VB.bub=document.getElementById('vbBubble');
+  if(!VB.cv)return;
+  VB.ctx=VB.cv.getContext&&VB.cv.getContext('2d');
+  if(!VB.ctx)return;
+  const btn=document.getElementById('vbBtn');
+  btn.addEventListener('click',()=>{vbJump();vbTip();});
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){vbDrawOnce();}
+  else VB.raf=requestAnimationFrame(vbFrame);
+}
+
+
+/* =====================================================================
+   MONTAR O PC
+   Nível 1 — montagem guiada (passo a passo)
+   Nível 2 — desafio: escolher peças compatíveis, sem ajudas
+   ===================================================================== */
+let _uq=0;
+function uniq(svg){
+  const k='u'+(++_uq)+'_';
+  return String(svg)
+    .replace(/\bid="([^"]+)"/g,(m,i)=>'id="'+k+i+'"')
+    .replace(/url\(#([^)]+)\)/g,(m,i)=>'url(#'+k+i+')')
+    .replace(/(xlink:)?href="#([^"]+)"/g,(m,x,i)=>(x||'')+'href="#'+k+i+'"');
+}
+
+const MP_SLOTS={
+  mobo:{cat:'mobo',label:'Espaço da placa-mãe'},
+  cpu:{cat:'cpu',label:'Socket do processador'},
+  cooler:{cat:'cooler',label:'Zona do cooler (sobre o processador)'},
+  ram1:{cat:'ram',label:'Ranhura de RAM 1 (A1)'},
+  ram2:{cat:'ram',label:'Ranhura de RAM 2 (A2)'},
+  ram3:{cat:'ram',label:'Ranhura de RAM 3 (B1)'},
+  ram4:{cat:'ram',label:'Ranhura de RAM 4 (B2)'},
+  ssd:{cat:'ssd',label:'Slot M.2'},
+  gpu:{cat:'gpu',label:'Slot PCIe x16'},
+  psu:{cat:'psu',label:'Espaço da fonte de alimentação'},
+  hdd:{cat:'hdd',label:'Baia de disco de 3,5"'},
+  c24:{cat:'c24',label:'Ficha de 24 pinos da placa-mãe',cable:true},
+  ceps:{cat:'ceps',label:'Ficha EPS do processador',cable:true},
+  cpcie:{cat:'cpcie',label:'Ficha de alimentação da placa gráfica',cable:true},
+  csata:{cat:'csata',label:'Ficha de alimentação do disco rígido',cable:true},
+  cdata:{cat:'cdata',label:'Porta SATA da placa-mãe (dados do disco)',cable:true}
+};
+const MP_CAT_PLACE={
+  mobo:'o espaço da placa-mãe',cpu:'o socket do processador',ram:'uma ranhura de RAM',cooler:'a zona do cooler, sobre o processador',
+  ssd:'o slot M.2',gpu:'o slot PCIe x16',psu:'o espaço da fonte, em baixo',hdd:'a baia do disco, em baixo à direita'
+};
+const MP_DEPS={cpu:['mobo'],ram:['mobo'],ssd:['mobo'],gpu:['mobo'],cooler:['cpu'],
+  c24:['psu','mobo'],ceps:['psu','cpu'],cpcie:['psu','gpu'],csata:['psu','hdd'],cdata:['hdd','mobo']};
+const MP_DEP_MSG={
+  mobo:'Primeiro instala a placa-mãe na caixa.',cpu:'Primeiro instala o processador no socket.',
+  psu:'Primeiro instala a fonte de alimentação.',gpu:'Primeiro instala a placa gráfica.',hdd:'Primeiro instala o disco rígido.'
+};
+
+const MP_PARTS={
+  mobo:[
+    {id:'mobo_ok',cat:'mobo',ok:true,icon:'motherboard',name:'Placa-mãe ATX · AM5 · DDR5',sub:'Chipset B650 · 305×244 mm',
+     tip:'Placa-mãe instalada! É ela que liga e permite a comunicação entre todos os componentes.'},
+    {id:'mobo_eatx',cat:'mobo',ok:false,icon:'motherboard',name:'Placa-mãe E-ATX · AM5 · DDR5',sub:'305×330 mm',
+     why:'A tua caixa aceita placas-mãe até ATX (305×244 mm). Uma E-ATX tem 305×330 mm: é demasiado grande e os furos de fixação não coincidem.'}
+  ],
+  cpu:[
+    {id:'cpu_ok',cat:'cpu',ok:true,icon:'cpu',name:'Processador AMD · socket AM5',sub:'8 núcleos · 16 threads',
+     tip:'Processador instalado! É o "cérebro" do PC: executa as instruções dos programas.'},
+    {id:'cpu_lga',cat:'cpu',ok:false,icon:'cpu',name:'Processador Intel · socket LGA 1700',sub:'12.ª/13.ª/14.ª geração',
+     why:'O socket é diferente. Cada socket tem o seu número e a sua disposição de contactos: um processador LGA 1700 não encaixa num socket AM5.'}
+  ],
+  ram:[
+    {id:'ram_ok',cat:'ram',ok:true,icon:'ram',name:'Memória DDR5 · 16 GB',sub:'DIMM · 288 pinos · 1,1 V',qty:2,
+     tip:'Memória instalada! A RAM guarda temporariamente os dados dos programas que estão a correr.'},
+    {id:'ram_ddr4',cat:'ram',ok:false,icon:'ram',name:'Memória DDR4 · 16 GB',sub:'DIMM · 288 pinos · 1,2 V',qty:2,
+     why:'A placa é DDR5. A DDR4 e a DDR5 têm o entalhe do conector em posições diferentes, por isso não encaixam — e a tensão também é diferente.'},
+    {id:'ram_sodimm',cat:'ram',ok:false,icon:'ram',name:'Memória DDR5 SO-DIMM · 16 GB',sub:'SO-DIMM · 262 pinos',qty:2,
+     why:'O SO-DIMM é o formato dos portáteis: é mais curto e tem outro conector. Numa placa de desktop usa-se o formato DIMM.'}
+  ],
+  cooler:[
+    {id:'cooler_ok',cat:'cooler',ok:true,icon:'cooler',name:'Cooler de torre · 155 mm',sub:'Compatível com AM5',
+     tip:'Cooler instalado! Retira o calor do processador para evitar o thermal throttling.'},
+    {id:'cooler_tall',cat:'cooler',ok:false,icon:'cooler',name:'Cooler de torre · 185 mm',sub:'Compatível com AM5',
+     why:'A tua caixa aceita coolers até 165 mm de altura. Com 185 mm, o painel lateral não fecharia.'}
+  ],
+  ssd:[
+    {id:'ssd_ok',cat:'ssd',ok:true,icon:'ssd',name:'SSD M.2 NVMe · 1 TB',sub:'M.2 2280 · PCIe',
+     tip:'SSD instalado! Sem partes móveis, é muito mais rápido e silencioso do que um HDD.'}
+  ],
+  gpu:[
+    {id:'gpu_ok',cat:'gpu',ok:true,icon:'gpu',name:'Placa gráfica · 310 mm',sub:'PCIe x16 · 3 ventoinhas',
+     tip:'Placa gráfica instalada! Processa imagens, vídeo e cálculos em paralelo.'},
+    {id:'gpu_long',cat:'gpu',ok:false,icon:'gpu',name:'Placa gráfica · 380 mm',sub:'PCIe x16 · 3 ventoinhas',
+     why:'A tua caixa aceita placas gráficas até 350 mm de comprimento. Com 380 mm, a placa bateria nas ventoinhas da frente.'}
+  ],
+  psu:[
+    {id:'psu_ok',cat:'psu',ok:true,icon:'psu',name:'Fonte ATX · 750 W',sub:'80 PLUS Gold',
+     tip:'Fonte instalada! Converte a corrente alternada da tomada em corrente contínua para os componentes.'},
+    {id:'psu_low',cat:'psu',ok:false,icon:'psu',name:'Fonte ATX · 350 W',sub:'80 PLUS Bronze',
+     why:'A placa gráfica deste projeto pede uma fonte de, pelo menos, 650 W. Com 350 W, o PC desligava-se (ou nem arrancava) quando o processador e a placa gráfica trabalhassem a sério.'}
+  ],
+  hdd:[
+    {id:'hdd_ok',cat:'hdd',ok:true,icon:'hdd',name:'Disco rígido 3,5" · 2 TB',sub:'SATA III · 7200 RPM',
+     tip:'Disco instalado! Guarda muita informação a baixo custo, mas é mais lento do que um SSD.'}
+  ]
+};
+const MP_CABLES=[
+  {id:'cab24',cat:'c24',ok:true,isCable:true,icon:null,name:'Cabo ATX de 24 pinos',sub:'Fonte → placa-mãe',
+   tip:'Cabo de 24 pinos ligado: a placa-mãe já recebe energia.'},
+  {id:'cabeps',cat:'ceps',ok:true,isCable:true,icon:null,name:'Cabo EPS 4+4 pinos',sub:'Fonte → processador',
+   tip:'Cabo EPS ligado: o processador já tem energia. Sem ele, o PC não arranca!'},
+  {id:'cabpcie',cat:'cpcie',ok:true,isCable:true,icon:null,name:'Cabo PCIe 6+2 pinos',sub:'Fonte → placa gráfica',
+   tip:'Cabo PCIe ligado: a placa gráfica já tem a energia de que precisa.'},
+  {id:'cabsata',cat:'csata',ok:true,isCable:true,icon:null,name:'Cabo SATA de alimentação',sub:'Fonte → disco rígido',
+   tip:'Cabo SATA ligado: o disco rígido já tem energia.'},
+  {id:'cabdata',cat:'cdata',ok:true,isCable:true,icon:null,name:'Cabo SATA de dados',sub:'Placa-mãe → disco rígido',
+   tip:'Cabo de dados ligado: o disco rígido já comunica com a placa-mãe.'}
+];
+const MP_STEPS={
+  mobo:['Placa-mãe','Coloca-a na caixa, alinhando os furos com os espaçadores (standoffs), e fixa-a com parafusos. Se a placa não tiver a proteção das portas traseiras (I/O shield) já incluída, coloca-a antes.'],
+  cpu:['Processador','Levanta a alavanca do socket, alinha o triângulo do processador com a marca do socket, pousa-o sem forçar e baixa a alavanca.'],
+  ram2:['Memória RAM (1.º módulo)','Para ativares o dual channel, usa as ranhuras 2 e 4 (a contar a partir do processador). Abre as patilhas, alinha o entalhe e pressiona até ouvires um clique.'],
+  ram4:['Memória RAM (2.º módulo)','Coloca o segundo módulo na ranhura 4. Com dois módulos iguais, o processador acede à memória por dois canais em simultâneo.'],
+  ssd:['SSD M.2','Insere-o na ranhura M.2 a cerca de 30°, pressiona para baixo e fixa-o com o parafuso.'],
+  cooler:['Cooler','Confirma que há pasta térmica (muitos coolers já a trazem), pousa-o sobre o processador, aperta os parafusos em cruz e liga a ventoinha ao conector CPU_FAN.'],
+  psu:['Fonte de alimentação','Fixa-a na zona de baixo da caixa com quatro parafusos, com a ventoinha virada para a abertura da caixa.'],
+  gpu:['Placa gráfica','Encaixa-a no primeiro slot PCIe x16 (o mais próximo do processador) até a patilha estalar e fixa-a à caixa com parafusos.'],
+  hdd:['Disco rígido','Coloca-o na baia de 3,5" e fixa-o com parafusos (ou numa gaveta sem ferramentas).'],
+  c24:['Cabo de 24 pinos','Liga a fonte à placa-mãe: é esta ficha que alimenta a placa e os componentes que dependem dela.'],
+  ceps:['Cabo EPS (4+4 pinos)','Alimenta o processador. A ficha fica sempre perto do socket, no topo da placa.'],
+  cpcie:['Cabo PCIe (6+2 pinos)','Alimenta a placa gráfica. Não o confundas com o cabo EPS do processador.'],
+  csata:['Cabo SATA de alimentação','Liga o disco rígido à fonte.'],
+  cdata:['Cabo SATA de dados','Liga o disco rígido a uma porta SATA da placa-mãe: é por este cabo que passam os dados. O cabo de alimentação é outro.']
+};
+const MP_ORDER=['mobo','cpu','ram2','ram4','ssd','cooler','psu','gpu','hdd','c24','ceps','cpcie','csata','cdata'];
+const MP_PART_SLOTS=['mobo','cpu','cooler','ram2','ram4','ssd','gpu','psu','hdd'];
+const MP_CABLE_SLOTS=['c24','ceps','cpcie','csata','cdata'];
+const MP_GEO={
+  mobo:[34,30,244,305],cpu:[108,100,54,54],cooler:[92,84,86,86],
+  ram1:[184,70,16,125],ram2:[202,70,16,125],ram3:[220,70,16,125],ram4:[238,70,16,125],
+  ssd:[92,205,80,22],gpu:[44,258,310,70],psu:[34,350,190,96],hdd:[236,350,160,96],
+  c24:[258,196,20,62],ceps:[100,34,70,20],cpcie:[322,236,34,22],csata:[372,372,22,50],cdata:[226,326,44,12]
+};
+
+const MP={level:0,placed:{},tray:[],sel:null,mistakes:0,hints:0,t0:0,tick:0,phase:'idle',elapsed:0,drag:null,dragged:false,hintFor:null,pausedAt:0};
+
+/* ---------- desenho do palco (SVG) ---------- */
+function mpFan(cx,cy,r,n,blade,ring,cls){
+  let b='';
+  for(let i=0;i<n;i++){
+    b+=`<path transform="rotate(${(i*360/n).toFixed(1)} ${cx} ${cy})" d="M${cx} ${cy} L${cx} ${cy-r*0.92} Q${cx+r*0.55} ${cy-r*0.8} ${cx+r*0.38} ${cy-r*0.2} Z" fill="${blade}"/>`;
+  }
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#101018" stroke="${ring}" stroke-width="1.5"/><g class="${cls}">${b}<circle cx="${cx}" cy="${cy}" r="${r*0.18}" fill="#1b1b26"/></g>`;
+}
+function mpVis(id){
+  const g=MP_GEO[id];
+  switch(id){
+    case 'mobo':return `
+      <rect x="34" y="30" width="244" height="305" rx="4" fill="#0e4a33" stroke="#1f8f63" stroke-width="1.5"/>
+      <rect x="34" y="44" width="26" height="96" fill="#16161f" stroke="#555d6a"/>
+      <text x="47" y="96" font-size="8" fill="#8a93a6" text-anchor="middle" transform="rotate(-90 47 96)">PORTAS I/O</text>
+      <rect x="66" y="44" width="18" height="70" fill="#2a2f3a"/><rect x="92" y="44" width="76" height="18" fill="#2a2f3a"/>
+      <rect x="104" y="96" width="62" height="62" fill="#1b1b24" stroke="#c8a840"/>
+      ${[184,202,220,238].map(x=>`<rect x="${x}" y="70" width="16" height="125" rx="2" fill="#15151d" stroke="#2f3a4a"/>`).join('')}
+      <rect x="88" y="201" width="88" height="30" rx="2" fill="#15151d" stroke="#2f3a4a"/>
+      <rect x="46" y="262" width="150" height="10" rx="1" fill="#15151d" stroke="#2f3a4a"/>
+      <rect x="46" y="240" width="60" height="8" rx="1" fill="#15151d" stroke="#2f3a4a"/>
+      <rect x="190" y="276" width="40" height="40" rx="3" fill="#3a4150" stroke="#555d6a"/><text x="210" y="300" font-size="8" fill="#c8ccd6" text-anchor="middle">Chipset</text>
+      <circle cx="70" cy="300" r="10" fill="#c8ccd6" stroke="#8a93a6"/>
+      <rect x="258" y="196" width="20" height="62" fill="#15151d" stroke="#2f3a4a"/>
+      <rect x="100" y="34" width="70" height="20" fill="#15151d" stroke="#2f3a4a"/>
+      <rect x="322" y="236" width="34" height="22" fill="#15151d" stroke="#2f3a4a" opacity=".0"/>`;
+    case 'cpu':return `
+      <rect x="112" y="104" width="46" height="46" rx="3" fill="#c8a840"/><rect x="118" y="110" width="34" height="34" fill="#d8dde6"/>
+      <text x="135" y="131" font-size="9" fill="#222" text-anchor="middle" font-weight="700">CPU</text>
+      <path d="M112 104 l9 0 l-9 9z" fill="#ff6b35"/>`;
+    case 'cooler':return `
+      <rect x="92" y="84" width="86" height="86" rx="8" fill="#20202a" stroke="#4a9eff" stroke-width="1.5"/>
+      ${mpFan(135,127,34,7,'#2c3a4a','#4a9eff','mp-fan')}`;
+    case 'ram1':case 'ram2':case 'ram3':case 'ram4':{
+      const x=g[0];
+      return `<rect x="${x}" y="70" width="16" height="125" rx="2" fill="#17171f" stroke="#8b5cf6"/>
+        ${[0,1,2,3].map(i=>`<rect x="${x+3}" y="${80+i*26}" width="10" height="20" rx="1" fill="#2a2a3a"/>`).join('')}
+        <rect x="${x+2}" y="191" width="12" height="3" fill="#d4af37"/>`;}
+    case 'ssd':return `
+      <rect x="92" y="205" width="80" height="22" rx="2" fill="#14201e" stroke="#00e5ff"/>
+      <rect x="100" y="209" width="14" height="14" fill="#20202a"/><rect x="120" y="209" width="18" height="14" fill="#1a2a3a"/><rect x="142" y="209" width="18" height="14" fill="#1a2a3a"/>
+      <circle cx="168" cy="216" r="2.5" fill="#c8ccd6"/>`;
+    case 'gpu':return `
+      <rect x="38" y="250" width="8" height="84" fill="#b9c2cf"/>
+      <rect x="44" y="268" width="310" height="56" rx="6" fill="#1e2230" stroke="#ff6b35" stroke-width="1.5"/>
+      <rect x="46" y="262" width="150" height="6" fill="#d4af37"/>
+      ${mpFan(104,296,23,9,'#3a3a4a','#ff6b35','mp-fan')}${mpFan(194,296,23,9,'#3a3a4a','#ff6b35','mp-fan')}${mpFan(284,296,23,9,'#3a3a4a','#ff6b35','mp-fan')}`;
+    case 'psu':return `
+      <rect x="34" y="350" width="190" height="96" rx="4" fill="#1e2230" stroke="#ffd700" stroke-width="1.5"/>
+      ${mpFan(84,398,34,7,'#2a8f5a','#ffd700','mp-fan')}
+      <text x="158" y="392" font-size="12" fill="#ffd700" font-weight="700" text-anchor="middle">PSU</text>
+      <text x="158" y="408" font-size="10" fill="#c8ccd6" text-anchor="middle">750 W</text>
+      <text x="158" y="422" font-size="8" fill="#8a93a6" text-anchor="middle">80 PLUS Gold</text>`;
+    case 'hdd':return `
+      <rect x="236" y="350" width="160" height="96" rx="4" fill="#8f98a5" stroke="#c8ccd6" stroke-width="1.5"/>
+      <circle cx="296" cy="398" r="38" fill="#2a2f3a"/><circle cx="296" cy="398" r="12" fill="#555d6a"/>
+      <line x1="296" y1="398" x2="350" y2="372" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/>
+      <rect x="370" y="368" width="26" height="58" fill="#15151d" stroke="#2f3a4a"/>`;
+    case 'c24':return `<path d="M200 350 C200 312 268 306 268 258" fill="none" stroke="#141414" stroke-width="9" stroke-linecap="round"/><path d="M200 350 C200 312 268 306 268 258" fill="none" stroke="#ff9d00" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="258" y="196" width="20" height="62" rx="2" fill="#111" stroke="#ffd700"/>`;
+    case 'ceps':return `<path d="M70 350 C14 336 16 64 98 46" fill="none" stroke="#141414" stroke-width="8" stroke-linecap="round"/><path d="M70 350 C14 336 16 64 98 46" fill="none" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="100" y="34" width="70" height="20" rx="2" fill="#111" stroke="#ffd700"/>`;
+    case 'cpcie':return `<path d="M150 350 C150 336 338 348 338 258" fill="none" stroke="#141414" stroke-width="8" stroke-linecap="round"/><path d="M150 350 C150 336 338 348 338 258" fill="none" stroke="#c8ccd6" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="322" y="236" width="34" height="22" rx="2" fill="#111" stroke="#00e5ff"/>`;
+    case 'cdata':return `<path d="M248 338 C248 350 330 340 330 352" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round"/><path d="M248 338 C248 350 330 340 330 352" fill="none" stroke="#4a9eff" stroke-width="2" stroke-dasharray="3 3"/><rect x="226" y="326" width="44" height="12" rx="2" fill="#111" stroke="#4a9eff"/>`;
+    case 'csata':return `<path d="M224 410 C300 440 350 430 372 400" fill="none" stroke="#141414" stroke-width="7" stroke-linecap="round"/><path d="M224 410 C300 440 350 430 372 400" fill="none" stroke="#ff3355" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="372" y="372" width="22" height="50" rx="2" fill="#111" stroke="#ff3355"/>`;
+  }
+  return '';
+}
+const MP_SHORT={cpu:'CPU',cooler:'COOLER',ram1:'1',ram2:'2',ram3:'3',ram4:'4',ssd:'M.2',gpu:'PLACA GRÁFICA (PCIe x16)',psu:'FONTE',hdd:'DISCO 3,5"',mobo:'PLACA-MÃE',c24:'24 pinos',ceps:'EPS',cpcie:'PCIe',csata:'SATA energia',cdata:'SATA dados'};
+function mpSvg(){
+  const order=['mobo','psu','hdd','gpu','ssd','cpu','cooler','ram1','ram2','ram3','ram4','c24','ceps','cpcie','csata','cdata'];
+  const slots=order.map(id=>{
+    const [x,y,w,h]=MP_GEO[id];
+    const small=(w<30||h<30);
+    const lab=small?'':`<text class="slab" x="${x+w/2}" y="${y+h/2+3}" text-anchor="middle">${MP_SHORT[id]}</text>`;
+    const ramLab=id.startsWith('ram')?`<text class="slab" x="${x+w/2}" y="${y+h+12}" text-anchor="middle">${MP_SHORT[id]}</text>`:'';
+    const cabLab=MP_SLOTS[id].cable?`<text class="slab" x="${x+w/2}" y="${y-3}" text-anchor="middle">${MP_SHORT[id]}</text>`:'';
+    return `<g class="slot" data-slot="${id}" tabindex="0" role="button" aria-label="${MP_SLOTS[id].label}">
+      <rect class="sbox" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>${lab}${ramLab}${cabLab}
+      <g class="vis" style="display:none">${mpVis(id)}</g>
+      <rect class="hit" x="${x-3}" y="${y-3}" width="${w+6}" height="${h+6}"/>
+    </g>`;
+  }).join('');
+  return `<svg id="mpSvg" viewBox="0 0 420 470" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Interior da caixa do PC, vista lateral, com os locais onde instalar cada peça">
+    <rect x="6" y="6" width="408" height="458" rx="14" fill="#080818" stroke="#2a2f3a" stroke-width="3"/>
+    <rect x="6" y="40" width="22" height="160" fill="#14141f"/>
+    <text x="17" y="120" font-size="9" fill="#5a5a8a" text-anchor="middle" transform="rotate(-90 17 120)">TRASEIRA</text>
+    <text x="404" y="270" font-size="9" fill="#5a5a8a" text-anchor="middle" transform="rotate(90 404 270)">FRENTE</text>
+    <circle cx="352" cy="90" r="24" fill="#101018" stroke="#2a2f3a"/><circle cx="352" cy="170" r="24" fill="#101018" stroke="#2a2f3a"/>
+    ${slots}</svg>`;
+}
+
+/* ---------- interface ---------- */
+function buildMontar(){
+  const el=document.getElementById('montar');
+  el.innerHTML=`<div class="inner mp-inner">
+    <div class="sec-header">
+      <h2 class="sec-title">Monta o <span class="accent">PC</span></h2>
+      <p class="sec-sub">Instala cada peça no sítio certo, liga os cabos e arranca o computador</p>
+    </div>
+    <div id="mpMenu" class="mp-menu">
+      <div class="mp-safety"><b>⚡ Segurança primeiro:</b> num PC a sério, trabalha sempre com a fonte desligada da tomada e toca numa parte metálica da caixa antes de pegares nos componentes, para descarregares a eletricidade estática.</div>
+      <div class="mp-levels">
+        <button class="mp-lvl" onclick="mpStart(1)"><span class="mp-lvl-n">NÍVEL 1</span><span class="mp-lvl-t">Montagem guiada</span><span class="mp-lvl-d">Passo a passo: mostra-te onde e como instalar cada peça, pela ordem certa.</span></button>
+        <button class="mp-lvl" onclick="mpStart(2)"><span class="mp-lvl-n">NÍVEL 2</span><span class="mp-lvl-t">Desafio de compatibilidade</span><span class="mp-lvl-d">Sem ajudas. Há peças que não servem — lê a ficha do projeto e escolhe as certas.</span></button>
+      </div>
+    </div>
+    <div id="mpGame" class="hidden">
+      <div class="mp-bar">
+        <span class="mp-chip" id="mpLvlTag"></span>
+        <span class="mp-chip" id="mpProg"></span>
+        <span class="mp-chip" id="mpTime" aria-hidden="true">00:00</span>
+        <span class="mp-chip" id="mpMist"></span>
+        <span class="mp-sp"></span>
+        <button class="cbtn" id="mpHintBtn" onclick="mpHint()">💡 Dica</button>
+        <button class="cbtn" onclick="mpStart(MP.level)">↺ Recomeçar</button>
+        <button class="cbtn" onclick="mpMenu()">✕ Sair</button>
+      </div>
+      <div class="mp-grid">
+        <div class="mp-step" id="mpStep"></div>
+        <div class="mp-status" id="mpStatus" role="status" aria-live="polite"></div>
+        <div class="mp-tray" id="mpTray"></div>
+        <div class="mp-stage" id="mpStage">${mpSvg()}</div>
+        <div class="mp-ficha" id="mpFicha"></div>
+      </div>
+    </div>
+    <div id="mpPost" class="hidden"></div>
+  </div>`;
+  const svg=document.getElementById('mpSvg');
+  svg.addEventListener('click',e=>{const g=e.target.closest('[data-slot]');if(g)mpTryPlace(g.dataset.slot);});
+  svg.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const g=e.target.closest&&e.target.closest('[data-slot]');
+    if(g){e.preventDefault();mpTryPlace(g.dataset.slot);}
+  });
+}
+
+function mpMenu(){
+  clearInterval(MP.tick);MP.phase='idle';MP.level=0;
+  document.getElementById('mpMenu').classList.remove('hidden');
+  document.getElementById('mpGame').classList.add('hidden');
+  document.getElementById('mpPost').classList.add('hidden');
+}
+
+function mpShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function mpStart(level){
+  MP.level=level;MP.placed={};MP.sel=null;MP.mistakes=0;MP.hints=0;MP.elapsed=0;MP.phase='parts';MP.hintFor=null;
+  let uid=0;const defs=[];
+  Object.keys(MP_PARTS).forEach(cat=>{
+    MP_PARTS[cat].forEach(d=>{if(level===2||d.ok)defs.push({uid:'p'+(uid++),def:d,qty:d.qty||1});});
+  });
+  MP.tray=level===2?mpShuffle(defs):defs;
+  document.getElementById('mpMenu').classList.add('hidden');
+  document.getElementById('mpPost').classList.add('hidden');
+  document.getElementById('mpGame').classList.remove('hidden');
+  document.getElementById('mpStage').innerHTML=mpSvg();
+  const svg=document.getElementById('mpSvg');
+  svg.addEventListener('click',e=>{const g=e.target.closest('[data-slot]');if(g)mpTryPlace(g.dataset.slot);});
+  svg.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const g=e.target.closest&&e.target.closest('[data-slot]');
+    if(g){e.preventDefault();mpTryPlace(g.dataset.slot);}
+  });
+  document.getElementById('mpLvlTag').textContent=level===1?'NÍVEL 1 · GUIADO':'NÍVEL 2 · DESAFIO';
+  document.getElementById('mpHintBtn').classList.toggle('hidden',level!==2);
+  clearInterval(MP.tick);
+  MP.t0=Date.now();
+  MP.tick=setInterval(mpTick,1000);
+  mpTick();
+  mpFicha();
+  mpRefresh();
+  const first=level===1?'Vamos montar! Escolhe uma peça e toca no sítio onde ela vai.':'Desafio! Nem todas as peças servem — lê a ficha do projeto antes de escolheres.';
+  mpSay(first,'info');
+  if(level===1)vbSay('Vamos montar um PC! Eu ajudo-te.',4500,'happy');
+  else vbSay('Atenção às peças compatíveis!',4500);
+}
+
+function mpTick(){
+  MP.elapsed=Math.floor((Date.now()-MP.t0)/1000);
+  const m=String(Math.floor(MP.elapsed/60)).padStart(2,'0'),s=String(MP.elapsed%60).padStart(2,'0');
+  const el=document.getElementById('mpTime');if(el)el.textContent=m+':'+s;
+}
+
+function mpFicha(){
+  const b=MP.placed.mobo;
+  document.getElementById('mpFicha').innerHTML=`<div class="mp-ficha-t">📋 Ficha do projeto</div>
+    <ul>
+      <li><b>Caixa:</b> Mid Tower — aceita placas-mãe até ATX</li>
+      <li><b>Espaço:</b> placa gráfica até 350 mm · cooler até 165 mm de altura</li>
+      <li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, 650 W</li>
+      <li><b>Placa-mãe:</b> ${b?'socket AM5 · memória DDR5':'ainda por instalar'}</li>
+    </ul>`;
+}
+
+function mpNext(){
+  for(const id of MP_ORDER){
+    if(MP.placed[id])continue;
+    const cat=MP_SLOTS[id].cat;
+    const deps=MP_DEPS[cat]||[];
+    if(deps.every(d=>MP.placed[d]))return id;
+  }
+  return null;
+}
+
+function mpStepText(){
+  const n=mpNext();
+  const total=MP_ORDER.length;
+  const done=MP_ORDER.filter(i=>MP.placed[i]).length;
+  if(!n)return '';
+  const [t,d]=MP_STEPS[n];
+  return `<div class="mp-step-n">Passo ${done+1} de ${total}</div><div class="mp-step-t">${t}</div><div class="mp-step-d">${d}</div>`;
+}
+
+function mpRefresh(){
+  const svg=document.getElementById('mpSvg');if(!svg)return;
+  const cablePhase=MP.phase!=='parts';
+  const sel=MP.sel?MP.sel.def:null;
+  const nextSlot=MP.level===1?mpNext():null;
+  svg.querySelectorAll('.slot').forEach(g=>{
+    const id=g.dataset.slot,slot=MP_SLOTS[id],filled=!!MP.placed[id];
+    const vis=g.querySelector('.vis'),box=g.querySelector('.sbox');
+    vis.style.display=filled?'':'none';
+    box.style.display=filled?'none':'';
+    g.querySelectorAll('.slab').forEach(t=>t.style.display=filled?'none':'');
+    const isCable=!!slot.cable;
+    let hide=false;
+    if(isCable&&!cablePhase)hide=true;
+    if(!isCable&&cablePhase&&!filled)hide=true;
+    if(id==='cooler'&&!MP.placed.cpu)hide=true;
+    if(id==='cpu'&&MP.placed.cooler)hide=true;
+    g.style.display=hide?'none':'';
+    g.setAttribute('tabindex',hide?'-1':'0');
+    const deps=MP_DEPS[slot.cat]||[];
+    g.classList.toggle('locked',!filled&&!deps.every(d=>MP.placed[d]));
+    g.classList.toggle('target',!!sel&&!filled&&sel.cat===slot.cat);
+    g.classList.toggle('hint',!!nextSlot&&nextSlot===id&&!filled);
+    g.setAttribute('aria-label',slot.label+(filled?' (ocupado)':''));
+  });
+  const done=MP_PART_SLOTS.filter(i=>MP.placed[i]).length+MP_CABLE_SLOTS.filter(i=>MP.placed[i]).length;
+  document.getElementById('mpProg').textContent=`${done} / ${MP_ORDER.length} passos`;
+  document.getElementById('mpMist').textContent=MP.level===2?`Erros: ${MP.mistakes} · Dicas: ${MP.hints}`:`Erros: ${MP.mistakes}`;
+  const st=document.getElementById('mpStep');
+  if(MP.phase==='ready'||MP.phase==='boot'||MP.phase==='done'){
+    st.innerHTML=`<div class="mp-step-n">Passo ${MP_ORDER.length+1} de ${MP_ORDER.length+1}</div><div class="mp-step-t">Ligar o PC</div><div class="mp-step-d">Antes de carregares no botão, confirma que o interruptor da fonte está em I (ligado) e que o cabo da tomada está ligado.</div>`;
+  }else if(MP.level===1||(MP.hintFor&&MP.hintFor===mpNext())){
+    st.innerHTML=mpStepText();
+  }else{
+    st.innerHTML=`<div class="mp-step-n">Desafio</div><div class="mp-step-t">Monta o PC sem ajudas</div><div class="mp-step-d">Escolhe só peças compatíveis com a ficha do projeto. Se precisares, usa o botão 💡 Dica: mostra o passo seguinte e conta como uma dica.</div>`;
+  }
+  mpRenderTray();
+}
+
+function mpRenderTray(){
+  const tr=document.getElementById('mpTray');
+  if(MP.phase==='ready'){
+    tr.innerHTML=`<button class="mp-power" onclick="mpBoot()"><span>⏻</span> Ligar o PC</button>`;
+    return;
+  }
+  if(MP.phase==='boot'||MP.phase==='done'){tr.innerHTML='';return;}
+  const next=MP.level===1?mpNext():null;
+  const nextCat=next?MP_SLOTS[next].cat:null;
+  tr.innerHTML=MP.tray.map(it=>{
+    const d=it.def;
+    const ic=d.icon?uniq(COMP[d.icon].svg):'<span class="mp-cabic">'+(d.cat==='c24'?'⚡':d.cat==='ceps'?'🔌':d.cat==='cpcie'?'🔌':'🔌')+'</span>';
+    const on=MP.sel&&MP.sel.uid===it.uid;
+    return `<button class="mp-card${on?' on':''}${nextCat&&nextCat===d.cat?' rec':''}" data-uid="${it.uid}" aria-pressed="${on}">
+      <span class="mp-ic">${ic}</span><span class="mp-nm">${d.name}</span><span class="mp-sub">${d.sub}</span>${it.qty>1?`<span class="mp-q">×${it.qty}</span>`:''}</button>`;
+  }).join('');
+  tr.querySelectorAll('.mp-card').forEach(b=>{
+    b.addEventListener('click',()=>{if(MP.dragged){MP.dragged=false;return;}mpSelect(b.dataset.uid);});
+    b.addEventListener('pointerdown',e=>mpDragStart(e,b));
+  });
+}
+
+function mpSelect(uid){
+  const it=MP.tray.find(x=>x.uid===uid);
+  if(!it)return;
+  MP.sel=(MP.sel&&MP.sel.uid===uid)?null:it;
+  if(MP.sel){
+    const d=MP.sel.def;
+    mpSay(`Escolheste: ${d.name}. Toca agora no sítio onde a queres instalar.`,'info');
+  }
+  mpRefresh();
+  const b=document.querySelector(`.mp-card[data-uid="${uid}"]`);if(b)b.focus();
+}
+
+/* arrastar (só rato/caneta; em ecrãs tácteis usa-se tocar na peça e depois no sítio) */
+function mpDragStart(e,btn){
+  if(e.pointerType==='touch'||e.button!==0)return;
+  const uid=btn.dataset.uid;
+  MP.drag={uid,x:e.clientX,y:e.clientY,ghost:null,active:false};
+  const move=ev=>{
+    const d=MP.drag;if(!d)return;
+    if(!d.active&&Math.hypot(ev.clientX-d.x,ev.clientY-d.y)>6){
+      d.active=true;
+      const it=MP.tray.find(x=>x.uid===uid);
+      if(MP.sel&&MP.sel.uid!==uid){MP.sel=null;}
+      MP.sel=it;
+      d.ghost=document.createElement('div');d.ghost.className='mp-ghost';d.ghost.textContent=it.def.name;
+      document.body.appendChild(d.ghost);
+      mpRefresh();
+    }
+    if(d.active&&d.ghost){d.ghost.style.left=ev.clientX+'px';d.ghost.style.top=ev.clientY+'px';}
+  };
+  const up=ev=>{
+    window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+    const d=MP.drag;MP.drag=null;
+    if(!d||!d.active)return;
+    MP.dragged=true;setTimeout(()=>{MP.dragged=false;},0);
+    if(d.ghost)d.ghost.remove();
+    const els=document.elementsFromPoint?document.elementsFromPoint(ev.clientX,ev.clientY):[];
+    let slot=null;
+    for(const el of els){const g=el.closest&&el.closest('[data-slot]');if(g){slot=g.dataset.slot;break;}}
+    if(slot)mpTryPlace(slot);
+    else{MP.sel=null;mpRefresh();}
+  };
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
+
+function mpSay(text,kind){
+  const el=document.getElementById('mpStatus');
+  if(el){el.textContent=text;el.className='mp-status '+(kind||'info');}
+}
+
+function mpTryPlace(slotId){
+  if(MP.phase!=='parts'&&MP.phase!=='cables')return;
+  const slot=MP_SLOTS[slotId];
+  if(!slot)return;
+  if(MP.placed[slotId]){mpSay('Esse lugar já está ocupado.','info');return;}
+  const it=MP.sel;
+  if(!it){
+    mpSay('Escolhe primeiro uma peça na lista.','info');
+    vbSay('Escolhe primeiro uma peça!',2500);
+    return;
+  }
+  const d=it.def;
+  // cabo na ficha errada: erro com explicação
+  if(d.isCable&&slot.cable&&d.cat!==slot.cat){
+    MP.mistakes++;
+    const eps=(d.cat==='ceps'&&slot.cat==='cpcie')||(d.cat==='cpcie'&&slot.cat==='ceps');
+    const msg=eps?'O cabo EPS (processador) e o cabo PCIe (placa gráfica) têm fichas parecidas, mas não são iguais — e nunca se podem trocar. Confirma o rótulo do cabo.'
+      :'Esse cabo não encaixa aí: cada ficha tem uma forma e um número de pinos próprios. Confirma o rótulo do cabo.';
+    mpSay(msg,'bad');vbSay('Cuidado com os cabos!',3500,'oops');mpRefresh();return;
+  }
+  if(d.cat!==slot.cat){
+    mpSay(`${d.name} não vai aí. Procura ${MP_CAT_PLACE[d.cat]||'o sítio certo'}.`,'bad');
+    vbSay('Esse não é o sítio certo!',3000,'oops');
+    return;
+  }
+  // dependências
+  const deps=MP_DEPS[slot.cat]||[];
+  for(const dep of deps){
+    if(!MP.placed[dep]){mpSay(MP_DEP_MSG[dep]||'Falta instalar outra peça primeiro.','bad');vbSay(MP_DEP_MSG[dep]||'Falta uma peça primeiro!',3500,'oops');return;}
+  }
+  // peça incompatível
+  if(!d.ok){
+    MP.mistakes++;
+    mpSay(d.why,'bad');vbSay('Essa peça não é compatível!',4000,'oops');mpRefresh();return;
+  }
+  // regra do dual channel
+  if(slot.cat==='ram'&&slotId!=='ram2'&&slotId!=='ram4'){
+    mpSay('Para ativar o dual channel, a placa recomenda as ranhuras 2 e 4 (a contar a partir do processador). Tenta aí.','bad');
+    vbSay('Usa as ranhuras 2 e 4!',3500,'oops');return;
+  }
+  // colocar
+  MP.placed[slotId]=d.id;
+  it.qty--;
+  if(it.qty<=0){MP.tray=MP.tray.filter(x=>x.uid!==it.uid);MP.sel=null;}
+  if(d.cat==='mobo')mpFicha();
+  mpSay(d.tip,'ok');
+  vbSay(d.tip,4500,'happy');
+  if(MP.phase==='parts'&&MP_PART_SLOTS.every(i=>MP.placed[i])){
+    MP.phase='cables';
+    MP.tray=MP_CABLES.map((c,i)=>({uid:'c'+i,def:c,qty:1}));
+    MP.sel=null;
+    setTimeout(()=>{mpSay('Todas as peças estão no lugar! Falta ligar os cabos que levam energia a cada componente.','info');vbSay('Agora os cabos!',4000);},50);
+  }else if(MP.phase==='cables'&&MP_CABLE_SLOTS.every(i=>MP.placed[i])){
+    MP.phase='ready';MP.sel=null;
+    setTimeout(()=>{mpSay('Tudo montado e ligado! Carrega em "Ligar o PC".','info');vbSay('Está na hora de ligar!',4000,'happy');},50);
+  }
+  mpRefresh();
+  const f=document.querySelector('#mpTray button');if(f)f.focus();
+}
+
+function mpHint(){
+  if(MP.level!==2||MP.phase==='ready'||MP.phase==='boot'||MP.phase==='done')return;
+  MP.hints++;MP.hintFor=mpNext();
+  mpRefresh();
+  vbSay('Aqui tens uma dica!',2500);
+}
+
+/* ---------- arranque ---------- */
+function mpBoot(){
+  if(MP.phase!=='ready')return;
+  MP.phase='boot';
+  clearInterval(MP.tick);mpTick();
+  mpRefresh();
+  document.getElementById('mpSvg').classList.add('powered');
+  const post=document.getElementById('mpPost');
+  post.classList.remove('hidden');
+  const lines=[
+    'Fonte de alimentação — tensões de +12 V, +5 V e +3,3 V presentes',
+    'Placa-mãe — a UEFI iniciou o teste de arranque (POST)',
+    'Processador AMD (AM5) — detetado',
+    'Memória — 32 GB DDR5 detetados, em dual channel (2 × 16 GB)',
+    'Placa gráfica — detetada no slot PCIe x16',
+    'Armazenamento — SSD NVMe de 1 TB e disco rígido de 2 TB detetados',
+    'Arrefecimento — ventoinhas do cooler e da placa gráfica a rodar'
+  ];
+  post.innerHTML=`<div class="mp-postbox"><div class="mp-post-t">⏻ A ligar o PC…</div><ol class="mp-post" id="mpPostList"></ol><div class="mp-bootbar hidden" id="mpBootBar"><div id="mpBootFill"></div></div><div id="mpResult"></div></div>`;
+  const list=document.getElementById('mpPostList');
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const gap=reduce?0:650;
+  vbSay('A ligar… dedos cruzados!',3000);
+  lines.forEach((t,i)=>setTimeout(()=>{
+    const li=document.createElement('li');li.innerHTML='<span class="ok">✓</span> '+t;list.appendChild(li);
+    if(i===lines.length-1)setTimeout(mpBootOS,gap);
+  },gap*(i+1)));
+  post.scrollIntoView&&post.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
+}
+
+function mpBootOS(){
+  const bar=document.getElementById('mpBootBar'),fill=document.getElementById('mpBootFill');
+  if(!bar)return;
+  bar.classList.remove('hidden');
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finish=()=>{
+    MP.phase='done';
+    const pen=MP.mistakes+MP.hints;
+    const stars=pen<=1?3:pen<=4?2:1;
+    const m=String(Math.floor(MP.elapsed/60)).padStart(2,'0'),s=String(MP.elapsed%60).padStart(2,'0');
+    document.getElementById('mpResult').innerHTML=`
+      <div class="mp-win">🎉 O teu PC arrancou!</div>
+      <div class="mp-stars" aria-label="${stars} de 3 estrelas">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3-stars)}</span></div>
+      <div class="mp-res-stats"><div><b>${m}:${s}</b><span>tempo</span></div><div><b>${MP.mistakes}</b><span>erros</span></div>${MP.level===2?`<div><b>${MP.hints}</b><span>dicas</span></div>`:''}</div>
+      <p class="mp-note">Num PC a sério ainda ligarias os cabos do painel frontal da caixa (botão de ligar, USB, áudio) e as ventoinhas da caixa — e, depois de arrancar, instalarias o sistema operativo.</p>
+      <div class="res-btns">
+        <button class="btn-p" onclick="mpStart(${MP.level})">Jogar outra vez</button>
+        <button class="btn-s" onclick="mpStart(${MP.level===1?2:1})">${MP.level===1?'Experimentar o Nível 2 →':'Voltar ao Nível 1'}</button>
+        <button class="btn-s" onclick="showSection('componentes')">Ver os componentes</button>
+      </div>`;
+    vbSay(stars===3?'Fantástico! Montaste o PC como um profissional!':'Boa! O PC arrancou!',6000,'dance');
+    vbJump();
+  };
+  if(reduce){fill.style.width='100%';finish();return;}
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=8;fill.style.width=Math.min(p,100)+'%';
+    if(p>=100){clearInterval(iv);setTimeout(finish,300);}
+  },90);
+}
+
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+buildGrid();
+buildComparatorSelects();
+renderComparador();
+buildMontar();
+vbInit();
+setTimeout(()=>vbSay("Olá! Eu sou o VanBerto. Explora os componentes ou monta o teu PC!",6000,"happy"),900);
+</script>
+</body>
+</html>
