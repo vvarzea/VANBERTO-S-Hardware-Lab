@@ -305,22 +305,37 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   .mp-stage svg{max-height:62vh;margin:0 auto}
   .mp-bar .cbtn{padding:6px 10px}
 }
-/* ===== MASCOTE ===== */
-#vb{position:fixed;right:10px;bottom:8px;z-index:250;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
-.vb-btn{pointer-events:auto;background:none;border:0;padding:0;cursor:pointer;border-radius:12px}
-.vb-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-#vbCv{width:84px;height:98px;display:block}
-.vb-bubble{position:relative;max-width:230px;background:#101028;border:1px solid var(--cyan);color:var(--text);font-family:var(--fc);font-size:.72rem;line-height:1.5;padding:9px 12px;border-radius:12px;margin-bottom:8px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.45)}
-.vb-bubble.show{opacity:1;transform:none}
-.vb-bubble::after{content:'';position:absolute;bottom:-7px;right:30px;width:12px;height:12px;background:#101028;border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan);transform:rotate(45deg)}
-@media(max-width:600px){#vbCv{width:62px;height:72px}.vb-bubble{max-width:180px;font-size:.66rem}}
+/* ===== MASCOTE — VanBerto's (mesmo aspeto dos outros jogos) ===== */
+#vb{position:fixed;bottom:18px;right:18px;z-index:150;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+#vb.vb-hidden{display:none!important}
+.hero-vb-bubble{pointer-events:auto;background:linear-gradient(135deg,#2a0a4e,#1a0835);border:2.5px solid #ec1e79;outline:1.5px solid rgba(255,167,51,.28);outline-offset:-3px;border-radius:16px;padding:7px 12px;box-shadow:3px 3px 0 rgba(5,2,15,.8);font-family:var(--fb);font-weight:700;font-size:.92rem;line-height:1.25;color:#fff8e0;max-width:200px;min-width:110px;text-align:center;position:relative;z-index:2;margin-bottom:14px;opacity:0;transform:translateY(6px) scale(.9);transition:opacity .35s,transform .35s cubic-bezier(.34,1.56,.64,1);visibility:hidden}
+.hero-vb-bubble.show{opacity:1;transform:none;visibility:visible}
+.hero-vb-bubble::after{content:"";position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);border-left:9px solid transparent;border-right:9px solid transparent;border-top:14px solid #ec1e79}
+.hero-vb-bubble::before{content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid #1a0835;z-index:1}
+.hero-robot{width:110px;height:110px;position:relative;z-index:1;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 0 14px #7dd3fc);animation:heroVbFloat 3s ease-in-out infinite}
+.hero-robot:hover{filter:drop-shadow(0 0 26px #38bdf8)}
+.hero-robot:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:12px}
+.hero-robot.bounce{animation:heroVbPop .65s cubic-bezier(.34,1.56,.64,1),heroVbFloat 3s ease-in-out .65s infinite}
+.hero-robot.oops{animation:vbShake .5s ease-in-out,heroVbFloat 3s ease-in-out .5s infinite}
+.hero-glow{position:absolute;bottom:0;width:140%;height:60px;border-radius:999px;background:radial-gradient(circle,rgba(255,140,0,.45),transparent 60%);opacity:.5;filter:blur(14px);animation:heroGlow 4s ease-in-out infinite alternate;z-index:0;pointer-events:none}
+@keyframes heroVbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes heroVbPop{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-16px) rotate(-6deg)}70%{transform:translateY(-7px) rotate(5deg)}}
+@keyframes heroGlow{0%{opacity:.25;transform:scale(1)}100%{opacity:.5;transform:scale(1.12)}}
+@keyframes vbShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px) rotate(-4deg)}40%{transform:translateX(7px) rotate(4deg)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@media(max-width:480px){#vb{bottom:10px;right:8px}.hero-robot{width:80px;height:80px}.hero-vb-bubble{max-width:165px;font-size:.84rem}}
+/* robô dentro do ecrã de montagem (o flutuante esconde-se, como nos outros jogos) */
+.mp-status{display:flex;align-items:center;gap:12px}
+.mp-bot{width:64px;height:64px;flex:0 0 auto;border-radius:10px;filter:drop-shadow(0 0 8px #7dd3fc)}
+.mp-bot.bounce{animation:heroVbPop .65s cubic-bezier(.34,1.56,.64,1)}
+.mp-bot.oops{animation:vbShake .5s ease-in-out}
+#mpStatusTxt{flex:1}
 /* ===== RODAPÉ ===== */
 .site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
 @media(max-width:600px){.site-foot{padding:18px 70px 26px}
   .logo{display:none}.nav-links{width:100%;justify-content:space-between;gap:3px}
   .nav-btn{padding:6px 6px;font-size:.56rem;letter-spacing:0}
   #nav{padding:8px 10px}}
-@media(prefers-reduced-motion:reduce){#mpSvg.powered .mp-fan{animation:none}.slot.target .sbox{animation:none}.vb-bubble{transition:none}}
+@media(prefers-reduced-motion:reduce){#mpSvg.powered .mp-fan{animation:none}.slot.target .sbox{animation:none}.hero-vb-bubble{transition:none}.hero-robot,.hero-glow{animation:none!important}}
 </style>
 </head>
 <body>
@@ -470,8 +485,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <footer class="site-foot">© Prof.ª Vanda Várzea</footer>
 
 <div id="vb">
-  <div class="vb-bubble" id="vbBubble" aria-hidden="true"></div>
-  <button class="vb-btn" id="vbBtn" aria-label="VanBerto, o robô: toca para ouvir uma curiosidade"><canvas id="vbCv" width="240" height="280"></canvas></button>
+  <div class="hero-vb-bubble" id="heroVbBubble" aria-hidden="true">Olá! 😊</div>
+  <canvas class="hero-robot" id="hero-robot" width="96" height="96" role="button" tabindex="0" aria-label="Robô VanBerto's — clica para falar"></canvas>
+  <div class="hero-glow"></div>
 </div>
 
 <script>
@@ -1003,6 +1019,7 @@ function showSection(id){
   if(id==='montar'&&MP.pausedAt&&(MP.phase==='parts'||MP.phase==='cables'||MP.phase==='ready')){
     MP.t0+=Date.now()-MP.pausedAt;MP.pausedAt=0;MP.tick=setInterval(mpTick,1000);
   }
+  vbSync();
   window.scrollTo(0,0);
 }
 
@@ -1809,138 +1826,260 @@ function generatePDF(){
   doc.save(`VanBertos_Certificado_${playerName.replace(/\s+/g,'_')}.pdf`);
 }
 
-/* =====================================================================
-   MASCOTE — ROBÔ VANBERTO'S
-   O desenho está todo em drawVanBerto(): é o único sítio a trocar
-   para usar o desenho oficial do robô dos outros jogos.
-   ===================================================================== */
-const VB_TIPS=[
-  'A RAM é volátil: quando desligas o PC, perde tudo o que lá estava.',
-  'DDR significa Double Data Rate: transfere dados nos dois flancos do sinal de relógio.',
-  'Dois módulos de RAM iguais em dual channel aumentam a largura de banda disponível para o processador.',
-  'O TDP indica o calor que o cooler tem de dissipar — não é exatamente o consumo do processador.',
-  'A pasta térmica preenche as micro-imperfeições entre o processador e o cooler.',
-  'A fonte converte a corrente alternada da tomada em corrente contínua para os componentes.',
-  'Um SSD não tem partes móveis, por isso resiste melhor a quedas do que um HDD.',
-  'Uma placa-mãe ATX mede 305 × 244 mm.',
-  'O Intel 4004, de 1971, tinha 2 300 transístores. Hoje há processadores com milhares de milhões!',
-  'Antes de mexeres nos componentes, desliga o PC da tomada e toca numa parte metálica da caixa para descarregares a eletricidade estática.',
-  'Os SSD NVMe ligam-se por PCIe e são muito mais rápidos do que os SSD SATA.',
-  'A BIOS/UEFI é o primeiro software a correr quando ligas o PC.'
-];
+/* ── VANBERTO'S — desenho idêntico ao do jogo de programação / Missão Cibersegurança ── */
+function rrVan(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+function cfVan(ctx,x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
 
-const VB={cv:null,ctx:null,W:240,H:280,t:0,mood:'idle',moodEnd:0,jumpAt:-9,blinkAt:2.5,raf:0,bub:null,bubT:0,tipI:Math.floor(Math.random()*VB_TIPS.length),idleT:0};
+function drawVanBerto(ctx,blink,step,armsUp){
+  const w=96,h=96;
+  ctx.clearRect(0,0,w,h);
+  ctx.lineJoin="round"; ctx.lineCap="round";
+  ctx.save(); ctx.translate(0,6);
+  const NAVY="#16233e", NAVY2="#26365a", OUT="#101a30";
+  function white(x0,y0,x1,y1){const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,"#ffffff");g.addColorStop(0.55,"#e6edf7");g.addColorStop(1,"#b4c4dc");return g;}
 
-function drawVanBerto(ctx,W,H,t,mood,jump){
-  ctx.clearRect(0,0,W,H);
-  ctx.save();
-  ctx.scale(W/120,H/140);
-  const dance=mood==='dance', happy=mood==='happy'||dance, oops=mood==='oops';
-  const bob=dance?Math.sin(t*9)*3:Math.sin(t*2)*1.2;
-  const lift=jump>0?-Math.sin((1-jump)*Math.PI)*20:0;
-  const sway=dance?Math.sin(t*9)*0.12:oops?Math.sin(t*30)*0.04:0;
-  // sombra
-  ctx.fillStyle='rgba(0,0,0,.35)';
-  ctx.beginPath();ctx.ellipse(60,134,26+lift*0.2,5,0,0,Math.PI*2);ctx.fill();
-  ctx.translate(60,70+bob+lift);ctx.rotate(sway);ctx.translate(-60,-70);
-  // pernas
-  ctx.fillStyle='#2a2f3a';
-  const l=dance?Math.sin(t*9)*4:0;
-  ctx.fillRect(46,106,10,18+l);ctx.fillRect(64,106,10,18-l);
-  ctx.fillStyle='#ff6b35';
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(42,122+l,18,8,3):ctx.rect(42,122+l,18,8);ctx.fill();
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(60,122-l,18,8,3):ctx.rect(60,122-l,18,8);ctx.fill();
-  // braços
-  ctx.strokeStyle='#ff6b35';ctx.lineWidth=6;ctx.lineCap='round';
-  const aL=happy?(dance?-1.9+Math.sin(t*9)*0.5:-2.2):oops?0.4:0.5+Math.sin(t*2)*0.06;
-  const aR=happy?(dance?-1.9-Math.sin(t*9)*0.5:-2.2):oops?0.4:0.5-Math.sin(t*2)*0.06;
-  ctx.beginPath();ctx.moveTo(38,84);ctx.lineTo(38-Math.sin(aL)*22,84+Math.cos(aL)*22);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(82,84);ctx.lineTo(82+Math.sin(aR)*22,84+Math.cos(aR)*22);ctx.stroke();
-  // corpo
-  ctx.fillStyle='#ff6b35';
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(38,76,44,34,8):ctx.rect(38,76,44,34);ctx.fill();
-  ctx.fillStyle='#0b0b1a';
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(48,84,24,16,4):ctx.rect(48,84,24,16);ctx.fill();
-  ctx.fillStyle='#00e5ff';ctx.fillRect(52,89,16,3);ctx.fillRect(52,94,10,3);
-  // antena
-  ctx.strokeStyle='#8a93a6';ctx.lineWidth=3;
-  ctx.beginPath();ctx.moveTo(60,24);ctx.lineTo(60,10);ctx.stroke();
-  ctx.fillStyle=happy?'#00ff88':oops?'#ff3355':'#00e5ff';
-  ctx.beginPath();ctx.arc(60,8,5,0,Math.PI*2);ctx.fill();
-  // cabeça
-  ctx.fillStyle='#0b0b1a';ctx.strokeStyle='#00e5ff';ctx.lineWidth=3;
-  ctx.beginPath();ctx.roundRect?ctx.roundRect(30,24,60,50,14):ctx.rect(30,24,60,50);ctx.fill();ctx.stroke();
-  // olhos
-  const blink=(t%4.2)>4.05;
-  ctx.fillStyle='#00e5ff';ctx.strokeStyle='#00e5ff';ctx.lineWidth=3.5;
-  if(happy){
-    ctx.beginPath();ctx.arc(46,48,6,Math.PI,0);ctx.stroke();
-    ctx.beginPath();ctx.arc(74,48,6,Math.PI,0);ctx.stroke();
-  }else if(oops){
-    ctx.beginPath();ctx.moveTo(40,44);ctx.lineTo(52,52);ctx.moveTo(52,44);ctx.lineTo(40,52);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(68,44);ctx.lineTo(80,52);ctx.moveTo(80,44);ctx.lineTo(68,52);ctx.stroke();
-  }else if(blink){
-    ctx.beginPath();ctx.moveTo(40,48);ctx.lineTo(52,48);ctx.moveTo(68,48);ctx.lineTo(80,48);ctx.stroke();
-  }else{
-    ctx.beginPath();ctx.arc(46,48,6.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(74,48,6.5,0,Math.PI*2);ctx.fill();
+  const LIFT=8, STRIDE=3;
+  let lTop=70, rTop=70, lDX=0, rDX=0;
+  if(step===0){ lTop=70-LIFT; lDX=STRIDE; rDX=-STRIDE; }
+  else if(step===1){ rTop=70-LIFT; rDX=STRIDE; lDX=-STRIDE; }
+  function leg(cx,top){
+    rrVan(ctx,cx-5,top,10,11,4.5); ctx.fillStyle=white(cx-5,top,cx+5,top); ctx.fill();
+    ctx.lineWidth=2.6; ctx.strokeStyle=OUT; ctx.stroke();
+    const fy=top+9;
+    rrVan(ctx,cx-6.5,fy,13,9,4); ctx.fillStyle=NAVY; ctx.fill();
+    ctx.lineWidth=2.6; ctx.strokeStyle=OUT; ctx.stroke();
+    rrVan(ctx,cx-6.5,fy+2,13,2.4,1.2); ctx.fillStyle="rgba(255,255,255,0.85)"; ctx.fill();
+    cfVan(ctx,cx-2.5,fy+4.5,1.4,"rgba(255,255,255,0.5)");
   }
-  // boca
-  ctx.strokeStyle='#00e5ff';ctx.lineWidth=3;
-  ctx.beginPath();
-  if(happy)ctx.arc(60,56,10,0.15*Math.PI,0.85*Math.PI);
-  else if(oops)ctx.arc(60,68,8,1.15*Math.PI,1.85*Math.PI);
-  else ctx.arc(60,57,8,0.2*Math.PI,0.8*Math.PI);
-  ctx.stroke();
+  leg(41+lDX,lTop); leg(55+rDX,rTop);
+
+  const ARM_SWING = 0.24;
+  const JUMP_RAISE = 2.9;
+  let lArmSwing = 0, rArmSwing = 0;
+  if(armsUp){ lArmSwing = JUMP_RAISE; rArmSwing = -JUMP_RAISE; }
+  else if(step===0){ lArmSwing=-ARM_SWING; rArmSwing=ARM_SWING; }
+  else if(step===1){ lArmSwing=ARM_SWING; rArmSwing=-ARM_SWING; }
+  function arm(sx,swing){
+    ctx.save();
+    const px=sx+4.5, py=52;
+    ctx.translate(px,py); ctx.rotate(swing); ctx.translate(-px,-py);
+    rrVan(ctx,sx,52,9,13,4.5); ctx.fillStyle=white(sx,52,sx+9,52); ctx.fill();
+    ctx.lineWidth=2.6; ctx.strokeStyle=OUT; ctx.stroke();
+    const hx=sx+4.5, hy=67;
+    cfVan(ctx,hx,hy,5,NAVY);
+    ctx.lineWidth=2.3; ctx.strokeStyle=OUT; ctx.beginPath(); ctx.arc(hx,hy,5,0,Math.PI*2); ctx.stroke();
+    cfVan(ctx,hx-2,hy+1.6,1.4,NAVY2); cfVan(ctx,hx+0.5,hy+2.4,1.4,NAVY2); cfVan(ctx,hx+2.5,hy+1.6,1.4,NAVY2);
+    ctx.restore();
+  }
+  arm(17,lArmSwing); arm(70,rArmSwing);
+
+  rrVan(ctx,26,44,44,32,15); ctx.fillStyle=white(28,46,68,46); ctx.fill();
+  ctx.save(); rrVan(ctx,26,44,44,32,15); ctx.clip();
+  const wg=ctx.createLinearGradient(0,64,0,76); wg.addColorStop(0,"rgba(22,35,62,0)"); wg.addColorStop(0.4,"#1c2c4c"); wg.addColorStop(1,"#142038");
+  ctx.fillStyle=wg; ctx.fillRect(26,62,44,16);
+  ctx.strokeStyle="rgba(16,26,48,0.6)"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(28,64); ctx.lineTo(68,64); ctx.stroke();
+  ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.ellipse(36,52,9,5.5,-0.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.lineWidth=3; ctx.strokeStyle=OUT; rrVan(ctx,26,44,44,32,15); ctx.stroke();
+
+  cfVan(ctx,48,56,8,NAVY);
+  ctx.lineWidth=2.5; ctx.strokeStyle=OUT; ctx.beginPath(); ctx.arc(48,56,8,0,Math.PI*2); ctx.stroke();
+  const dome=ctx.createRadialGradient(45.5,53.5,1,48,56,7); dome.addColorStop(0,"#aebccf"); dome.addColorStop(0.6,"#5a6a85"); dome.addColorStop(1,"#2b3a57");
+  ctx.fillStyle=dome; ctx.beginPath(); ctx.arc(48,56,5.7,0,Math.PI*2); ctx.fill();
+  cfVan(ctx,46,53.8,1.5,"rgba(255,255,255,0.85)");
+
+  function pod(cx){
+    cfVan(ctx,cx,32,6,NAVY);
+    ctx.lineWidth=2.3; ctx.strokeStyle=OUT; ctx.beginPath(); ctx.arc(cx,32,6,0,Math.PI*2); ctx.stroke();
+    cfVan(ctx,cx,32,2.8,NAVY2); cfVan(ctx,cx-0.8,31,1,"rgba(255,255,255,0.6)");
+  }
+  pod(25); pod(71);
+
+  ctx.fillStyle=NAVY; ctx.beginPath(); ctx.moveTo(45,16); ctx.lineTo(51,16); ctx.lineTo(49.2,8); ctx.lineTo(46.8,8); ctx.closePath(); ctx.fill();
+  const halo=ctx.createRadialGradient(48,5,1,48,5,11); halo.addColorStop(0,"rgba(90,200,255,0.55)"); halo.addColorStop(1,"rgba(90,200,255,0)");
+  ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(48,5,11,0,Math.PI*2); ctx.fill();
+  const bg=ctx.createRadialGradient(46.3,3.5,0.5,48,5,5.5); bg.addColorStop(0,"#e6f7ff"); bg.addColorStop(0.4,"#48b4ff"); bg.addColorStop(1,"#1670d8");
+  ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(48,5,5.5,0,Math.PI*2); ctx.fill();
+  cfVan(ctx,46.2,3.4,1.6,"#ffffff");
+
+  rrVan(ctx,26,14,44,34,17); ctx.fillStyle=white(28,15,68,15); ctx.fill();
+  ctx.lineWidth=3; ctx.strokeStyle=OUT; ctx.stroke();
+  ctx.save(); rrVan(ctx,26,14,44,34,17); ctx.clip();
+  ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.beginPath(); ctx.ellipse(38,19,10,4,-0.5,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+  rrVan(ctx,30,20,36,23,12); ctx.fillStyle=NAVY; ctx.fill();
+  rrVan(ctx,32.5,22,31,19,10);
+  const vg=ctx.createLinearGradient(0,22,0,41); vg.addColorStop(0,"#7fd4ff"); vg.addColorStop(0.5,"#2a9bf0"); vg.addColorStop(1,"#1366c6");
+  ctx.fillStyle=vg; ctx.fill();
+  ctx.save(); rrVan(ctx,32.5,22,31,19,10); ctx.clip();
+  ctx.fillStyle="rgba(255,255,255,0.45)"; ctx.beginPath(); ctx.ellipse(42,25,9,3.5,-0.4,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+  if(!blink){
+    ctx.fillStyle="#0a0f1c";
+    ctx.beginPath(); ctx.ellipse(41,30,3.3,4,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(55,30,3.3,4,0,0,Math.PI*2); ctx.fill();
+    cfVan(ctx,42.3,28.4,1.5,"#fff"); cfVan(ctx,39.9,31,0.8,"#fff");
+    cfVan(ctx,56.3,28.4,1.5,"#fff"); cfVan(ctx,53.9,31,0.8,"#fff");
+  } else if(blink==="happy"){
+    ctx.lineWidth=3.2; ctx.strokeStyle="#0a0f1c"; ctx.lineCap="round";
+    ctx.beginPath(); ctx.arc(41,31,3.9,0.10*Math.PI,0.90*Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.arc(55,31,3.9,0.10*Math.PI,0.90*Math.PI); ctx.stroke();
+    cfVan(ctx,33.5,35.5,3,"rgba(255,120,120,0.55)");
+    cfVan(ctx,62.5,35.5,3,"rgba(255,120,120,0.55)");
+  } else {
+    ctx.lineWidth=3; ctx.strokeStyle="#0a0f1c";
+    ctx.beginPath(); ctx.arc(41,31,3.5,0.15*Math.PI,0.85*Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.arc(55,31,3.5,0.15*Math.PI,0.85*Math.PI); ctx.stroke();
+  }
+  ctx.fillStyle="#0a0f1c";
+  if(blink==="happy"){
+    ctx.beginPath(); ctx.ellipse(48,36,6.2,4.2,0,0,Math.PI); ctx.fill();
+    ctx.fillStyle="#ff7a7a";
+    ctx.beginPath(); ctx.ellipse(48,38,3.2,1.9,0,0,Math.PI); ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.ellipse(48,36,4.6,3.2,0,0,Math.PI); ctx.fill();
+    ctx.fillStyle="#ff7a7a";
+    ctx.beginPath(); ctx.ellipse(48,37.4,2.4,1.5,0,0,Math.PI); ctx.fill();
+  }
   ctx.restore();
 }
 
-function vbFrame(ts){
-  VB.raf=requestAnimationFrame(vbFrame);
-  const now=ts/1000;VB.t=now;
-  if(VB.mood!=='idle'&&now>VB.moodEnd)VB.mood='idle';
-  let j=0;
-  if(now-VB.jumpAt<0.7)j=1-(now-VB.jumpAt)/0.7;
-  drawVanBerto(VB.ctx,VB.W,VB.H,now,VB.mood,j);
-  // dicas ocasionais, só na página inicial e nos componentes
-  if(!VB.bubT&&now-VB.idleT>28){
-    VB.idleT=now;
-    const sec=document.querySelector('.section.active');
-    if(sec&&(sec.id==='home'||sec.id==='componentes')&&!document.hidden)vbTip();
-  }
-}
+/* ── Comportamento do VanBerto's (igual ao dos outros jogos: balão de fala, pisca, marcha, salta) ── */
+const VB_MSGS=[
+  'Olá! Vamos explorar hardware? 🔧',
+  'Clica num componente para o ver em 3D! 🔄',
+  'Já montaste um PC aqui? 🖥️',
+  'Testa-te no quiz! 🧠',
+  'Arrasta, roda e faz zoom! 🔍',
+  'Boa sorte! 🌟',
+  'Conto contigo! 🤩'
+];
+const VB_TIPS=[
+  'Sabias que a RAM é volátil? Perde tudo quando desligas o PC.',
+  'Sabias que DDR quer dizer Double Data Rate?',
+  'Sabias que o dual channel aumenta a largura de banda da memória?',
+  'Sabias que o TDP não é exatamente o consumo do processador?',
+  'Sabias que a pasta térmica preenche as micro-imperfeições do processador?',
+  'Sabias que a fonte converte a corrente alternada em contínua?',
+  'Sabias que um SSD não tem partes móveis?',
+  'Sabias que uma placa-mãe ATX mede 305 × 244 mm?',
+  'Sabias que o Intel 4004, de 1971, tinha 2 300 transístores?',
+  'Sabias que os SSD NVMe usam PCIe e são mais rápidos do que os SATA?',
+  'Sabias que a BIOS/UEFI é o primeiro software a correr quando ligas o PC?',
+  'Antes de mexeres num PC a sério, desliga-o da tomada e toca numa parte metálica da caixa. ⚡'
+];
+const VB={cvs:[],ctxs:[],bub:null,busy:false,bubT:0,msgI:0,tipI:Math.floor(Math.random()*VB_TIPS.length),
+  reduce:!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)};
 
-function vbMood(m,ms){VB.mood=m;VB.moodEnd=(VB.t||performance.now()/1000)+(ms||2.5);vbDrawOnce();}
-function vbJump(){VB.jumpAt=VB.t||performance.now()/1000;vbDrawOnce();}
-function vbDrawOnce(){
-  if(VB.raf||!VB.ctx)return;
-  drawVanBerto(VB.ctx,VB.W,VB.H,performance.now()/1000,VB.mood,0);
+function vbFrame(blink,step,armsUp){VB.ctxs.forEach(c=>drawVanBerto(c,blink,step,armsUp));}
+function vbBlink(){
+  if(VB.busy||!VB.ctxs.length)return;
+  vbFrame(true,-1,false);
+  setTimeout(()=>{if(!VB.busy)vbFrame(false,-1,false);},180);
 }
-function vbSay(text,ms,mood){
-  if(!VB.bub)return;
-  VB.bub.textContent=text;
-  VB.bub.classList.add('show');
+function vbWalk(steps,speed){
+  if(VB.busy||!VB.ctxs.length)return;
+  steps=steps||6;speed=speed||170;
+  VB.busy=true;let i=0;
+  const iv=setInterval(()=>{
+    vbFrame(false,i%2===0?0:1,false);i++;
+    if(i>=steps){clearInterval(iv);vbFrame(false,-1,false);VB.busy=false;}
+  },speed);
+}
+function vbBounce(cls){
+  VB.cvs.forEach(cv=>{cv.classList.remove(cls);void cv.offsetWidth;cv.classList.add(cls);setTimeout(()=>cv.classList.remove(cls),800);});
+}
+function vbJump(){
+  if(!VB.ctxs.length)return;
+  VB.busy=true;
+  vbBounce('bounce');
+  vbFrame('happy',-1,true);
+  setTimeout(()=>{vbFrame(false,-1,false);VB.busy=false;},700);
+}
+function vbDance(cycles){
+  if(!VB.ctxs.length)return;
+  VB.busy=true;
+  let i=0;const total=(cycles||4)*2;
+  vbFrame('happy',0,true);
+  const iv=setInterval(()=>{
+    i++;
+    if(i>=total){clearInterval(iv);vbFrame(false,-1,false);VB.busy=false;return;}
+    vbFrame('happy',i%2===0?0:1,i%2===0);
+  },170);
+}
+function vbOops(){ vbBounce('oops'); }
+function vbInGame(){
+  const m=document.getElementById('montar'),g=document.getElementById('mpGame');
+  return !!(m&&g&&m.classList.contains('active')&&!g.classList.contains('hidden'));
+}
+function vbSync(){
+  const w=document.getElementById('vb');
+  if(w)w.classList.toggle('vb-hidden',vbInGame());
+}
+function vbBlocked(){
+  const w=document.getElementById('vb');
+  if(!w||w.classList.contains('vb-hidden'))return true;
+  if(document.visibilityState==='hidden')return true;
+  const m=document.getElementById('modal');
+  if(m&&m.classList.contains('open'))return true;
+  return false;
+}
+function vbShow(msg,ms){
+  if(!VB.bub||vbBlocked())return;
   clearTimeout(VB.bubT);
-  VB.bubT=setTimeout(()=>{VB.bub.classList.remove('show');VB.bubT=0;VB.idleT=VB.t;},ms||4500);
-  if(mood){vbMood(mood,(ms||4500)/1000);}
+  VB.bub.textContent=msg;
+  VB.bub.classList.add('show');
+  vbJump();
+  VB.bubT=setTimeout(()=>VB.bub.classList.remove('show'),ms||Math.max(4500,msg.length*55));
 }
-function vbTip(){
-  VB.tipI=(VB.tipI+1)%VB_TIPS.length;
-  vbSay('Sabias que… '+VB_TIPS[VB.tipI],7000);
+/* API usada pelo resto do laboratório: texto no balão (fora do jogo) e/ou reação do robô */
+function vbSay(text,ms,mood){
+  if(vbInGame()){
+    if(mood==='dance')vbDance(4);
+    else if(mood==='happy')vbJump();
+    else if(mood==='oops')vbOops();
+    return;
+  }
+  vbShow(text,ms);
+  if(mood==='dance')setTimeout(()=>vbDance(4),50);
+  else if(mood==='oops')vbOops();
+}
+function vbPick(){
+  const useTip=Math.random()<0.45;
+  if(useTip){VB.tipI=(VB.tipI+1)%VB_TIPS.length;return VB_TIPS[VB.tipI];}
+  VB.msgI=(VB.msgI+1)%VB_MSGS.length;return VB_MSGS[VB.msgI];
 }
 function vbInit(){
-  VB.cv=document.getElementById('vbCv');
-  VB.bub=document.getElementById('vbBubble');
-  if(!VB.cv)return;
-  VB.ctx=VB.cv.getContext&&VB.cv.getContext('2d');
-  if(!VB.ctx)return;
-  const btn=document.getElementById('vbBtn');
-  btn.addEventListener('click',()=>{vbJump();vbTip();});
-  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce){vbDrawOnce();}
-  else VB.raf=requestAnimationFrame(vbFrame);
+  const cv=document.getElementById('hero-robot'),bot=document.getElementById('mpBot');
+  VB.bub=document.getElementById('heroVbBubble');
+  [cv,bot].forEach(c=>{
+    if(!c||!c.getContext)return;
+    const ctx=c.getContext('2d');
+    if(ctx){VB.cvs.push(c);VB.ctxs.push(ctx);}
+  });
+  vbFrame(false,-1,false);
+  if(cv){
+    const talk=()=>vbShow(vbPick());
+    cv.addEventListener('click',talk);
+    cv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();talk();}});
+  }
+  if(bot){
+    bot.addEventListener('click',()=>{vbJump();});
+  }
+  setTimeout(()=>vbShow('Olá! Eu sou o VanBerto\'s. Explora os componentes ou monta o teu PC! 🔧'),1500);
+  setInterval(()=>{if(!vbBlocked())vbShow(vbPick());},22000);
+  if(!VB.reduce){
+    setInterval(()=>{
+      if(VB.busy||document.visibilityState==='hidden')return;
+      if(vbBlocked()&&!vbInGame())return;
+      Math.random()<0.5?vbBlink():vbWalk();
+    },3600);
+  }
+  vbSync();
 }
-
 
 /* =====================================================================
    MONTAR O PC
@@ -1967,7 +2106,7 @@ const MP_SLOTS={
   ssd:{cat:'ssd',label:'Slot M.2'},
   gpu:{cat:'gpu',label:'Slot PCIe x16'},
   psu:{cat:'psu',label:'Espaço da fonte de alimentação'},
-  hdd:{cat:'hdd',label:'Baia de disco de 3,5"'},
+  hdd:{cat:'hdd',label:'Baia do disco rígido de 3,5 polegadas'},
   c24:{cat:'c24',label:'Ficha de 24 pinos da placa-mãe',cable:true},
   ceps:{cat:'ceps',label:'Ficha EPS do processador',cable:true},
   cpcie:{cat:'cpcie',label:'Ficha de alimentação da placa gráfica',cable:true},
@@ -2139,12 +2278,12 @@ function mpVis(id){
   }
   return '';
 }
-const MP_SHORT={cpu:'CPU',cooler:'COOLER',ram1:'1',ram2:'2',ram3:'3',ram4:'4',ssd:'M.2',gpu:'PLACA GRÁFICA (PCIe x16)',psu:'FONTE',hdd:'DISCO 3,5"',mobo:'PLACA-MÃE',c24:'24 pinos',ceps:'EPS',cpcie:'PCIe',csata:'SATA energia',cdata:'SATA dados'};
+const MP_SHORT={cpu:'CPU',cooler:'COOLER',ram1:'1',ram2:'2',ram3:'3',ram4:'4',ssd:'M.2',gpu:'PLACA GRÁFICA (PCIe x16)',psu:'FONTE',hdd:'DISCO RÍGIDO',mobo:'PLACA-MÃE',c24:'24 pinos',ceps:'EPS',cpcie:'PCIe',csata:'SATA energia',cdata:'SATA dados'};
 function mpSvg(){
   const order=['mobo','psu','hdd','gpu','ssd','cpu','cooler','ram1','ram2','ram3','ram4','c24','ceps','cpcie','csata','cdata'];
   const slots=order.map(id=>{
     const [x,y,w,h]=MP_GEO[id];
-    const small=(w<30||h<30);
+    const small=(w<30||h<18);
     const lab=small?'':`<text class="slab" x="${x+w/2}" y="${y+h/2+3}" text-anchor="middle">${MP_SHORT[id]}</text>`;
     const ramLab=id.startsWith('ram')?`<text class="slab" x="${x+w/2}" y="${y+h+12}" text-anchor="middle">${MP_SHORT[id]}</text>`:'';
     const cabLab=MP_SLOTS[id].cable?`<text class="slab" x="${x+w/2}" y="${y-3}" text-anchor="middle">${MP_SHORT[id]}</text>`:'';
@@ -2191,7 +2330,7 @@ function buildMontar(){
       </div>
       <div class="mp-grid">
         <div class="mp-step" id="mpStep"></div>
-        <div class="mp-status" id="mpStatus" role="status" aria-live="polite"></div>
+        <div class="mp-status" id="mpStatus"><canvas class="mp-bot hero-robot-mini" id="mpBot" width="96" height="96" role="img" aria-label="VanBerto's, o robô"></canvas><span id="mpStatusTxt" role="status" aria-live="polite"></span></div>
         <div class="mp-tray" id="mpTray"></div>
         <div class="mp-stage" id="mpStage">${mpSvg()}</div>
         <div class="mp-ficha" id="mpFicha"></div>
@@ -2213,6 +2352,7 @@ function mpMenu(){
   document.getElementById('mpMenu').classList.remove('hidden');
   document.getElementById('mpGame').classList.add('hidden');
   document.getElementById('mpPost').classList.add('hidden');
+  vbSync();
 }
 
 function mpShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -2227,6 +2367,7 @@ function mpStart(level){
   document.getElementById('mpMenu').classList.add('hidden');
   document.getElementById('mpPost').classList.add('hidden');
   document.getElementById('mpGame').classList.remove('hidden');
+  vbSync();
   document.getElementById('mpStage').innerHTML=mpSvg();
   const svg=document.getElementById('mpSvg');
   svg.addEventListener('click',e=>{const g=e.target.closest('[data-slot]');if(g)mpTryPlace(g.dataset.slot);});
@@ -2245,8 +2386,7 @@ function mpStart(level){
   mpRefresh();
   const first=level===1?'Vamos montar! Escolhe uma peça e toca no sítio onde ela vai.':'Desafio! Nem todas as peças servem — lê a ficha do projeto antes de escolheres.';
   mpSay(first,'info');
-  if(level===1)vbSay('Vamos montar um PC! Eu ajudo-te.',4500,'happy');
-  else vbSay('Atenção às peças compatíveis!',4500);
+  vbSay('',0,'happy');
 }
 
 function mpTick(){
@@ -2392,8 +2532,8 @@ function mpDragStart(e,btn){
 }
 
 function mpSay(text,kind){
-  const el=document.getElementById('mpStatus');
-  if(el){el.textContent=text;el.className='mp-status '+(kind||'info');}
+  const el=document.getElementById('mpStatus'),tx=document.getElementById('mpStatusTxt');
+  if(el&&tx){tx.textContent=text;el.className='mp-status '+(kind||'info');}
 }
 
 function mpTryPlace(slotId){
@@ -2533,7 +2673,6 @@ buildComparatorSelects();
 renderComparador();
 buildMontar();
 vbInit();
-setTimeout(()=>vbSay("Olá! Eu sou o VanBerto. Explora os componentes ou monta o teu PC!",6000,"happy"),900);
 </script>
 </body>
 </html>
