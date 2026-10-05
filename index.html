@@ -2846,7 +2846,50 @@ function mpBios(){
       m:'Não estão. Com todos os 32 GB reconhecidos, a RAM funciona. A velocidade mais baixa é o comportamento padrão e resolve-se na BIOS, sem trocar nada.'},
      {ok:false,t:'Ignoro: a velocidade anunciada é só publicidade.',
       m:'Não é. A velocidade anunciada é real, mas só é atingida depois de ativar o perfil EXPO/XMP. Sem isso, a memória fica abaixo do que podia dar.'}],
-    mpBootOS);
+    ()=>mpInstall(0));
+}
+/* ── Instalação do sistema operativo: 4 mini-passos ── */
+const MP_INSTALL=[
+ {t:'Instalar o sistema (1/4): arrancar da pen',
+  i:'Para instalar o Windows ou o Linux, usa-se uma pen USB de arranque com o instalador, criada noutro computador. Depois liga-se ao PC novo.',
+  q:'Ligas o PC com a pen USB e ele arranca para o disco, ignorando o instalador. O que fazes?',
+  o:[{ok:true,t:'Abro o menu de arranque (tecla indicada no arranque, como F11, F12 ou Esc) ou entro na BIOS e escolho a pen como primeiro dispositivo.',
+      m:'Certo. A BIOS decide de onde o PC arranca. A tecla varia de placa para placa e aparece no ecrã de arranque ou no manual.'},
+     {ok:false,t:'Troco a pen por outra de maior capacidade.',
+      m:'A capacidade não é o problema. O instalador cabe numa pen pequena. O que falta é dizer à BIOS para arrancar da pen.'},
+     {ok:false,t:'Reinstalo a BIOS no PC.',
+      m:'Não é preciso. A BIOS já está instalada e funciona. Só é preciso mudar a ordem dos dispositivos de arranque.'}]},
+ {t:'Instalar o sistema (2/4): requisitos do Windows 11',
+  i:'O Windows 11 pede um processador de 64 bits, 4 GB de RAM, 64 GB de armazenamento, UEFI com Secure Boot e um chip de segurança TPM 2.0. O Windows 10 deixou de ter suporte em 14 de outubro de 2025.',
+  q:'O instalador diz que o PC não cumpre os requisitos, mas o hardware é recente e tem 32 GB de RAM. Qual é a causa mais provável?',
+  o:[{ok:true,t:'O TPM 2.0 e o Secure Boot estão desativados na BIOS. Vou ativá-los (o TPM aparece como fTPM na AMD ou PTT na Intel).',
+      m:'Certo. Em muitas placas novas estas opções vêm desligadas de fábrica. Ativam-se na BIOS e o instalador passa a aceitar o PC.'},
+     {ok:false,t:'O processador é demasiado antigo.',
+      m:'Aqui o processador é recente (AM5). Quase todo o hardware atual cumpre este requisito, por isso a causa é outra.'},
+     {ok:false,t:'Faltam mais de 32 GB de RAM.',
+      m:'O Windows 11 precisa de apenas 4 GB. Com 32 GB há memória de sobra.'}]},
+ {t:'Instalar o sistema (3/4): onde instalar',
+  i:'O instalador mostra os discos que detetou: um SSD NVMe de 1 TB e um disco rígido de 2 TB.',
+  q:'Em qual instalas o sistema operativo?',
+  o:[{ok:true,t:'No SSD NVMe. O disco rígido fica para guardar ficheiros grandes e cópias de segurança.',
+      m:'Certo. O sistema e os programas num SSD arrancam e abrem muito mais depressa. O disco rígido é lento, mas barato e com muito espaço para dados.'},
+     {ok:false,t:'No disco rígido, porque tem mais espaço.',
+      m:'O PC ficaria lento a arrancar e a abrir programas. O espaço não é o mais importante para o sistema: a velocidade é.'},
+     {ok:false,t:'Divido o sistema pelos dois discos ao mesmo tempo.',
+      m:'O sistema instala-se num só disco. Dividi-lo só complica e não traz vantagem.'}]},
+ {t:'Instalar o sistema (4/4): depois de instalar',
+  i:'O sistema arrancou, mas a imagem está com pouca resolução e a placa gráfica não rende o que devia.',
+  q:'O que falta fazer?',
+  o:[{ok:true,t:'Instalar os drivers da placa gráfica e da placa-mãe (chipset), vindos do site do fabricante, e correr as atualizações do sistema.',
+      m:'Certo. Sem os drivers certos, o sistema usa um genérico e a peça não rende. Depois convém manter as atualizações e o antivírus (o Windows Defender chega) sempre ativos.'},
+     {ok:false,t:'Comprar outra placa gráfica.',
+      m:'A placa está bem. Falta só o software (driver) que lhe diz como trabalhar.'},
+     {ok:false,t:'Trocar o monitor.',
+      m:'O monitor não é a causa. A resolução baixa vem do driver genérico que o sistema usa até instalares o certo.'}]}
+];
+function mpInstall(k){
+  const x=MP_INSTALL[k];
+  mpAsk('mpInst'+k,x.t,x.i,x.q,x.o,k<MP_INSTALL.length-1?()=>mpInstall(k+1):mpBootOS);
 }
 function mpBootOS(){
   const bar=document.getElementById('mpBootBar'),fill=document.getElementById('mpBootFill');
@@ -2859,10 +2902,10 @@ function mpBootOS(){
     const stars=pen<=1?3:pen<=4?2:1;
     const m=String(Math.floor(MP.elapsed/60)).padStart(2,'0'),s=String(MP.elapsed%60).padStart(2,'0');
     document.getElementById('mpResult').innerHTML=`
-      <div class="mp-win">🎉 O teu PC arrancou!</div>
+      <div class="mp-win">🎉 O teu PC está pronto a usar!</div>
       <div class="mp-stars" aria-label="${stars} de 3 estrelas">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3-stars)}</span></div>
       <div class="mp-res-stats"><div><b>${m}:${s}</b><span>tempo</span></div><div><b>${MP.mistakes}</b><span>erros</span></div>${MP.level===2?`<div><b>${MP.hints}</b><span>dicas</span></div>`:''}</div>
-      <p class="mp-note">Num PC a sério, o passo seguinte seria instalar o sistema operativo (Windows ou Linux) a partir de uma pen USB.</p>
+      <p class="mp-note">Num PC a sério ainda configurarias a rede e as contas, e instalarias os teus programas.</p>
       <div class="res-btns">
         <button class="btn-p" onclick="mpStart(${MP.level})">Jogar outra vez</button>
         <button class="btn-s" onclick="mpStart(${MP.level===1?2:1})">${MP.level===1?'Experimentar o Nível 2 →':'Voltar ao Nível 1'}</button>
