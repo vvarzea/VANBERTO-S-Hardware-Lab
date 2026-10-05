@@ -329,6 +329,20 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mp-bot.bounce{animation:heroVbPop .65s cubic-bezier(.34,1.56,.64,1)}
 .mp-bot.oops{animation:vbShake .5s ease-in-out}
 #mpStatusTxt{flex:1}
+#sndBtn{position:fixed;left:14px;bottom:14px;z-index:151;width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:rgba(10,12,22,.85);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+#sndBtn:hover{color:var(--cyan);border-color:var(--cyan)}
+#sndBtn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#sndBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mp-prep{max-width:760px;margin:0 auto 16px;border:1px solid var(--border);border-radius:12px;background:var(--card)}
+.mp-prep summary{cursor:pointer;padding:12px 16px;font-family:var(--fb);font-weight:700;color:var(--cyan);font-size:.95rem}
+.mp-prep summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:12px}
+.mp-prep-b{padding:0 16px 14px;font-family:var(--fb);font-size:.92rem;color:var(--muted);line-height:1.5}
+.mp-prep-b p{margin:8px 0}.mp-prep-b ul{margin:4px 0 8px;padding-left:20px}.mp-prep-b li{margin:3px 0}
+.mp-prep-b b{color:var(--text)}
+.mp-ov{position:fixed;inset:0;z-index:300;background:rgba(3,4,12,.82);display:flex;align-items:center;justify-content:center;padding:16px}
+.mp-ov-box{max-width:560px;width:100%;max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--cyan);border-radius:14px;padding:18px 20px}
+.mp-ov-opts{display:flex;flex-direction:column;gap:8px}
+.mp-ov-opts button{text-align:left;white-space:normal;line-height:1.35}
 /* ===== RODAPÉ ===== */
 .site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
 @media(max-width:600px){.site-foot{padding:18px 70px 26px}
@@ -482,10 +496,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </section>
 
-<footer class="site-foot">© Prof.ª Vanda Várzea</footer>
+<footer class="site-foot">© Prof.ª Vanda Várzea · Informação revista em outubro de 2026</footer>
+
+<button id="sndBtn" type="button" aria-pressed="true" aria-label="Som ligado. Clica para desligar" title="Som"></button>
 
 <div id="vb">
-  <div class="hero-vb-bubble" id="heroVbBubble" aria-hidden="true">Olá! 😊</div>
+  <div class="hero-vb-bubble" id="heroVbBubble" aria-hidden="true">Olá.</div>
   <canvas class="hero-robot" id="hero-robot" width="96" height="96" role="button" tabindex="0" aria-label="Robô VanBerto's — clica para falar"></canvas>
   <div class="hero-glow"></div>
 </div>
@@ -536,7 +552,8 @@ const COMP = {
       {y:'2011',n:'Intel Sandy Bridge',i:'GPU integrada, 32 nm, maior IPC (instruções por ciclo), ring bus'},
       {y:'2017',n:'AMD Ryzen 1000 (Zen)',i:'8 núcleos, 14 nm — reacendeu a concorrência com a Intel nos processadores de desktop'},
       {y:'2022',n:'Intel Core i9-13900K',i:'24 núcleos (8 P + 16 E), Intel 7, até 5,8 GHz, suporta DDR5 e DDR4'},
-      {y:'2024',n:'AMD Ryzen 9 9950X',i:'16 núcleos Zen 5, TSMC 4 nm, até 5,7 GHz em Boost'}
+      {y:'2024',n:'AMD Ryzen 9 9950X',i:'16 núcleos Zen 5, TSMC 4 nm, até 5,7 GHz em Boost'},
+      {y:'2026',n:'Próxima geração (Zen 6 / Nova Lake)',i:'Ainda por lançar em outubro de 2026. A AMD mantém o socket AM5 no Zen 6 e a Intel prepara o Nova Lake com novo socket; chegada prevista para o início de 2027'}
     ],
     svg:`<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="cpuM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c8a840"/><stop offset="50%" stop-color="#e5c85a"/><stop offset="100%" stop-color="#a07a28"/></linearGradient></defs><rect width="200" height="200" rx="4" fill="#0d1a0d"/><g fill="#c8a840" opacity=".8"><rect x="20" y="188" width="4" height="10"/><rect x="28" y="188" width="4" height="10"/><rect x="36" y="188" width="4" height="10"/><rect x="44" y="188" width="4" height="10"/><rect x="52" y="188" width="4" height="10"/><rect x="60" y="188" width="4" height="10"/><rect x="68" y="188" width="4" height="10"/><rect x="76" y="188" width="4" height="10"/><rect x="84" y="188" width="4" height="10"/><rect x="92" y="188" width="4" height="10"/><rect x="100" y="188" width="4" height="10"/><rect x="108" y="188" width="4" height="10"/><rect x="116" y="188" width="4" height="10"/><rect x="124" y="188" width="4" height="10"/><rect x="132" y="188" width="4" height="10"/><rect x="140" y="188" width="4" height="10"/><rect x="148" y="188" width="4" height="10"/><rect x="156" y="188" width="4" height="10"/><rect x="164" y="188" width="4" height="10"/><rect x="172" y="188" width="4" height="10"/><rect x="-2" y="20" width="10" height="4"/><rect x="-2" y="28" width="10" height="4"/><rect x="-2" y="36" width="10" height="4"/><rect x="-2" y="44" width="10" height="4"/><rect x="-2" y="52" width="10" height="4"/><rect x="-2" y="60" width="10" height="4"/><rect x="-2" y="68" width="10" height="4"/><rect x="-2" y="76" width="10" height="4"/><rect x="-2" y="84" width="10" height="4"/><rect x="-2" y="92" width="10" height="4"/><rect x="-2" y="100" width="10" height="4"/><rect x="-2" y="108" width="10" height="4"/><rect x="-2" y="116" width="10" height="4"/><rect x="-2" y="124" width="10" height="4"/><rect x="-2" y="132" width="10" height="4"/><rect x="-2" y="140" width="10" height="4"/><rect x="-2" y="148" width="10" height="4"/><rect x="-2" y="156" width="10" height="4"/><rect x="-2" y="164" width="10" height="4"/><rect x="-2" y="172" width="10" height="4"/></g><rect x="18" y="18" width="164" height="164" rx="4" fill="url(#cpuM)" stroke="#c8a840" stroke-width="1.5"/><rect x="50" y="50" width="100" height="100" rx="3" fill="#0a0f1a" stroke="#333" stroke-width="1"/><rect x="58" y="58" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#4a9eff" stroke-width="1" opacity=".8"/><rect x="100" y="58" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#ff6b35" stroke-width="1" opacity=".8"/><rect x="58" y="100" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#ff6b35" stroke-width="1" opacity=".8"/><rect x="100" y="100" width="42" height="42" rx="2" fill="#1a1a3a" stroke="#00ff88" stroke-width="1" opacity=".8"/><text x="100" y="46" text-anchor="middle" fill="#888" font-size="8" font-family="monospace">INTEL CORE</text><text x="100" y="37" text-anchor="middle" fill="#00e5ff" font-size="11" font-family="monospace" font-weight="bold">i9-13900K</text><text x="79" y="183" text-anchor="middle" fill="#666" font-size="7" font-family="monospace">LGA1700</text><circle cx="24" cy="24" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="176" cy="24" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="24" cy="176" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/><circle cx="176" cy="176" r="5" fill="none" stroke="#c8a840" stroke-width="1.5"/></svg>`
   },
@@ -666,7 +683,8 @@ const COMP = {
       {y:'2018',n:'NVIDIA RTX 2080 (Turing)',i:'Primeiras placas de consumo com RT Cores (ray tracing em hardware) e Tensor Cores'},
       {y:'2020',n:'NVIDIA RTX 3090 (Ampere)',i:'24 GB de GDDR6X, RT Cores e Tensor Cores de nova geração, DLSS 2'},
       {y:'2022',n:'NVIDIA RTX 4090 (Ada)',i:'76 mil milhões de transístores, TSMC 4N, DLSS 3'},
-      {y:'2025',n:'NVIDIA RTX 5090 (Blackwell)',i:'92 mil milhões de transístores, 32 GB de GDDR7, DLSS 4'}
+      {y:'2025',n:'NVIDIA RTX 5090 (Blackwell)',i:'92 mil milhões de transístores, 32 GB de GDDR7, DLSS 4'},
+      {y:'2025',n:'AMD Radeon RX 9070 XT (RDNA 4)',i:'16 GB de GDDR6 e ray tracing melhorado; concorre com as RTX 5070 e 5070 Ti. Em outubro de 2026 as séries RTX 50 e RX 9000 continuam a ser a geração atual'}
     ],
     svg:`<svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gpuBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0a0a"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="280" height="150" rx="4" fill="url(#gpuBack)"/><rect x="4" y="4" width="272" height="100" rx="3" fill="#120808" stroke="#ff6b35" stroke-width="1.5"/><circle cx="70" cy="54" r="38" fill="#0a0a0a" stroke="#ff6b35" stroke-width="2"/><circle cx="70" cy="54" r="30" fill="#111" stroke="#555" stroke-width="1"/><circle cx="70" cy="54" r="5" fill="#333"/><g stroke="#ff6b35" stroke-width="1" fill="none" opacity=".6"><line x1="70" y1="24" x2="70" y2="34"/><line x1="70" y1="74" x2="70" y2="84"/><line x1="40" y1="54" x2="50" y2="54"/><line x1="90" y1="54" x2="100" y2="54"/><line x1="49" y1="33" x2="56" y2="40"/><line x1="84" y1="68" x2="91" y2="75"/><line x1="91" y1="33" x2="84" y2="40"/><line x1="56" y1="68" x2="49" y2="75"/></g><circle cx="180" cy="54" r="38" fill="#0a0a0a" stroke="#ff6b35" stroke-width="2"/><circle cx="180" cy="54" r="30" fill="#111" stroke="#555" stroke-width="1"/><circle cx="180" cy="54" r="5" fill="#333"/><g stroke="#ff6b35" stroke-width="1" fill="none" opacity=".6" transform="translate(110,0)"><line x1="70" y1="24" x2="70" y2="34"/><line x1="70" y1="74" x2="70" y2="84"/><line x1="40" y1="54" x2="50" y2="54"/><line x1="90" y1="54" x2="100" y2="54"/><line x1="49" y1="33" x2="56" y2="40"/><line x1="84" y1="68" x2="91" y2="75"/><line x1="91" y1="33" x2="84" y2="40"/><line x1="56" y1="68" x2="49" y2="75"/></g><rect x="240" y="10" width="34" height="88" rx="2" fill="#0d0808" stroke="#444" stroke-width="1"/><rect x="244" y="15" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="30" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="45" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><rect x="244" y="60" width="26" height="10" rx="1" fill="#333" stroke="#666" stroke-width=".5"/><text x="257" y="22" text-anchor="middle" fill="#666" font-size="5" font-family="monospace">DP</text><text x="257" y="92" text-anchor="middle" fill="#666" font-size="5" font-family="monospace">HDMI</text><rect x="4" y="108" width="272" height="16" rx="2" fill="#1a0808" stroke="#ff6b35" stroke-width="1"/><g fill="#ff6b35" opacity=".6"><rect x="10" y="110" width="3" height="12"/><rect x="15" y="110" width="3" height="12"/><rect x="20" y="110" width="3" height="12"/><rect x="25" y="110" width="3" height="12"/><rect x="30" y="110" width="3" height="12"/><rect x="36" y="110" width="3" height="12"/><rect x="41" y="110" width="3" height="12"/><rect x="46" y="110" width="3" height="12"/></g><text x="140" y="120" text-anchor="middle" fill="#ff6b35" font-size="7" font-family="monospace">PCIe x16</text><text x="125" y="140" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="monospace" font-weight="bold">RTX 4090 · 24 GB GDDR6X</text></svg>`
   },
@@ -685,7 +703,7 @@ const COMP = {
       'Certificação':'80 PLUS (White / Bronze / Silver / Gold / Platinum / Titanium)',
       'Eficiência':'80% – 94% (a 50% de carga)',
       'Conector CPU':'4+4 pin EPS12V',
-      'Conector GPU':'6+2 pin PCIe / 12VHPWR (16-pin)',
+      'Conector GPU':'6+2 pin PCIe / 12V-2x6 (16 pinos)',
       'Conector SATA':'SATA Power',
       'Fator de Forma':'ATX / SFX',
       'Modulabilidade':'Não-modular / Semi / Full Modular'
@@ -708,7 +726,8 @@ const COMP = {
       {y:'2004',n:'Conector PCIe de alimentação (6 pinos)',i:'Conector dedicado para placas gráficas exigentes'},
       {y:'2008',n:'80 PLUS Bronze / Silver / Gold',i:'As certificações de eficiência tornam-se uma referência na indústria'},
       {y:'2012',n:'80 PLUS Titanium',i:'Eficiência mínima de 94% a 50% de carga'},
-      {y:'2022',n:'ATX 3.0 + conector de 16 pinos',i:'Conector de até 600 W para placas gráficas, usado pela RTX 4090 (450 W)'}
+      {y:'2022',n:'ATX 3.0 + conector de 16 pinos',i:'Conector de até 600 W para placas gráficas, usado pela RTX 4090 (450 W)'},
+      {y:'2024',n:'ATX 3.1 + conector 12V-2x6',i:'Revisão da norma com o conector 12V-2x6, de encaixe mais seguro, usado nas placas gráficas atuais'}
     ],
     svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="psuGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1600"/><stop offset="100%" stop-color="#0a0d00"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#psuGrad)"/><rect x="10" y="10" width="200" height="160" rx="4" fill="#111100" stroke="#ffd700" stroke-width="1.5"/><rect x="160" y="20" width="42" height="140" rx="3" fill="#0a0a00" stroke="#333" stroke-width="1"/><g fill="none" stroke="#444" stroke-width=".8"><line x1="164" y1="30" x2="198" y2="30"/><line x1="164" y1="38" x2="198" y2="38"/><line x1="164" y1="46" x2="198" y2="46"/><line x1="164" y1="54" x2="198" y2="54"/><line x1="164" y1="62" x2="198" y2="62"/><line x1="164" y1="70" x2="198" y2="70"/><line x1="164" y1="78" x2="198" y2="78"/><line x1="164" y1="86" x2="198" y2="86"/><line x1="164" y1="94" x2="198" y2="94"/><line x1="164" y1="102" x2="198" y2="102"/><line x1="164" y1="110" x2="198" y2="110"/><line x1="164" y1="118" x2="198" y2="118"/><line x1="164" y1="126" x2="198" y2="126"/><line x1="164" y1="134" x2="198" y2="134"/><line x1="164" y1="142" x2="198" y2="142"/><line x1="164" y1="150" x2="198" y2="150"/></g><text x="181" y="167" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">FAN</text><circle cx="90" cy="90" r="50" fill="#0d0d00" stroke="#ffd700" stroke-width="1.5"/><circle cx="90" cy="90" r="40" fill="#0a0a00" stroke="#444" stroke-width="1"/><circle cx="90" cy="90" r="8" fill="#1a1a00" stroke="#ffd700" stroke-width="1.5"/><g stroke="#ffd700" stroke-width="1.5" fill="none" opacity=".5"><line x1="90" y1="50" x2="90" y2="60"/><line x1="90" y1="120" x2="90" y2="130"/><line x1="50" y1="90" x2="60" y2="90"/><line x1="120" y1="90" x2="130" y2="90"/><line x1="62" y1="62" x2="69" y2="69"/><line x1="111" y1="111" x2="118" y2="118"/><line x1="118" y1="62" x2="111" y2="69"/><line x1="69" y1="111" x2="62" y2="118"/></g><rect x="20" y="20" width="24" height="16" rx="2" fill="#1a1600" stroke="#ffd700" stroke-width="1"/><text x="32" y="31" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">ON</text><rect x="20" y="42" width="60" height="16" rx="2" fill="#0d0d00" stroke="#444" stroke-width="1"/><text x="50" y="53" text-anchor="middle" fill="#888" font-size="6" font-family="monospace">100-240V~</text><text x="90" y="162" text-anchor="middle" fill="#ffd700" font-size="9" font-family="monospace" font-weight="bold">850W · 80+ GOLD</text></svg>`
   },
@@ -750,7 +769,7 @@ const COMP = {
       {y:'2003',n:'SATA (Serial ATA)',i:'Interface em série que substitui o PATA (IDE); chegam os primeiros discos SATA'},
       {y:'2011',n:'HDDs de 4 TB',i:'Capacidades de vários terabytes tornam-se comuns nos discos de desktop'},
       {y:'2019',n:'Seagate Exos 2X14 (Mach.2)',i:'14 TB com dois atuadores independentes para maior desempenho'},
-      {y:'2024',n:'Tecnologia HAMR (Seagate)',i:'Gravação magnética assistida por calor: um laser aquece o prato e permite discos de 30 TB ou mais'}
+      {y:'2025',n:'Tecnologia HAMR (Seagate Mozaic)',i:'Gravação magnética assistida por calor: um laser aquece o prato e permite discos de mais de 30 TB. Em 2026 já há modelos de 44 TB para centros de dados'}
     ],
     svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hddGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0820"/><stop offset="100%" stop-color="#05050f"/></linearGradient><linearGradient id="platGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#333"/><stop offset="50%" stop-color="#888"/><stop offset="100%" stop-color="#444"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#hddGrad)"/><rect x="8" y="8" width="204" height="164" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="60" fill="url(#platGrad)" stroke="#555" stroke-width="2"/><circle cx="110" cy="85" r="48" fill="url(#platGrad)" stroke="#444" stroke-width="1" opacity=".6"/><circle cx="110" cy="85" r="36" fill="url(#platGrad)" stroke="#333" stroke-width="1" opacity=".5"/><circle cx="110" cy="85" r="18" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="6" fill="#333"/><circle cx="110" cy="85" r="2" fill="#8b5cf6"/><line x1="110" y1="25" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="50" y1="85" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="68" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="152" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><rect x="14" y="20" width="50" height="14" rx="2" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1"/><line x1="39" y1="34" x2="80" y2="75" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="82" cy="77" r="3" fill="#8b5cf6"/><text x="38" y="30" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">READ HEAD</text><rect x="155" y="150" width="50" height="12" rx="2" fill="#0d0b1e" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840"><rect x="158" y="153" width="3" height="6"/><rect x="163" y="153" width="3" height="6"/><rect x="168" y="153" width="3" height="6"/><rect x="173" y="153" width="3" height="6"/><rect x="178" y="153" width="3" height="6"/></g><text x="110" y="168" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">4 TB · 7200 RPM · SATA</text></svg>`
   },
@@ -763,8 +782,8 @@ const COMP = {
     specs:{
       'Tipo':'NVMe PCIe 4.0/5.0 ou SATA III',
       'Fator de Forma':'M.2 2280 / 2.5" SATA',
-      'Leitura Seq. (NVMe)':'4 000 – 14 500 MB/s',
-      'Escrita Seq. (NVMe)':'3 500 – 12 700 MB/s',
+      'Leitura Seq. (NVMe)':'4 000 – 14 800 MB/s',
+      'Escrita Seq. (NVMe)':'3 500 – 13 400 MB/s',
       'Leitura Seq. (SATA)':'~550 MB/s',
       'Escrita Seq. (SATA)':'~520 MB/s',
       'Latência':'< 0,1 ms',
@@ -791,7 +810,7 @@ const COMP = {
       {y:'2011',n:'NVMe 1.0',i:'Protocolo desenhado para memória flash sobre PCIe, com muito menos latência do que o AHCI'},
       {y:'2015',n:'Samsung 950 Pro (M.2 NVMe)',i:'Cerca de 2,5 GB/s de leitura — SSD M.2 NVMe de topo'},
       {y:'2020',n:'PCIe 4.0 NVMe',i:'Cerca de 7 GB/s sequenciais — Samsung 980 Pro, WD Black SN850'},
-      {y:'2023',n:'PCIe 5.0 NVMe',i:'Cerca de 12 GB/s em 2023 (Crucial T700) e até 14,5 GB/s em 2024 (Crucial T705)'}
+      {y:'2023',n:'PCIe 5.0 NVMe',i:'Cerca de 12 GB/s em 2023 (Crucial T700) e até 14,8 GB/s em 2025 (Samsung 9100 Pro)'}
     ],
     svg:`<svg viewBox="0 0 240 110" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ssdPCB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0f1a"/><stop offset="100%" stop-color="#050a12"/></linearGradient></defs><rect width="240" height="110" rx="4" fill="url(#ssdPCB)"/><rect x="4" y="15" width="232" height="80" rx="3" fill="#080d18" stroke="#00e5ff" stroke-width="1.5"/><rect x="15" y="25" width="50" height="60" rx="3" fill="#0d1525" stroke="#00e5ff" stroke-width="1.5"/><text x="40" y="52" text-anchor="middle" fill="#00e5ff" font-size="7" font-family="monospace" font-weight="bold">NVMe</text><text x="40" y="62" text-anchor="middle" fill="#00e5ff" font-size="6" font-family="monospace">CTRL</text><text x="40" y="72" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">PS5021</text><rect x="80" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="120" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="160" y="25" width="35" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><rect x="200" y="25" width="24" height="28" rx="2" fill="#0d1525" stroke="#4a9eff" stroke-width="1"/><text x="97" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><text x="97" y="46" text-anchor="middle" fill="#333" font-size="5" font-family="monospace">TLC</text><text x="137" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><text x="177" y="37" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">NAND</text><rect x="80" y="63" width="20" height="20" rx="2" fill="#0d1525" stroke="#00ff88" stroke-width="1.5"/><text x="90" y="75" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">DRAM</text><rect x="2" y="80" width="18" height="25" rx="1" fill="#0a0f1a" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840" opacity=".8"><rect x="5" y="83" width="2" height="18"/><rect x="9" y="83" width="2" height="18"/><rect x="13" y="83" width="2" height="18"/></g><text x="120" y="99" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="monospace" font-weight="bold">1 TB NVMe PCIe 4.0 · 7400 MB/s</text></svg>`
   },
@@ -1001,7 +1020,7 @@ const QUESTIONS = [
    ===================================================================== */
 let currentComp = null;
 let activeTab = 't3d';
-let qIdx = 0, qScore = 0, answered = false;
+let qIdx = 0, qScore = 0, answered = false, qStreak = 0;
 let playerName = '';
 let wrongAnswers = [];
 
@@ -1672,7 +1691,7 @@ function renderComparador(){
    ===================================================================== */
 function startQuiz(){
   playerName=document.getElementById('playerName').value.trim()||'Aluno';
-  qIdx=0;qScore=0;wrongAnswers=[];
+  qIdx=0;qScore=0;qStreak=0;wrongAnswers=[];
   // Fisher-Yates: baralha perguntas e a ordem das opções
   const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
   window._quizQ=shuf(QUESTIONS).slice(0,25).map(q=>{
@@ -1710,11 +1729,15 @@ function answerQ(i){
   const btns=document.querySelectorAll('.opt');
   btns.forEach(b=>b.disabled=true);
   btns[q.ans].classList.add('correct');
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
   if(i===q.ans){
-    qScore++;
+    qScore++;qStreak++;
+    vbSay(qStreak>=3?qStreak+' seguidas.':pick(['Correto.','Exato.','Certo.','Muito bem.']),2200,qStreak>=3&&qStreak%3===0?'streak':'happy');
   } else {
     btns[i].classList.add('wrong');
     wrongAnswers.push({q:q.q,correct:q.opts[q.ans]});
+    qStreak=0;
+    vbSay(pick(['Não é bem isso. Lê a explicação.','Incorreto. Vê porquê abaixo.']),3200,'oops');
   }
   const fb=document.getElementById('qFb');
   fb.textContent=q.exp;
@@ -1737,6 +1760,7 @@ function showResult(){
   res.classList.add('show');
   const pct=Math.round((qScore/25)*100);
   let grade,desc,col;
+  vbSay(pct>=90?'Resultado excelente.':pct>=50?'Resultado positivo.':'Revê as respostas e volta a tentar.',4500,pct>=75?'dance':pct>=50?'happy':'oops');
   if(pct>=90){grade=5;desc='Muito Bom 🌟';col='var(--green)'}
   else if(pct>=75){grade=4;desc='Bom ✅';col='#4a9eff'}
   else if(pct>=50){grade=3;desc='Suficiente 👍';col='var(--gold)'}
@@ -1833,6 +1857,46 @@ function rrVan(ctx,x,y,w,h,r){
 }
 function cfVan(ctx,x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
 
+/* ── SOM: sintetizado no browser (Web Audio), discreto, sem ficheiros externos ── */
+const SFX=(()=>{
+  let ac=null,master=null,on=true;
+  try{on=localStorage.getItem('vb_snd')!=='off';}catch(e){}
+  function ctx(){
+    if(!ac){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;ac=new A();master=ac.createGain();master.gain.value=.55;master.connect(ac.destination);}
+    if(ac.state==='suspended')ac.resume();return ac;
+  }
+  function tone(f,t,d,type,v,to){
+    const c=ctx();if(!c)return;const t0=c.currentTime+t,o=c.createOscillator(),g=c.createGain();
+    o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(to)o.frequency.exponentialRampToValueAtTime(to,t0+d);
+    g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(v||.15,t0+.012);g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+    o.connect(g);g.connect(master);o.start(t0);o.stop(t0+d+.05);
+  }
+  const seq=(notes,gap,d,type,v)=>notes.forEach((f,i)=>tone(f,i*gap,d,type,v));
+  const S={
+    ok(){tone(659,0,.14,'sine',.16);tone(988,.09,.28,'sine',.14);},
+    bad(){tone(233,0,.28,'triangle',.18,175);tone(147,.12,.3,'triangle',.12,120);},
+    streak(){seq([523,659,784,1047],.07,.22,'sine',.13);},
+    win(){seq([523,659,784,1047,1319],.1,.4,'sine',.13);},
+    hint(){tone(880,0,.14,'sine',.1);tone(1319,.1,.22,'sine',.09);},
+    power(){tone(110,0,.55,'sine',.14,440);tone(880,.5,.25,'sine',.1);},
+    tick(){tone(1100,0,.035,'sine',.05);}
+  };
+  function play(n){if(!on)return;try{if(navigator.userActivation&&!navigator.userActivation.hasBeenActive)return;S[n]&&S[n]();}catch(e){}}
+  return {
+    tick:()=>play('tick'),
+    mood:m=>play({happy:'ok',oops:'bad',streak:'streak',dance:'win',think:'hint',power:'power'}[m]),
+    get on(){return on;},
+    toggle(){on=!on;try{localStorage.setItem('vb_snd',on?'on':'off');}catch(e){}if(on)play('ok');return on;}
+  };
+})();
+(function(){
+  const b=document.getElementById('sndBtn');if(!b)return;
+  const ico=on=>'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/>'+(on?'<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>':'<path d="m16 9 5 6M21 9l-5 6"/>')+'</svg>';
+  const upd=()=>{b.innerHTML=ico(SFX.on);b.setAttribute('aria-pressed',String(SFX.on));b.setAttribute('aria-label',SFX.on?'Som ligado. Clica para desligar':'Som desligado. Clica para ligar');};
+  b.addEventListener('click',()=>{SFX.toggle();upd();});upd();
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('button');if(t&&t!==b&&!t.classList.contains('opt'))SFX.tick();});
+})();
+let VB_EXPR=null; /* null = aspeto original (igual aos outros jogos) */
 function drawVanBerto(ctx,blink,step,armsUp){
   const w=96,h=96;
   ctx.clearRect(0,0,w,h);
@@ -1934,6 +1998,14 @@ function drawVanBerto(ctx,blink,step,armsUp){
     ctx.beginPath(); ctx.arc(41,31,3.5,0.15*Math.PI,0.85*Math.PI); ctx.stroke();
     ctx.beginPath(); ctx.arc(55,31,3.5,0.15*Math.PI,0.85*Math.PI); ctx.stroke();
   }
+  if(VB_EXPR){
+    ctx.strokeStyle="#0a0f1c"; ctx.fillStyle="#0a0f1c"; ctx.lineWidth=2.6;
+    const br=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();};
+    if(VB_EXPR==="sad"){ br(35,26,44,23); br(61,26,52,23); ctx.lineWidth=2.4; ctx.beginPath(); ctx.arc(48,41,4.2,1.18*Math.PI,1.82*Math.PI); ctx.stroke(); }
+    else if(VB_EXPR==="think"){ br(36,22.5,44,21.5); br(52,25.5,60,25.5); ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(44,37); ctx.lineTo(53,36); ctx.stroke(); }
+    else if(VB_EXPR==="wow"){ ctx.lineWidth=2.2; ctx.beginPath(); ctx.arc(41,23,4,1.15*Math.PI,1.85*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.arc(55,23,4,1.15*Math.PI,1.85*Math.PI); ctx.stroke(); ctx.beginPath(); ctx.ellipse(48,37,2.7,3.2,0,0,Math.PI*2); ctx.fill(); }
+    ctx.restore(); return;
+  }
   ctx.fillStyle="#0a0f1c";
   if(blink==="happy"){
     ctx.beginPath(); ctx.ellipse(48,36,6.2,4.2,0,0,Math.PI); ctx.fill();
@@ -1949,13 +2021,12 @@ function drawVanBerto(ctx,blink,step,armsUp){
 
 /* ── Comportamento do VanBerto's (igual ao dos outros jogos: balão de fala, pisca, marcha, salta) ── */
 const VB_MSGS=[
-  'Olá! Vamos explorar hardware? 🔧',
-  'Clica num componente para o ver em 3D! 🔄',
-  'Já montaste um PC aqui? 🖥️',
-  'Testa-te no quiz! 🧠',
-  'Arrasta, roda e faz zoom! 🔍',
-  'Boa sorte! 🌟',
-  'Conto contigo! 🤩'
+  'Explora os componentes e vê-os em 3D.',
+  'Seleciona uma peça para ver o seu interior.',
+  'Experimenta montar um PC na secção Montar.',
+  'Testa os teus conhecimentos no quiz.',
+  'Arrasta para rodar e usa o zoom para ver pormenores.',
+  'Compara componentes na secção Comparador.'
 ];
 const VB_TIPS=[
   'Sabias que a RAM é volátil? Perde tudo quando desligas o PC.',
@@ -1968,8 +2039,10 @@ const VB_TIPS=[
   'Sabias que uma placa-mãe ATX mede 305 × 244 mm?',
   'Sabias que o Intel 4004, de 1971, tinha 2 300 transístores?',
   'Sabias que os SSD NVMe usam PCIe e são mais rápidos do que os SATA?',
+  'Em 2026, os discos rígidos de maior capacidade já usam HAMR e passam dos 30 TB.',
+  'Os SSD NVMe PCIe 5.0 ultrapassam os 14 GB/s de leitura sequencial.',
   'Sabias que a BIOS/UEFI é o primeiro software a correr quando ligas o PC?',
-  'Antes de mexeres num PC a sério, desliga-o da tomada e toca numa parte metálica da caixa. ⚡'
+  'Antes de mexeres num PC a sério, desliga-o da tomada e toca numa parte metálica da caixa.'
 ];
 const VB={cvs:[],ctxs:[],bub:null,busy:false,bubT:0,msgI:0,tipI:Math.floor(Math.random()*VB_TIPS.length),
   reduce:!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)};
@@ -2011,6 +2084,11 @@ function vbDance(cycles){
   },170);
 }
 function vbOops(){ vbBounce('oops'); }
+function vbExpr(name,ms){
+  VB_EXPR=name; if(VB.ctxs.length&&!VB.busy)vbFrame(false,-1,false);
+  clearTimeout(VB.exT);
+  VB.exT=setTimeout(()=>{VB_EXPR=null;if(!VB.busy)vbFrame(false,-1,false);},ms||2000);
+}
 function vbInGame(){
   const m=document.getElementById('montar'),g=document.getElementById('mpGame');
   return !!(m&&g&&m.classList.contains('active')&&!g.classList.contains('hidden'));
@@ -2032,11 +2110,14 @@ function vbShow(msg,ms){
   clearTimeout(VB.bubT);
   VB.bub.textContent=msg;
   VB.bub.classList.add('show');
-  vbJump();
+  if(!VB_EXPR)vbJump();
   VB.bubT=setTimeout(()=>VB.bub.classList.remove('show'),ms||Math.max(4500,msg.length*55));
 }
 /* API usada pelo resto do laboratório: texto no balão (fora do jogo) e/ou reação do robô */
 function vbSay(text,ms,mood){
+  if(mood&&(text||mood!=='happy'))SFX.mood(mood);
+  const ex={oops:'sad',think:'think',power:'wow'}[mood];
+  if(ex)vbExpr(ex,Math.max(1800,Math.min(ms||2500,3500)));
   if(vbInGame()){
     if(mood==='dance')vbDance(4);
     else if(mood==='happy')vbJump();
@@ -2069,7 +2150,7 @@ function vbInit(){
   if(bot){
     bot.addEventListener('click',()=>{vbJump();});
   }
-  setTimeout(()=>vbShow('Olá! Eu sou o VanBerto\'s. Explora os componentes ou monta o teu PC! 🔧'),1500);
+  setTimeout(()=>vbShow('Olá, sou o VanBerto\'s. Explora os componentes ou monta o teu PC.'),1500);
   setInterval(()=>{if(!vbBlocked())vbShow(vbPick());},22000);
   if(!VB.reduce){
     setInterval(()=>{
@@ -2111,14 +2192,16 @@ const MP_SLOTS={
   ceps:{cat:'ceps',label:'Ficha EPS do processador',cable:true},
   cpcie:{cat:'cpcie',label:'Ficha de alimentação da placa gráfica',cable:true},
   csata:{cat:'csata',label:'Ficha de alimentação do disco rígido',cable:true},
-  cdata:{cat:'cdata',label:'Porta SATA da placa-mãe (dados do disco)',cable:true}
+  cdata:{cat:'cdata',label:'Porta SATA da placa-mãe (dados do disco)',cable:true},
+  cfp:{cat:'cfp',label:'Pinos do painel frontal da placa-mãe (F_PANEL, USB e áudio)',cable:true},
+  cfan:{cat:'cfan',label:'Conector SYS_FAN da placa-mãe (ventoinha da caixa)',cable:true}
 };
 const MP_CAT_PLACE={
   mobo:'o espaço da placa-mãe',cpu:'o socket do processador',ram:'uma ranhura de RAM',cooler:'a zona do cooler, sobre o processador',
   ssd:'o slot M.2',gpu:'o slot PCIe x16',psu:'o espaço da fonte, em baixo',hdd:'a baia do disco, em baixo à direita'
 };
 const MP_DEPS={cpu:['mobo'],ram:['mobo'],ssd:['mobo'],gpu:['mobo'],cooler:['cpu'],
-  c24:['psu','mobo'],ceps:['psu','cpu'],cpcie:['psu','gpu'],csata:['psu','hdd'],cdata:['hdd','mobo']};
+  c24:['psu','mobo'],ceps:['psu','cpu'],cpcie:['psu','gpu'],csata:['psu','hdd'],cdata:['hdd','mobo'],cfp:['mobo'],cfan:['mobo']};
 const MP_DEP_MSG={
   mobo:'Primeiro instala a placa-mãe na caixa.',cpu:'Primeiro instala o processador no socket.',
   psu:'Primeiro instala a fonte de alimentação.',gpu:'Primeiro instala a placa gráfica.',hdd:'Primeiro instala o disco rígido.'
@@ -2147,7 +2230,7 @@ const MP_PARTS={
   ],
   cooler:[
     {id:'cooler_ok',cat:'cooler',ok:true,icon:'cooler',name:'Cooler de torre · 155 mm',sub:'Compatível com AM5',
-     tip:'Cooler instalado! Retira o calor do processador para evitar o thermal throttling.'},
+     tip:'Cooler instalado! Retira o calor do processador. Se aquecer demais, o processador reduz sozinho a velocidade (thermal throttling) para se proteger.'},
     {id:'cooler_tall',cat:'cooler',ok:false,icon:'cooler',name:'Cooler de torre · 185 mm',sub:'Compatível com AM5',
      why:'A tua caixa aceita coolers até 165 mm de altura. Com 185 mm, o painel lateral não fecharia.'}
   ],
@@ -2182,32 +2265,38 @@ const MP_CABLES=[
   {id:'cabsata',cat:'csata',ok:true,isCable:true,icon:null,name:'Cabo SATA de alimentação',sub:'Fonte → disco rígido',
    tip:'Cabo SATA ligado: o disco rígido já tem energia.'},
   {id:'cabdata',cat:'cdata',ok:true,isCable:true,icon:null,name:'Cabo SATA de dados',sub:'Placa-mãe → disco rígido',
-   tip:'Cabo de dados ligado: o disco rígido já comunica com a placa-mãe.'}
+   tip:'Cabo de dados ligado: o disco rígido já comunica com a placa-mãe.'},
+  {id:'cabfp',cat:'cfp',ok:true,isCable:true,icon:null,name:'Cabos do painel frontal',sub:'Frente da caixa → placa-mãe',
+   tip:'Painel frontal ligado: o botão de ligar, as luzes e as portas USB da caixa já comunicam com a placa-mãe.'},
+  {id:'cabfan',cat:'cfan',ok:true,isCable:true,icon:null,name:'Cabo da ventoinha da caixa',sub:'Ventoinha da frente → placa-mãe',
+   tip:'Ventoinha da caixa ligada: já faz circular ar fresco pelo interior.'}
 ];
 const MP_STEPS={
-  mobo:['Placa-mãe','Coloca-a na caixa, alinhando os furos com os espaçadores (standoffs), e fixa-a com parafusos. Se a placa não tiver a proteção das portas traseiras (I/O shield) já incluída, coloca-a antes.'],
-  cpu:['Processador','Levanta a alavanca do socket, alinha o triângulo do processador com a marca do socket, pousa-o sem forçar e baixa a alavanca.'],
-  ram2:['Memória RAM (1.º módulo)','Para ativares o dual channel, usa as ranhuras 2 e 4 (a contar a partir do processador). Abre as patilhas, alinha o entalhe e pressiona até ouvires um clique.'],
-  ram4:['Memória RAM (2.º módulo)','Coloca o segundo módulo na ranhura 4. Com dois módulos iguais, o processador acede à memória por dois canais em simultâneo.'],
-  ssd:['SSD M.2','Insere-o na ranhura M.2 a cerca de 30°, pressiona para baixo e fixa-o com o parafuso.'],
-  cooler:['Cooler','Confirma que há pasta térmica (muitos coolers já a trazem), pousa-o sobre o processador, aperta os parafusos em cruz e liga a ventoinha ao conector CPU_FAN.'],
-  psu:['Fonte de alimentação','Fixa-a na zona de baixo da caixa com quatro parafusos, com a ventoinha virada para a abertura da caixa.'],
-  gpu:['Placa gráfica','Encaixa-a no primeiro slot PCIe x16 (o mais próximo do processador) até a patilha estalar e fixa-a à caixa com parafusos.'],
+  mobo:['Placa-mãe','Pousa-a na caixa, com os furos alinhados com os espaçadores (pilares metálicos) e fixa-a com os parafusos. Se a placa não trouxer já a chapa das portas traseiras (I/O shield), coloca-a antes, no recorte da caixa.'],
+  cpu:['Processador','Levanta a alavanca do socket. O processador tem um triângulo num canto: alinha-o com a marca igual no socket e pousa-o sem forçar, ele assenta sozinho. Baixa a alavanca.'],
+  ram2:['Memória RAM (1.º módulo)','Usa as ranhuras 2 e 4, contando a partir do processador (A2 e B2). Assim a memória trabalha em dual channel. Abre as patilhas, alinha o entalhe do módulo com o da ranhura e pressiona com os dois polegares até ouvires um clique.'],
+  ram4:['Memória RAM (2.º módulo)','Repete na ranhura 4. Com dois módulos iguais nas ranhuras certas, o processador acede à memória por dois caminhos ao mesmo tempo.'],
+  ssd:['SSD M.2','Insere-o na ranhura M.2 inclinado (cerca de 30°), pressiona-o para baixo até ficar plano e prende-o com o pequeno parafuso na ponta.'],
+  cooler:['Cooler','Precisa de pasta térmica entre ele e o processador (muitos já a trazem). Pousa-o sobre o processador e aperta os parafusos em cruz, um pouco de cada vez. Liga o cabo da ventoinha ao conector CPU_FAN da placa.'],
+  psu:['Fonte de alimentação','Fixa-a em baixo na caixa com quatro parafusos. A ventoinha fica virada para a abertura da caixa, para a fonte puxar ar fresco.'],
+  gpu:['Placa gráfica','Encaixa-a no primeiro slot comprido (PCIe x16), o mais perto do processador, e empurra até a patilha estalar. Prende-a à caixa com parafusos.'],
   hdd:['Disco rígido','Coloca-o na baia de 3,5" e fixa-o com parafusos (ou numa gaveta sem ferramentas).'],
-  c24:['Cabo de 24 pinos','Liga a fonte à placa-mãe: é esta ficha que alimenta a placa e os componentes que dependem dela.'],
-  ceps:['Cabo EPS (4+4 pinos)','Alimenta o processador. A ficha fica sempre perto do socket, no topo da placa.'],
-  cpcie:['Cabo PCIe (6+2 pinos)','Alimenta a placa gráfica. Não o confundas com o cabo EPS do processador.'],
-  csata:['Cabo SATA de alimentação','Liga o disco rígido à fonte.'],
-  cdata:['Cabo SATA de dados','Liga o disco rígido a uma porta SATA da placa-mãe: é por este cabo que passam os dados. O cabo de alimentação é outro.']
+  c24:['Cabo de 24 pinos','É a ficha larga que liga a fonte à placa-mãe e dá energia a tudo o que depende dela. Só encaixa de um lado: alinha e empurra até a patilha prender.'],
+  ceps:['Cabo EPS (4+4 pinos)','Dá energia ao processador. A ficha fica sempre perto do socket, no topo da placa. Não o confundas com o cabo da placa gráfica.'],
+  cpcie:['Cabo PCIe (6+2 pinos)','Dá energia à placa gráfica. Parece-se com o EPS, mas é outro cabo: confirma a etiqueta, porque ligar o errado pode danificar peças.'],
+  csata:['Cabo SATA de alimentação','Liga o disco rígido à fonte. Tem uma ficha achatada em forma de L e só encaixa de um lado.'],
+  cdata:['Cabo SATA de dados','Liga o disco rígido a uma porta SATA da placa-mãe: por aqui passam os dados. É um cabo diferente do de energia.'],
+  cfan:['Ventoinha da caixa','A ventoinha da frente da caixa tem um cabo de 3 ou 4 pinos. Liga-o ao conector SYS_FAN (ou CHA_FAN) da placa-mãe, no topo da placa. Os de 4 pinos permitem à placa regular a velocidade conforme a temperatura. Sem esta ligação, a ventoinha não roda e o ar não circula.'],
+  cfp:['Cabos do painel frontal','Os fios que vêm da frente da caixa ligam-se aos pinos no canto inferior da placa-mãe: botão de ligar (POWER SW), reset, luzes (LED), portas USB frontais e áudio. Cada ficha vem etiquetada e o manual da placa tem o diagrama dos pinos. As luzes (LED) têm polaridade (+ e −): se não acenderem, inverte a ficha. Se o botão de ligar não funciona, é aqui que se começa a procurar.']
 };
-const MP_ORDER=['mobo','cpu','ram2','ram4','ssd','cooler','psu','gpu','hdd','c24','ceps','cpcie','csata','cdata'];
+const MP_ORDER=['mobo','cpu','ram2','ram4','ssd','cooler','psu','gpu','hdd','c24','ceps','cpcie','csata','cdata','cfp','cfan'];
 const MP_PART_SLOTS=['mobo','cpu','cooler','ram2','ram4','ssd','gpu','psu','hdd'];
-const MP_CABLE_SLOTS=['c24','ceps','cpcie','csata','cdata'];
+const MP_CABLE_SLOTS=['c24','ceps','cpcie','csata','cdata','cfp','cfan'];
 const MP_GEO={
   mobo:[34,30,244,305],cpu:[108,100,54,54],cooler:[92,84,86,86],
   ram1:[184,70,16,125],ram2:[202,70,16,125],ram3:[220,70,16,125],ram4:[238,70,16,125],
   ssd:[92,205,80,22],gpu:[44,258,310,70],psu:[34,350,190,96],hdd:[236,350,160,96],
-  c24:[258,196,20,62],ceps:[100,34,70,20],cpcie:[322,236,34,22],csata:[372,372,22,50],cdata:[226,326,44,12]
+  c24:[258,196,20,62],ceps:[100,34,70,20],cpcie:[322,236,34,22],csata:[372,372,22,50],cdata:[226,326,44,12],cfp:[118,331,80,14],cfan:[226,34,48,14]
 };
 
 const MP={level:0,placed:{},tray:[],sel:null,mistakes:0,hints:0,t0:0,tick:0,phase:'idle',elapsed:0,drag:null,dragged:false,hintFor:null,pausedAt:0};
@@ -2274,13 +2363,15 @@ function mpVis(id){
     case 'ceps':return `<path d="M70 350 C14 336 16 64 98 46" fill="none" stroke="#141414" stroke-width="8" stroke-linecap="round"/><path d="M70 350 C14 336 16 64 98 46" fill="none" stroke="#ffd700" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="100" y="34" width="70" height="20" rx="2" fill="#111" stroke="#ffd700"/>`;
     case 'cpcie':return `<path d="M150 350 C150 336 338 348 338 258" fill="none" stroke="#141414" stroke-width="8" stroke-linecap="round"/><path d="M150 350 C150 336 338 348 338 258" fill="none" stroke="#c8ccd6" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="322" y="236" width="34" height="22" rx="2" fill="#111" stroke="#00e5ff"/>`;
     case 'cdata':return `<path d="M248 338 C248 350 330 340 330 352" fill="none" stroke="#141414" stroke-width="5" stroke-linecap="round"/><path d="M248 338 C248 350 330 340 330 352" fill="none" stroke="#4a9eff" stroke-width="2" stroke-dasharray="3 3"/><rect x="226" y="326" width="44" height="12" rx="2" fill="#111" stroke="#4a9eff"/>`;
+    case 'cfp':return `<path d="M198 338 C250 350 380 352 398 300" fill="none" stroke="#141414" stroke-width="6" stroke-linecap="round"/><path d="M198 338 C250 350 380 352 398 300" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="3 3"/><rect x="118" y="331" width="80" height="14" rx="2" fill="#111" stroke="#22c55e"/>`;
+    case 'cfan':return `<path d="M330 92 C300 70 290 41 274 41" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round"/><path d="M330 92 C300 70 290 41 274 41" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-dasharray="3 3"/><rect x="226" y="34" width="48" height="14" rx="2" fill="#111" stroke="#a78bfa"/>`;
     case 'csata':return `<path d="M224 410 C300 440 350 430 372 400" fill="none" stroke="#141414" stroke-width="7" stroke-linecap="round"/><path d="M224 410 C300 440 350 430 372 400" fill="none" stroke="#ff3355" stroke-width="2.5" stroke-dasharray="3 3"/><rect x="372" y="372" width="22" height="50" rx="2" fill="#111" stroke="#ff3355"/>`;
   }
   return '';
 }
-const MP_SHORT={cpu:'CPU',cooler:'COOLER',ram1:'1',ram2:'2',ram3:'3',ram4:'4',ssd:'M.2',gpu:'PLACA GRÁFICA (PCIe x16)',psu:'FONTE',hdd:'DISCO RÍGIDO',mobo:'PLACA-MÃE',c24:'24 pinos',ceps:'EPS',cpcie:'PCIe',csata:'SATA energia',cdata:'SATA dados'};
+const MP_SHORT={cpu:'CPU',cooler:'COOLER',ram1:'1',ram2:'2',ram3:'3',ram4:'4',ssd:'M.2',gpu:'PLACA GRÁFICA (PCIe x16)',psu:'FONTE',hdd:'DISCO RÍGIDO',mobo:'PLACA-MÃE',c24:'24 pinos',ceps:'EPS',cpcie:'PCIe',csata:'SATA energia',cdata:'SATA dados',cfp:'PAINEL',cfan:'SYS_FAN'};
 function mpSvg(){
-  const order=['mobo','psu','hdd','gpu','ssd','cpu','cooler','ram1','ram2','ram3','ram4','c24','ceps','cpcie','csata','cdata'];
+  const order=['mobo','psu','hdd','gpu','ssd','cpu','cooler','ram1','ram2','ram3','ram4','c24','ceps','cpcie','csata','cdata','cfp','cfan'];
   const slots=order.map(id=>{
     const [x,y,w,h]=MP_GEO[id];
     const small=(w<30||h<18);
@@ -2312,9 +2403,28 @@ function buildMontar(){
     </div>
     <div id="mpMenu" class="mp-menu">
       <div class="mp-safety"><b>⚡ Segurança primeiro:</b> num PC a sério, trabalha sempre com a fonte desligada da tomada e toca numa parte metálica da caixa antes de pegares nos componentes, para descarregares a eletricidade estática.</div>
+      <details class="mp-prep">
+        <summary>Antes de começar: ferramentas, vocabulário e ordem real</summary>
+        <div class="mp-prep-b">
+          <p><b>Ferramentas.</b> Uma chave de fendas Phillips (de cruz) chega para quase tudo. Útil: uma lanterna e abraçadeiras para arrumar os cabos.</p>
+          <p><b>Regra geral.</b> Nada se força. Os conectores só encaixam numa posição (têm entalhes ou lados diferentes). Se não entra, está virado ao contrário.</p>
+          <p><b>Vocabulário.</b></p>
+          <ul>
+            <li><b>Socket:</b> o encaixe na placa-mãe onde assenta o processador.</li>
+            <li><b>Espaçadores (standoffs):</b> pequenos pilares metálicos na caixa que mantêm a placa-mãe afastada do metal.</li>
+            <li><b>I/O shield:</b> a chapa com recortes para as portas traseiras (USB, rede, áudio).</li>
+            <li><b>Dual channel:</b> dois módulos de RAM em ranhuras certas, para a memória enviar dados por dois caminhos ao mesmo tempo.</li>
+            <li><b>Pasta térmica:</b> pasta que enche as falhas minúsculas entre o processador e o cooler, para o calor passar melhor.</li>
+            <li><b>SATA:</b> tipo de ligação de discos. Usa um cabo para dados e outro, vindo da fonte, para energia.</li>
+            <li><b>PCIe x16:</b> o slot comprido onde fica a placa gráfica.</li>
+            <li><b>M.2:</b> slot pequeno, na própria placa-mãe, para SSD em forma de barra.</li>
+          </ul>
+          <p><b>Na prática.</b> Muita gente monta primeiro o processador, a RAM, o SSD e o cooler na placa-mãe, ainda fora da caixa, porque há mais espaço. Aqui seguimos uma ordem simples, com a placa já na caixa.</p>
+        </div>
+      </details>
       <div class="mp-levels">
         <button class="mp-lvl" onclick="mpStart(1)"><span class="mp-lvl-n">NÍVEL 1</span><span class="mp-lvl-t">Montagem guiada</span><span class="mp-lvl-d">Passo a passo: mostra-te onde e como instalar cada peça, pela ordem certa.</span></button>
-        <button class="mp-lvl" onclick="mpStart(2)"><span class="mp-lvl-n">NÍVEL 2</span><span class="mp-lvl-t">Desafio de compatibilidade</span><span class="mp-lvl-d">Sem ajudas. Há peças que não servem — lê a ficha do projeto e escolhe as certas.</span></button>
+        <button class="mp-lvl" onclick="mpStart(2)"><span class="mp-lvl-n">NÍVEL 2</span><span class="mp-lvl-t">Desafio de compatibilidade</span><span class="mp-lvl-d">Sem ajudas. Há peças que não servem — lê a ficha do projeto e escolhe as certas. No fim, se o PC não arrancar, tens de descobrir porquê.</span></button>
       </div>
     </div>
     <div id="mpGame" class="hidden">
@@ -2358,6 +2468,7 @@ function mpMenu(){
 function mpShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function mpStart(level){
+  MP.diag=false;MP.diagDone=false;MP.fault=null;
   MP.level=level;MP.placed={};MP.sel=null;MP.mistakes=0;MP.hints=0;MP.elapsed=0;MP.phase='parts';MP.hintFor=null;
   let uid=0;const defs=[];
   Object.keys(MP_PARTS).forEach(cat=>{
@@ -2459,7 +2570,7 @@ function mpRefresh(){
   }else if(MP.level===1||(MP.hintFor&&MP.hintFor===mpNext())){
     st.innerHTML=mpStepText();
   }else{
-    st.innerHTML=`<div class="mp-step-n">Desafio</div><div class="mp-step-t">Monta o PC sem ajudas</div><div class="mp-step-d">Escolhe só peças compatíveis com a ficha do projeto. Se precisares, usa o botão 💡 Dica: mostra o passo seguinte e conta como uma dica.</div>`;
+    st.innerHTML=`<div class="mp-step-n">Desafio</div><div class="mp-step-t">Monta o PC sem ajudas</div><div class="mp-step-d">Escolhe só peças compatíveis com a ficha do projeto. Numa compra real, estes limites (altura do cooler, comprimento da placa gráfica, tamanho da placa-mãe) estão nas especificações da caixa, no site do fabricante. Se precisares, usa o botão 💡 Dica: mostra o passo seguinte e conta como uma dica.</div>`;
   }
   mpRenderTray();
 }
@@ -2590,22 +2701,106 @@ function mpTryPlace(slotId){
     setTimeout(()=>{mpSay('Todas as peças estão no lugar! Falta ligar os cabos que levam energia a cada componente.','info');vbSay('Agora os cabos!',4000);},50);
   }else if(MP.phase==='cables'&&MP_CABLE_SLOTS.every(i=>MP.placed[i])){
     MP.phase='ready';MP.sel=null;
-    setTimeout(()=>{mpSay('Tudo montado e ligado! Carrega em "Ligar o PC".','info');vbSay('Está na hora de ligar!',4000,'happy');},50);
+    setTimeout(()=>{mpSay('Tudo montado e ligado! Carrega em "Ligar o PC".','info');vbSay('Está na hora de ligar!',4000,'happy');mpCableMgmt();},50);
   }
   mpRefresh();
+  if(d.cat==='cooler'){mpPaste();return;}
   const f=document.querySelector('#mpTray button');if(f)f.focus();
+}
+
+/* ── Diálogo de pergunta (pasta térmica, arrumação dos cabos) ── */
+function mpAsk(id,title,intro,question,opts,done){
+  if(document.getElementById(id))return;
+  opts=mpShuffle(opts);
+  const ov=document.createElement('div');
+  ov.id=id;ov.className='mp-ov';
+  ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="${id}T">
+    <div class="mp-post-t" id="${id}T">${title}</div>
+    <p class="mp-note" style="margin:6px 0 10px;max-width:none;text-align:left">${intro}</p>
+    <p class="mp-note" style="margin:0 0 10px;max-width:none;text-align:left"><b>${question}</b></p>
+    <div class="mp-ov-opts">${opts.map((o,k)=>`<button class="btn-s" data-i="${k}">${o.t}</button>`).join('')}</div>
+    <p class="mp-note mp-ov-msg" role="status" aria-live="polite" style="margin-top:10px;max-width:none;text-align:left"></p>
+    <div class="res-btns hidden mp-ov-go"><button class="btn-p mp-ov-ok">Continuar</button></div>
+  </div>`;
+  document.body.appendChild(ov);
+  const msg=ov.querySelector('.mp-ov-msg'),go=ov.querySelector('.mp-ov-go');
+  const first=ov.querySelector('.mp-ov-opts button');if(first)first.focus();
+  ov.querySelector('.mp-ov-opts').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const o=opts[+b.dataset.i];msg.textContent=o.m;
+    if(o.ok){ov.querySelectorAll('.mp-ov-opts button').forEach(x=>x.disabled=true);go.classList.remove('hidden');ov.querySelector('.mp-ov-ok').focus();vbSay('Boa escolha.',2200,'happy');}
+    else{b.disabled=true;if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Pensa nas consequências.',3000,'oops');}
+  });
+  ov.querySelector('.mp-ov-ok').addEventListener('click',()=>{ov.remove();if(done){done();return;}const f=document.querySelector('#mpTray button')||document.querySelector('.mp-power');if(f)f.focus();});
+}
+function mpPaste(){
+  mpAsk('mpPaste','Antes de apertar o cooler',
+    'Entre o processador e o cooler fica uma camada fina de <b>pasta térmica</b>, que enche as falhas microscópicas e deixa o calor passar para o cooler. Muitos coolers já trazem pasta aplicada na base, coberta por uma película de plástico.',
+    'O teu cooler traz pasta pré-aplicada e uma película na base. O que fazes?',
+    [{ok:true,t:'Tiro a película de plástico da base do cooler e monto-o. Se já traz pasta aplicada, não ponho mais.',
+      m:'Certo. A película só protege o cooler durante o transporte. Se o cooler não trouxer pasta, põe-se uma gota do tamanho de uma ervilha no centro do processador: a pressão do cooler espalha-a em camada fina.'},
+     {ok:false,t:'Deixo a película, porque protege o processador.',
+      m:'A película é plástico e isola o calor. Com ela, o calor não passa do processador para o cooler e o PC sobreaquece em poucos segundos. Tira-se sempre.'},
+     {ok:false,t:'Ponho mais pasta por cima da que já vem, para garantir.',
+      m:'Pasta a mais é pior: forma uma camada grossa que conduz mal o calor e escorre para a placa-mãe. Uma camada fina e uniforme é o ideal.'}]);
+}
+function mpCableMgmt(){
+  mpAsk('mpCables','Antes de fechar a caixa: arrumar os cabos',
+    'O ar entra pela frente da caixa e sai por trás e por cima. Cabos soltos no meio do caminho atrapalham essa circulação e podem tocar nas ventoinhas.',
+    'Como arrumas os cabos da fonte?',
+    [{ok:true,t:'Passo-os pelos orifícios para a parte de trás da caixa, fixo-os com abraçadeiras e deixo livre o caminho do ar.',
+      m:'É assim que se faz. Os cabos escondidos atrás da placa deixam o ar circular, o interior fica mais fresco e é mais fácil mexer no PC mais tarde.'},
+     {ok:false,t:'Deixo-os soltos no interior, para ser mais rápido.',
+      m:'Cabos soltos bloqueiam o ar e podem roçar numa ventoinha e impedi-la de rodar. Também dificultam qualquer mudança futura.'},
+     {ok:false,t:'Enrolo-os e coloco-os por cima da placa gráfica e do cooler.',
+      m:'Cobrir o cooler e a placa gráfica retém o calor onde ele é produzido. Os cabos nunca devem tapar as zonas que precisam de ar.'}]);
 }
 
 function mpHint(){
   if(MP.level!==2||MP.phase==='ready'||MP.phase==='boot'||MP.phase==='done')return;
   MP.hints++;MP.hintFor=mpNext();
   mpRefresh();
-  vbSay('Aqui tens uma dica!',2500);
+  vbSay('Dica: repara na peça assinalada.',2500,'think');
 }
 
 /* ---------- arranque ---------- */
+/* ── Nível 2: avaria simulada — o PC não arranca e o aluno tem de diagnosticar ── */
+const MP_FAULTS={
+  c24:{n:'Cabo de 24 pinos mal encaixado',sym:'Não acende nenhuma luz nem roda nenhuma ventoinha, como se o PC estivesse desligado da tomada.',fix:'O cabo de 24 pinos alimenta a placa-mãe e quase tudo o que depende dela. Solto, a placa fica sem energia. Voltaste a encaixá-lo até a patilha prender.'},
+  ceps:{n:'Cabo EPS do processador solto',sym:'A fonte liga e as ventoinhas rodam, mas não aparece imagem nem se ouve o bip do teste de arranque.',fix:'Sem o cabo EPS, o processador não recebe energia e o teste de arranque nunca começa. É uma das causas mais comuns de "liga mas não dá imagem". Voltaste a encaixá-lo.'},
+  cpcie:{n:'Cabo PCIe da placa gráfica solto',sym:'O PC arranca e as ventoinhas rodam, mas o monitor, ligado à placa gráfica, fica sem sinal.',fix:'A placa gráfica não tem energia suficiente e não arranca, por isso o monitor não recebe imagem. Voltaste a encaixar o cabo PCIe.'},
+  cfp:{n:'Ficha do botão de ligar (painel frontal) solta',sym:'Carregas no botão de ligar da caixa e não acontece nada, embora a fonte esteja ligada.',fix:'O botão da caixa só envia o sinal de ligar à placa-mãe se a ficha POWER SW estiver nos pinos certos. Voltaste a encaixá-la.'}
+};
+function mpDiag(){
+  MP.diag=true;
+  const ids=Object.keys(MP_FAULTS);
+  const bad=ids[Math.floor(Math.random()*ids.length)];
+  MP.fault=bad;
+  const post=document.getElementById('mpPost');
+  post.classList.remove('hidden');
+  const opts=ids.map(id=>`<button class="btn-s mp-diag-o" data-id="${id}">${MP_FAULTS[id].n}</button>`).join('');
+  post.innerHTML=`<div class="mp-postbox"><div class="mp-post-t">⏻ O PC não arrancou</div><p class="mp-note" style="margin:6px 0 10px"><b>O que se vê:</b> ${MP_FAULTS[bad].sym}</p><p class="mp-note" style="margin:0 0 10px">Montaste tudo, mas uma ligação ficou mal encaixada. Qual é a causa mais provável?</p><div class="res-btns" id="mpDiagOpts">${opts}</div><p class="mp-note" id="mpDiagMsg" role="status" aria-live="polite" style="margin-top:10px"></p></div>`;
+  vbSay('Algo falhou. Pensa no que o sintoma indica.',3500,'oops');
+  document.getElementById('mpDiagOpts').addEventListener('click',e=>{
+    const b=e.target.closest('.mp-diag-o');if(!b||!MP.diag)return;
+    const id=b.dataset.id,msg=document.getElementById('mpDiagMsg');
+    if(id===bad){
+      MP.diag=false;MP.diagDone=true;
+      document.querySelectorAll('.mp-diag-o').forEach(x=>x.disabled=true);
+      msg.textContent=MP_FAULTS[bad].fix;
+      const sl=document.querySelector('[data-slot="'+bad+'"]');if(sl){sl.classList.add('target');setTimeout(()=>sl.classList.remove('target'),2500);}
+      vbSay('Diagnóstico certo.',2500,'happy');
+      setTimeout(()=>{MP.phase='ready';mpBoot();},2600);
+    }else{
+      MP.mistakes++;b.disabled=true;
+      msg.textContent='Não parece ser isso. Com "'+MP_FAULTS[id].n.toLowerCase()+'" o que se veria era: '+MP_FAULTS[id].sym.charAt(0).toLowerCase()+MP_FAULTS[id].sym.slice(1)+' Compara com o que observas.';
+      vbSay('Não é essa. Compara os sintomas.',3000,'oops');
+    }
+  });
+}
 function mpBoot(){
-  if(MP.phase!=='ready')return;
+  if(MP.phase!=='ready'||MP.diag)return;
+  if(MP.level===2&&!MP.diagDone){mpDiag();return;}
   MP.phase='boot';
   clearInterval(MP.tick);mpTick();
   mpRefresh();
@@ -2625,14 +2820,34 @@ function mpBoot(){
   const list=document.getElementById('mpPostList');
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const gap=reduce?0:650;
-  vbSay('A ligar… dedos cruzados!',3000);
+  vbSay('A iniciar o sistema…',3000,'power');
   lines.forEach((t,i)=>setTimeout(()=>{
     const li=document.createElement('li');li.innerHTML='<span class="ok">✓</span> '+t;list.appendChild(li);
-    if(i===lines.length-1)setTimeout(mpBootOS,gap);
+    if(i===lines.length-1)setTimeout(mpBios,gap);
   },gap*(i+1)));
   post.scrollIntoView&&post.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
 }
 
+/* ── BIOS/UEFI: confirmar que o hardware foi reconhecido e ativar o perfil da RAM ── */
+function mpBios(){
+  const row=(a,b)=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid var(--border)"><span>${a}</span><b style="color:var(--text);text-align:right">${b}</b></div>`;
+  mpAsk('mpBios','BIOS/UEFI — o que a placa reconheceu',
+    `A BIOS/UEFI é o programa da placa-mãe que mostra o hardware detetado. Se uma peça não aparece aqui, algo ficou mal encaixado ou ligado.
+     <div style="margin-top:8px;font-family:var(--fc);font-size:.82rem;color:var(--muted)">
+       ${row('Processador','AMD · socket AM5 · 8 núcleos')}
+       ${row('Memória','32 GB DDR5 (2 × 16 GB) · <span style="color:var(--orange)">4800 MT/s</span>')}
+       ${row('Armazenamento','NVMe 1 TB · SATA 2 TB')}
+       ${row('Temperatura do processador','38 °C')}
+     </div>`,
+    'Todas as peças aparecem. Mas os módulos de RAM anunciam 6000 MT/s e a BIOS mostra 4800 MT/s. O que fazes?',
+    [{ok:true,t:'É normal: a placa arranca com uma velocidade segura. Ativo o perfil EXPO/XMP na BIOS para chegar à velocidade anunciada.',
+      m:'Certo. Os 4800 MT/s são a velocidade padrão. O perfil EXPO (AMD) ou XMP (Intel) é um conjunto de valores testados pelo fabricante da RAM e, ao ativá-lo, a memória passa à velocidade anunciada. Sem isso, pagas por uma velocidade que não usas.'},
+     {ok:false,t:'Os módulos estão avariados, por isso devolvo-os.',
+      m:'Não estão. Com todos os 32 GB reconhecidos, a RAM funciona. A velocidade mais baixa é o comportamento padrão e resolve-se na BIOS, sem trocar nada.'},
+     {ok:false,t:'Ignoro: a velocidade anunciada é só publicidade.',
+      m:'Não é. A velocidade anunciada é real, mas só é atingida depois de ativar o perfil EXPO/XMP. Sem isso, a memória fica abaixo do que podia dar.'}],
+    mpBootOS);
+}
 function mpBootOS(){
   const bar=document.getElementById('mpBootBar'),fill=document.getElementById('mpBootFill');
   if(!bar)return;
@@ -2647,13 +2862,13 @@ function mpBootOS(){
       <div class="mp-win">🎉 O teu PC arrancou!</div>
       <div class="mp-stars" aria-label="${stars} de 3 estrelas">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3-stars)}</span></div>
       <div class="mp-res-stats"><div><b>${m}:${s}</b><span>tempo</span></div><div><b>${MP.mistakes}</b><span>erros</span></div>${MP.level===2?`<div><b>${MP.hints}</b><span>dicas</span></div>`:''}</div>
-      <p class="mp-note">Num PC a sério ainda ligarias os cabos do painel frontal da caixa (botão de ligar, USB, áudio) e as ventoinhas da caixa — e, depois de arrancar, instalarias o sistema operativo.</p>
+      <p class="mp-note">Num PC a sério, o passo seguinte seria instalar o sistema operativo (Windows ou Linux) a partir de uma pen USB.</p>
       <div class="res-btns">
         <button class="btn-p" onclick="mpStart(${MP.level})">Jogar outra vez</button>
         <button class="btn-s" onclick="mpStart(${MP.level===1?2:1})">${MP.level===1?'Experimentar o Nível 2 →':'Voltar ao Nível 1'}</button>
         <button class="btn-s" onclick="showSection('componentes')">Ver os componentes</button>
       </div>`;
-    vbSay(stars===3?'Fantástico! Montaste o PC como um profissional!':'Boa! O PC arrancou!',6000,'dance');
+    vbSay(stars===3?'Excelente. Montagem sem falhas.':'O PC arrancou. Bom trabalho.',6000,'dance');
     vbJump();
   };
   if(reduce){fill.style.width='100%';finish();return;}
