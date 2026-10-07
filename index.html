@@ -4,15 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VanBerto's — Hardware Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Fira+Code:wght@300;400;500&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#050509">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hardware Lab">
+<meta name="description" content="VanBerto's Hardware Lab: explora componentes em 3D, monta um PC e testa o que sabes sobre hardware e software.">
+<style>
+/* Fontes locais (funcionam sem internet) */
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/orbitron-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/orbitron-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:800;font-display:swap;src:url('fonts/orbitron-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:900;font-display:swap;src:url('fonts/orbitron-latin-900-normal.woff2') format('woff2')}
+@font-face{font-family:'Fira Code';font-style:normal;font-weight:300;font-display:swap;src:url('fonts/fira-code-latin-300-normal.woff2') format('woff2')}
+@font-face{font-family:'Fira Code';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/fira-code-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Fira Code';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/fira-code-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Rajdhani';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/rajdhani-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Rajdhani';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/rajdhani-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Rajdhani';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/rajdhani-latin-700-normal.woff2') format('woff2')}
+</style>
+<script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/three.min.js"></script>
 <style>
 :root{
   --bg:#050509;--surface:#0b0b1a;--card:#101028;--border:#1c1c40;
   --cyan:#00e5ff;--purple:#8b5cf6;--orange:#ff6b35;--green:#00ff88;
   --red:#ff3355;--gold:#ffd700;
-  --text:#e2e2ff;--muted:#5a5a8a;
+  --text:#e2e2ff;--muted:#8a8ac0;
   --fd:'Orbitron',monospace;--fc:'Fira Code',monospace;--fb:'Rajdhani',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -33,7 +52,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .section.active{display:block}
 
 /* HERO */
-#home{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:100px}
+#home{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:100px}
+#home.active{display:flex}
 .hero-badge{font-family:var(--fc);font-size:.7rem;color:var(--cyan);border:1px solid rgba(0,229,255,.4);padding:5px 14px;border-radius:20px;margin-bottom:28px;letter-spacing:2px;animation:badge-pulse 2.5s infinite}
 @keyframes badge-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 0 0 10px rgba(0,229,255,0)}}
 .hero-title{font-family:var(--fd);font-size:clamp(2.2rem,7vw,4.5rem);font-weight:900;line-height:1.05;margin-bottom:16px}
@@ -339,10 +359,33 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mp-prep-b{padding:0 16px 14px;font-family:var(--fb);font-size:.92rem;color:var(--muted);line-height:1.5}
 .mp-prep-b p{margin:8px 0}.mp-prep-b ul{margin:4px 0 8px;padding-left:20px}.mp-prep-b li{margin:3px 0}
 .mp-prep-b b{color:var(--text)}
+.loosemark,.loosemark-t{display:none;pointer-events:none}
+.loosemark{fill:rgba(255,77,109,.12);stroke:#ff4d6d;stroke-width:2.5;stroke-dasharray:4 3}
+.loosemark-t{font-size:9px;font-weight:700;fill:#ff4d6d}
+.slot.loose .loosemark,.slot.loose .loosemark-t{display:block}
+.slot.loose .loosemark{animation:mp-pulse 1s ease-in-out infinite}
+.mp-diag-o{text-transform:none;letter-spacing:0;font-family:var(--fb);font-size:.95rem;font-weight:600;text-align:left;white-space:normal;line-height:1.4}
 .mp-ov{position:fixed;inset:0;z-index:300;background:rgba(3,4,12,.82);display:flex;align-items:center;justify-content:center;padding:16px}
 .mp-ov-box{max-width:560px;width:100%;max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--cyan);border-radius:14px;padding:18px 20px}
 .mp-ov-opts{display:flex;flex-direction:column;gap:8px}
-.mp-ov-opts button{text-align:left;white-space:normal;line-height:1.35}
+.mp-ov-opts button{text-align:left;white-space:normal;line-height:1.4;text-transform:none;letter-spacing:0;font-family:var(--fb);font-size:.95rem;font-weight:600}
+.sw-layers{display:flex;flex-direction:column;gap:6px;max-width:640px;margin:0 auto 26px}
+.sw-l{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 16px;border-radius:10px;border:1px solid var(--border);background:rgba(0,229,255,calc(.14 - var(--k,5)*.025));font-family:var(--fb)}
+.sw-l b{color:var(--cyan);font-family:var(--fd);font-size:.95rem}
+.sw-l span{color:var(--muted);font-size:.9rem;text-align:right}
+.sw-hw{background:rgba(255,167,51,.1);border-color:rgba(255,167,51,.35)}
+.sw-hw b{color:var(--orange)}
+.sw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:26px}
+.sw-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.sw-card h3{font-family:var(--fd);font-size:1rem;color:var(--cyan);margin-bottom:6px}
+.sw-card p{font-family:var(--fb);font-size:.95rem;line-height:1.5;color:var(--muted)}
+.sw-card b{color:var(--text)}
+.sw-h{font-family:var(--fd);font-size:1.15rem;margin:8px 0 10px}
+.sw-steps{font-family:var(--fb);color:var(--muted);line-height:1.5;padding-left:22px;max-width:700px}
+.sw-steps li{margin:6px 0}.sw-steps b{color:var(--text)}
+@media(max-width:560px){.sw-l{flex-direction:column;align-items:flex-start;gap:2px}.sw-l span{text-align:left}}
+.qtheme-l{display:block;font-family:var(--fc);font-size:.75rem;color:var(--muted);margin:10px 0 4px}
+select.name-input{margin-bottom:10px;text-align:left}
 /* ===== RODAPÉ ===== */
 .site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
 @media(max-width:600px){.site-foot{padding:18px 70px 26px}
@@ -363,6 +406,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <button class="nav-btn active" onclick="showSection('home')">Home</button>
     <button class="nav-btn" onclick="showSection('componentes')">Componentes</button>
     <button class="nav-btn" onclick="showSection('montar')">Montar PC</button>
+    <button class="nav-btn" onclick="showSection('software')">Software</button>
     <button class="nav-btn" onclick="showSection('comparador')">Comparador</button>
     <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
   </div>
@@ -377,7 +421,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores — totalmente grátis, sem registo, no browser.</p>
   <div class="hero-stats">
     <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
-    <div><div class="stat-num">25</div><div class="stat-label">Perguntas Quiz</div></div>
+    <div><div class="stat-num">35</div><div class="stat-label">Perguntas Quiz</div></div>
     <div><div class="stat-num">5</div><div class="stat-label">Vistas por Peça</div></div>
     <div><div class="stat-num">PDF</div><div class="stat-label">Certificado</div></div>
   </div>
@@ -428,6 +472,40 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <!-- COMPARADOR -->
+<section id="software" class="section">
+  <div class="inner" style="max-width:980px;margin:0 auto">
+    <div class="sec-header">
+      <h2 class="sec-title">Software <span class="accent">por camadas</span></h2>
+      <p class="sec-sub">O hardware só faz alguma coisa quando há software a dizer-lhe o que fazer</p>
+    </div>
+    <div class="sw-layers" role="list" aria-label="Camadas do software, de cima para baixo">
+      <div class="sw-l" role="listitem" style="--k:1"><b>Aplicações</b><span>Navegador, jogos, Office, editores de vídeo</span></div>
+      <div class="sw-l" role="listitem" style="--k:2"><b>Sistema operativo</b><span>Windows, Linux, macOS — gere tudo o que está por baixo</span></div>
+      <div class="sw-l" role="listitem" style="--k:3"><b>Drivers</b><span>Ensinam o sistema a falar com cada peça</span></div>
+      <div class="sw-l" role="listitem" style="--k:4"><b>Firmware (BIOS/UEFI)</b><span>Arranca o hardware e entrega o controlo ao sistema</span></div>
+      <div class="sw-l sw-hw" role="listitem"><b>Hardware</b><span>Processador, memória, discos, placa gráfica…</span></div>
+    </div>
+    <div class="sw-grid">
+      <article class="sw-card"><h3>Firmware: BIOS/UEFI</h3><p>Programa gravado num chip da placa-mãe. É o primeiro a correr: testa o hardware (POST), deixa escolher o dispositivo de arranque e passa o controlo ao sistema operativo. Atualiza-se com cuidado: se faltar a energia a meio, a placa pode ficar inutilizável.</p></article>
+      <article class="sw-card"><h3>Sistema operativo</h3><p>Reparte o processador, a memória e o armazenamento pelos programas, controla os periféricos e dá a interface ao utilizador. O núcleo (kernel) é a parte que fala com o hardware. Exemplos: Windows 11, Linux (Ubuntu, Fedora…) e macOS, que só corre em Mac.</p></article>
+      <article class="sw-card"><h3>Drivers</h3><p>Fazem a ponte entre o sistema e cada peça: placa gráfica, rede, áudio, chipset. Sem o driver certo o sistema usa um genérico e a peça rende pouco. O mais seguro é descarregá-los do site do fabricante.</p></article>
+      <article class="sw-card"><h3>Aplicações</h3><p>São os programas que usas no dia a dia. Correm sobre o sistema operativo, por isso uma aplicação feita para Windows não corre diretamente em Linux ou macOS. Também têm de ser de 64 bits para usar mais de 4 GB de memória.</p></article>
+      <article class="sw-card"><h3>Atualizações e segurança</h3><p>As atualizações corrigem falhas de segurança e erros. O Windows 10 deixou de ter suporte gratuito a 14 de outubro de 2025: sem atualizações, o PC fica exposto. Mantém o antivírus ativo e faz cópias de segurança dos ficheiros importantes.</p></article>
+      <article class="sw-card"><h3>Licenças</h3><p><b>Proprietário</b>: pagas para usar (Windows, Office). <b>Livre/código aberto</b>: o código é público e podes usá-lo e alterá-lo (Linux, LibreOffice). <b>Freeware</b>: gratuito, mas o código é fechado. <b>Teste (trial)</b>: gratuito por tempo limitado.</p></article>
+    </div>
+    <h3 class="sw-h">O que acontece quando ligas o PC</h3>
+    <ol class="sw-steps">
+      <li><b>Energia.</b> A fonte alimenta a placa-mãe e o processador.</li>
+      <li><b>Firmware (UEFI).</b> Faz o teste de arranque (POST): verifica processador, memória e restantes peças.</li>
+      <li><b>Dispositivo de arranque.</b> A UEFI procura onde está o sistema (normalmente o SSD).</li>
+      <li><b>Carregador do sistema.</b> Carrega o núcleo do sistema operativo para a memória.</li>
+      <li><b>Sistema operativo.</b> Carrega os drivers e os serviços.</li>
+      <li><b>Ambiente de trabalho.</b> Já podes abrir as aplicações.</li>
+    </ol>
+    <p class="mp-note" style="margin-top:18px">Queres testar o que aprendeste? Há perguntas sobre software no <a href="#" onclick="showSection('quiz');return false" style="color:var(--cyan)">Quiz</a>.</p>
+  </div>
+</section>
+
 <section id="comparador" class="section">
   <div class="inner">
     <div class="sec-header">
@@ -452,13 +530,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="inner">
     <div id="quizStart" class="quiz-start">
       <div class="qstart-icon">🧠</div>
-      <h2 class="qstart-title">Quiz de Hardware</h2>
-      <p class="qstart-sub">25 perguntas · Nota de 1 a 5 · Certificado PDF</p>
+      <h2 class="qstart-title">Quiz de Hardware e Software</h2>
+      <p class="qstart-sub" id="qSub">25 perguntas · Nota de 1 a 5 · Certificado PDF</p>
       <div class="quiz-meta">
-        <div class="qmeta-item"><div class="qmeta-num">25</div><div class="qmeta-label">Perguntas</div></div>
+        <div class="qmeta-item"><div class="qmeta-num" id="qMetaN">25</div><div class="qmeta-label">Perguntas</div></div>
         <div class="qmeta-item"><div class="qmeta-num">4</div><div class="qmeta-label">Opções cada</div></div>
         <div class="qmeta-item"><div class="qmeta-num">1–5</div><div class="qmeta-label">Escala nota</div></div>
       </div>
+      <label for="quizTheme" class="qtheme-l">Tema</label>
+      <select id="quizTheme" class="name-input" aria-label="Tema do quiz"></select>
       <input class="name-input" id="playerName" type="text" placeholder="O teu nome (para o certificado)" maxlength="40">
       <br>
       <button class="btn-p" onclick="startQuiz()">Começar Quiz →</button>
@@ -569,7 +649,7 @@ const COMP = {
       'Capacidade':'8 GB – 64 GB por módulo (desktop)',
       'Velocidade DDR5':'4800 – 8000+ MT/s',
       'Velocidade DDR4':'1600 – 3200 MT/s (padrão); mais com XMP',
-      'Latência CAS':'CL32–CL40 (DDR5)',
+      'Latência CAS':'CL30–CL40 (DDR5)',
       'Tensão DDR5':'1,1 V',
       'Tensão DDR4':'1,2 – 1,35 V',
       'Pinos (DIMM)':'288 pinos (DDR4 e DDR5)',
@@ -595,7 +675,8 @@ const COMP = {
       {y:'2003',n:'DDR2',i:'Frequências mais altas e tensão reduzida (1,8 V)'},
       {y:'2007',n:'DDR3',i:'1,5 V, de 800 a 2133 MT/s'},
       {y:'2014',n:'DDR4',i:'1,2 V, de 1600 a 3200 MT/s (padrão); mais com XMP'},
-      {y:'2021',n:'DDR5',i:'1,1 V, a partir de 4800 MT/s, maior capacidade por módulo e ECC interno (on-die)'}
+      {y:'2021',n:'DDR5',i:'1,1 V, a partir de 4800 MT/s, maior capacidade por módulo e ECC interno (on-die)'},
+      {y:'2024',n:'DDR5 até 8800 MT/s (JEDEC) e módulos CUDIMM',i:'A norma passou a definir velocidades até 8800 MT/s. Os módulos CUDIMM trazem um chip de relógio no próprio módulo, para manter a estabilidade a velocidades muito altas'}
     ],
     svg:`<svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ramPCB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0a"/><stop offset="100%" stop-color="#060f06"/></linearGradient></defs><rect width="240" height="120" rx="3" fill="url(#ramPCB)"/><rect x="0" y="85" width="240" height="25" rx="1" fill="#0d200d" stroke="#1a3a1a" stroke-width="1"/><g fill="#c8a840"><rect x="4" y="87" width="3" height="20"/><rect x="9" y="87" width="3" height="20"/><rect x="14" y="87" width="3" height="20"/><rect x="19" y="87" width="3" height="20"/><rect x="24" y="87" width="3" height="20"/><rect x="29" y="87" width="3" height="20"/><rect x="34" y="87" width="3" height="20"/><rect x="39" y="87" width="3" height="20"/><rect x="44" y="87" width="3" height="20"/><rect x="49" y="87" width="3" height="20"/><rect x="54" y="87" width="3" height="20"/><rect x="59" y="87" width="3" height="20"/><rect x="64" y="87" width="3" height="20"/><rect x="69" y="87" width="3" height="20"/><rect x="77" y="87" width="3" height="20"/><rect x="82" y="87" width="3" height="20"/><rect x="87" y="87" width="3" height="20"/><rect x="92" y="87" width="3" height="20"/><rect x="97" y="87" width="3" height="20"/><rect x="102" y="87" width="3" height="20"/><rect x="107" y="87" width="3" height="20"/><rect x="112" y="87" width="3" height="20"/><rect x="117" y="87" width="3" height="20"/><rect x="122" y="87" width="3" height="20"/><rect x="127" y="87" width="3" height="20"/><rect x="132" y="87" width="3" height="20"/><rect x="140" y="87" width="3" height="20"/><rect x="145" y="87" width="3" height="20"/><rect x="150" y="87" width="3" height="20"/><rect x="155" y="87" width="3" height="20"/><rect x="160" y="87" width="3" height="20"/><rect x="165" y="87" width="3" height="20"/><rect x="170" y="87" width="3" height="20"/><rect x="175" y="87" width="3" height="20"/><rect x="180" y="87" width="3" height="20"/><rect x="185" y="87" width="3" height="20"/><rect x="190" y="87" width="3" height="20"/><rect x="195" y="87" width="3" height="20"/><rect x="200" y="87" width="3" height="20"/><rect x="205" y="87" width="3" height="20"/><rect x="210" y="87" width="3" height="20"/><rect x="215" y="87" width="3" height="20"/><rect x="220" y="87" width="3" height="20"/><rect x="225" y="87" width="3" height="20"/><rect x="230" y="87" width="3" height="20"/><rect x="235" y="87" width="3" height="20"/></g><g fill="#1a2a1a" stroke="#00ff88" stroke-width="1"><rect x="10" y="8" width="28" height="22" rx="2"/><rect x="44" y="8" width="28" height="22" rx="2"/><rect x="78" y="8" width="28" height="22" rx="2"/><rect x="112" y="8" width="28" height="22" rx="2"/><rect x="146" y="8" width="28" height="22" rx="2"/><rect x="180" y="8" width="28" height="22" rx="2"/><rect x="10" y="38" width="28" height="22" rx="2"/><rect x="44" y="38" width="28" height="22" rx="2"/><rect x="78" y="38" width="28" height="22" rx="2"/><rect x="112" y="38" width="28" height="22" rx="2"/><rect x="146" y="38" width="28" height="22" rx="2"/><rect x="180" y="38" width="28" height="22" rx="2"/></g><text x="24" y="22" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace" opacity=".8">DRAM</text><text x="120" y="22" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace" opacity=".8">DRAM</text><text x="120" y="75" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace" font-weight="bold">DDR5-6000 · 32GB</text><text x="120" y="85" text-anchor="middle" fill="#666" font-size="7" font-family="monospace">CORSAIR VENGEANCE</text></svg>`
   },
@@ -612,7 +693,7 @@ const COMP = {
       'Slots PCIe':'1–3× PCIe x16 + PCIe x1',
       'Slots M.2':'2 a 5× M.2 (NVMe / SATA)',
       'Portas SATA':'4 a 6× SATA III (6 Gbps)',
-      'USB Traseiros':'USB 2.0, 3.2 Gen 1/2, USB4/TB4',
+      'USB Traseiros':'USB 2.0, 3.2 Gen 1/2, USB4 (40 Gbps); Thunderbolt 5 (80 Gbps) em algumas placas topo de gama',
       'Rede':'1G / 2,5G LAN (10G em modelos de topo)',
       'Áudio':'Codec Realtek ALC1220 ou superior',
       'Chipset Intel':'Z790 / B760 / H770',
@@ -936,7 +1017,8 @@ const COMP = {
       {y:'1999',n:'Gigabit Ethernet (1 Gbps)',i:'1000BASE-T sobre cabo Cat5e — ainda hoje o padrão doméstico'},
       {y:'2009',n:'Wi-Fi 4 (802.11n)',i:'Até 600 Mbps teóricos, antenas MIMO'},
       {y:'2019',n:'Wi-Fi 6 (802.11ax)',i:'9,6 Gbps teóricos, OFDMA, MU-MIMO melhorado'},
-      {y:'2024',n:'Wi-Fi 7 (802.11be)',i:'Multi-Link Operation, até 46 Gbps teóricos, menor latência'}
+      {y:'2024',n:'Wi-Fi 7 (802.11be)',i:'Multi-Link Operation, até 46 Gbps teóricos, menor latência'},
+      {y:'2026',n:'Wi-Fi 8 (802.11bn), em desenvolvimento',i:'Aposta na fiabilidade e não na velocidade. Já há routers pré-norma anunciados em 2026, mas a norma só deverá ficar concluída por volta de 2028. O Wi-Fi 7 continua a ser a escolha atual'}
     ],
     svg:`<svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><rect width="220" height="130" rx="4" fill="#050f0a"/><rect x="4" y="10" width="212" height="90" rx="3" fill="#080f0a" stroke="#00ff88" stroke-width="1.5"/><rect x="50" y="25" width="50" height="55" rx="3" fill="#0d1a10" stroke="#00ff88" stroke-width="1.5"/><text x="75" y="50" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace" font-weight="bold">INTEL</text><text x="75" y="60" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">I226-V</text><text x="75" y="70" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">2.5GbE</text><rect x="155" y="15" width="52" height="80" rx="2" fill="#0a1a0a" stroke="#444" stroke-width="1"/><rect x="162" y="22" width="38" height="30" rx="2" fill="#0d200d" stroke="#00ff88" stroke-width="1.5"/><text x="181" y="40" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">RJ45</text><circle cx="165" cy="65" r="4" fill="#00ff88" opacity=".6"/><circle cx="178" cy="65" r="4" fill="#ffd700" opacity=".6"/><text x="172" y="76" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">LINK</text><rect x="120" y="25" width="25" height="20" rx="2" fill="#0d1a0d" stroke="#333" stroke-width="1"/><text x="132" y="38" text-anchor="middle" fill="#666" font-size="6" font-family="monospace">XFMR</text><rect x="15" y="25" width="25" height="18" rx="2" fill="#0d1a0d" stroke="#ffd700" stroke-width="1"/><text x="27" y="37" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">PWR</text><rect x="4" y="100" width="212" height="22" rx="2" fill="#0a1a0a" stroke="#00ff88" stroke-width="1"/><g fill="#00ff88" opacity=".6"><rect x="10" y="103" width="3" height="16"/><rect x="15" y="103" width="3" height="16"/><rect x="20" y="103" width="3" height="16"/><rect x="25" y="103" width="3" height="16"/></g><text x="130" y="115" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace" font-weight="bold">NIC 2.5GbE · PCIe x1</text></svg>`
   },
@@ -1012,7 +1094,17 @@ const QUESTIONS = [
   {cat:'Memória',q:'O que é a memória virtual?',opts:['Memória RAM adicional instalável por software','Cache do processador','Memória dedicada da GPU','Espaço em disco rígido/SSD utilizado como extensão da RAM'],ans:3,exp:'A memória virtual (swap/page file) usa espaço no disco como extensão da RAM quando esta está cheia. É muito mais lenta que a RAM real — o PC fica lento quando a usa ativamente.'},
   {cat:'Energia',q:'O que indica a certificação 80 PLUS Gold numa fonte de alimentação?',opts:['A fonte tem 80 W de potência máxima','A fonte é dourada por fora','A fonte tem pelo menos 90% de eficiência energética a 50% de carga (rede de 115 V)','A fonte tem 80 conectores de alimentação'],ans:2,exp:'80 PLUS Gold certifica uma eficiência de, pelo menos, 87% a 20% e a 100% de carga, e de 90% a 50% de carga (valores para rede de 115 V). Menos calor gerado e menor fatura de eletricidade.'},
   {cat:'Processador',q:'Qual é a função dos núcleos de eficiência (E-cores) nos processadores Intel de 12.ª geração em diante?',opts:['Substituir os P-cores para poupar energia','Tratar tarefas em segundo plano com menor consumo, libertando P-cores para tarefas principais','Controlar exclusivamente a memória RAM','Gerir as ligações PCIe'],ans:1,exp:'Os E-cores (Efficiency cores) são núcleos mais simples e energeticamente eficientes, ideais para tarefas em background. Os P-cores (Performance cores) ficam disponíveis para aplicações exigentes.'},
-  {cat:'Armazenamento',q:'O que é TBW (Total Bytes Written) num SSD?',opts:['Velocidade máxima de escrita em TB/s','Temperatura máxima de funcionamento','Indicador de durabilidade — total de dados que o SSD pode escrever ao longo da vida útil','Capacidade total do SSD em terabytes'],ans:2,exp:'TBW indica a resistência total de escrita do SSD. Um SSD de 1 TB com 600 TBW pode escrever 600 TB de dados dentro do limite garantido pelo fabricante — muito mais do que o uso normal requer.'}
+  {cat:'Armazenamento',q:'O que é TBW (Total Bytes Written) num SSD?',opts:['Velocidade máxima de escrita em TB/s','Temperatura máxima de funcionamento','Indicador de durabilidade — total de dados que o SSD pode escrever ao longo da vida útil','Capacidade total do SSD em terabytes'],ans:2,exp:'TBW indica a resistência total de escrita do SSD. Um SSD de 1 TB com 600 TBW pode escrever 600 TB de dados dentro do limite garantido pelo fabricante — muito mais do que o uso normal requer.'},
+  {cat:'Software',q:"Qual é o primeiro software a correr quando ligas o PC?",opts:["O sistema operativo (Windows)", "O firmware BIOS/UEFI", "O antivírus", "Os drivers da placa gráfica"],ans:1,exp:"O firmware BIOS/UEFI, gravado num chip da placa-mãe, corre primeiro: faz o teste de arranque (POST) e só depois entrega o controlo ao sistema operativo."},
+  {cat:'Software',q:"O que faz um driver?",opts:["Liga fisicamente uma peça à placa-mãe", "Permite ao sistema operativo comunicar com um componente", "Protege o PC contra vírus", "Aumenta a memória RAM"],ans:1,exp:"O driver é o software que ensina o sistema operativo a usar uma peça (placa gráfica, rede, áudio). Sem o driver certo, a peça funciona mal ou nem é reconhecida."},
+  {cat:'Software',q:"Qual é a função principal de um sistema operativo?",opts:["Aquecer menos o processador", "Gerir os recursos do hardware e servir de base aos programas", "Guardar cópias de segurança", "Ligar o PC à internet"],ans:1,exp:"O sistema operativo reparte o processador, a memória e o armazenamento pelos programas, controla os periféricos e fornece a interface ao utilizador."},
+  {cat:'Software',q:"Porque se instala o sistema operativo num SSD e não num disco rígido?",opts:["Porque o SSD aguenta mais calor", "Porque o PC arranca e abre os programas muito mais depressa", "Porque o disco rígido não aceita sistemas operativos", "Porque o SSD é mais barato por terabyte"],ans:1,exp:"O SSD é muito mais rápido a ler e escrever, por isso o sistema e os programas arrancam e abrem mais depressa. O disco rígido fica bem para ficheiros grandes e cópias."},
+  {cat:'Software',q:"O que é firmware?",opts:["Um antivírus integrado no Windows", "Software gravado num chip de um componente, como a BIOS/UEFI", "Um tipo de memória RAM", "Um programa para criar cópias de segurança"],ans:1,exp:"Firmware é software guardado de forma permanente num chip do próprio dispositivo (placa-mãe, SSD, router…). Controla o seu funcionamento básico."},
+  {cat:'Software',q:"Qual destes é um sistema operativo de código aberto?",opts:["Windows 11", "macOS", "Linux", "Microsoft Office"],ans:2,exp:"O Linux tem o código público: qualquer pessoa o pode usar, estudar e alterar. O Windows e o macOS são proprietários e o Office nem é um sistema operativo."},
+  {cat:'Software',q:"Porque é importante manter o sistema operativo atualizado?",opts:["Para o PC gastar menos energia", "Para corrigir falhas de segurança e erros", "Para aumentar a capacidade do disco", "Para dispensar o antivírus"],ans:1,exp:"As atualizações corrigem vulnerabilidades que podem ser exploradas por atacantes, além de erros. Não substituem o antivírus: complementam-no."},
+  {cat:'Software',q:"Para que serve o TPM exigido pelo Windows 11?",opts:["Aumentar a velocidade da RAM", "Guardar chaves de segurança num chip dedicado", "Refrigerar o processador", "Ligar a placa gráfica"],ans:1,exp:"O TPM é um módulo de segurança que guarda chaves criptográficas e ajuda a proteger o arranque e a cifra do disco. O Windows 11 exige o TPM 2.0."},
+  {cat:'Software',q:"Qual é a ordem correta do arranque de um PC?",opts:["Sistema operativo → POST → UEFI → ambiente de trabalho", "POST (UEFI) → procura do dispositivo de arranque → sistema operativo → ambiente de trabalho", "UEFI → ambiente de trabalho → POST → sistema operativo", "Drivers → UEFI → sistema operativo → POST"],ans:1,exp:"O firmware faz o POST, procura o dispositivo de arranque (por exemplo, o SSD), carrega o sistema operativo e este mostra o ambiente de trabalho."},
+  {cat:'Software',q:"Quando é que o Windows 10 deixou de ter suporte gratuito de atualizações de segurança?",opts:["Em 14 de outubro de 2025", "Em 2015, quando foi lançado", "Em 2021, com o Windows 11", "Ainda tem suporte indefinido"],ans:0,exp:"O suporte do Windows 10 terminou a 14 de outubro de 2025. Sem atualizações de segurança, o PC fica mais exposto, por isso convém passar para o Windows 11 ou outro sistema com suporte."},
 ];
 
 /* =====================================================================
@@ -1031,7 +1123,7 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const idx = ['home','componentes','montar','comparador','quiz'].indexOf(id);
+  const idx = ['home','componentes','montar','software','comparador','quiz'].indexOf(id);
   document.querySelectorAll('.nav-btn')[idx].classList.add('active');
   if(id==='comparador') buildComparatorSelects();
   if(id!=='montar'&&MP.tick){clearInterval(MP.tick);MP.tick=0;if(!MP.pausedAt)MP.pausedAt=Date.now();}
@@ -1613,7 +1705,7 @@ function buildTabEscala(c){
       <text x="${cx+CW*k/2}" y="${base+23}" text-anchor="middle" fill="#8888aa" font-size="9" font-family="monospace">85,6 mm</text>
       <text x="${bx+W*k/2}" y="${base+36}" text-anchor="middle" fill="${c.color}" font-size="8" font-family="monospace">${c.short.toUpperCase()}</text>
       <text x="${cx+CW*k/2}" y="${base+36}" text-anchor="middle" fill="#8888aa" font-size="8" font-family="monospace">CARTÃO DE CRÉDITO</text>
-      <text x="150" y="14" text-anchor="middle" fill="#5a5a8a" font-size="8" font-family="monospace">VISTA DE FRENTE · MESMA ESCALA · ÁREA ≈ ${rt}× O CARTÃO</text>
+      <text x="150" y="14" text-anchor="middle" fill="#8a8ac0" font-size="8" font-family="monospace">VISTA DE FRENTE · MESMA ESCALA · ÁREA ≈ ${rt}× O CARTÃO</text>
     </svg>`;
   }
   document.getElementById('tescala').innerHTML=`
@@ -1689,12 +1781,27 @@ function renderComparador(){
 /* =====================================================================
    QUIZ
    ===================================================================== */
+const QN=()=>(window._quizQ||[]).length||25;
+function quizPool(){const t=(document.getElementById('quizTheme')||{}).value||'all';return t==='all'?QUESTIONS:QUESTIONS.filter(q=>q.cat===t);}
+function quizMeta(){
+  const n=Math.min(25,quizPool().length);
+  const a=document.getElementById('qSub'),b=document.getElementById('qMetaN');
+  if(a)a.textContent=n+' perguntas · Nota de 1 a 5 · Certificado PDF';
+  if(b)b.textContent=n;
+}
+(function(){
+  const sel=document.getElementById('quizTheme');if(!sel)return;
+  const c={};QUESTIONS.forEach(q=>c[q.cat]=(c[q.cat]||0)+1);
+  sel.innerHTML='<option value="all">Todos os temas</option>'+
+    Object.keys(c).filter(k=>c[k]>=4).sort((x,y)=>c[y]-c[x]).map(k=>'<option value="'+k+'">'+k+' ('+c[k]+' perguntas)</option>').join('');
+  sel.addEventListener('change',quizMeta);quizMeta();
+})();
 function startQuiz(){
   playerName=document.getElementById('playerName').value.trim()||'Aluno';
   qIdx=0;qScore=0;qStreak=0;wrongAnswers=[];
   // Fisher-Yates: baralha perguntas e a ordem das opções
   const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
-  window._quizQ=shuf(QUESTIONS).slice(0,25).map(q=>{
+  window._quizQ=shuf(quizPool()).slice(0,25).map(q=>{
     const order=shuf(q.opts.map((_,i)=>i));
     return {...q,opts:order.map(i=>q.opts[i]),ans:order.indexOf(q.ans)};
   });
@@ -1707,9 +1814,9 @@ function startQuiz(){
 function showQuestion(){
   answered=false;
   const q=window._quizQ[qIdx];
-  const pct=Math.round((qIdx/25)*100);
+  const pct=Math.round((qIdx/QN())*100);
   document.getElementById('qbarFill').style.width=pct+'%';
-  document.getElementById('qNum').textContent=`${qIdx+1} / 25`;
+  document.getElementById('qNum').textContent=`${qIdx+1} / ${QN()}`;
   document.getElementById('qCat').textContent=q.cat;
   document.getElementById('qText').textContent=q.q;
   document.getElementById('qFb').className='fb';
@@ -1747,7 +1854,7 @@ function answerQ(i){
 
 function nextQuestion(){
   qIdx++;
-  if(qIdx>=25){
+  if(qIdx>=QN()){
     showResult();
   } else {
     showQuestion();
@@ -1758,7 +1865,7 @@ function showResult(){
   document.getElementById('quizGame').classList.add('hidden');
   const res=document.getElementById('resultado');
   res.classList.add('show');
-  const pct=Math.round((qScore/25)*100);
+  const pct=Math.round((qScore/QN())*100);
   let grade,desc,col;
   vbSay(pct>=90?'Resultado excelente.':pct>=50?'Resultado positivo.':'Revê as respostas e volta a tentar.',4500,pct>=75?'dance':pct>=50?'happy':'oops');
   if(pct>=90){grade=5;desc='Muito Bom 🌟';col='var(--green)'}
@@ -1769,9 +1876,9 @@ function showResult(){
   document.getElementById('gradeBig').textContent=grade;
   document.getElementById('gradeBig').style.color=col;
   document.getElementById('gradeDesc').textContent=desc;
-  document.getElementById('gradeSub').textContent=`${qScore} respostas corretas em 25 perguntas`;
+  document.getElementById('gradeSub').textContent=`${qScore} respostas corretas em ${QN()} perguntas`;
   document.getElementById('rsCorrect').textContent=qScore;
-  document.getElementById('rsWrong').textContent=25-qScore;
+  document.getElementById('rsWrong').textContent=QN()-qScore;
   document.getElementById('rsPct').textContent=pct+'%';
   if(wrongAnswers.length>0){
     const wl=document.getElementById('wrongList');
@@ -1826,11 +1933,11 @@ function generatePDF(){
   doc.setFontSize(10);doc.setTextColor(150,150,200);doc.setFont('helvetica','normal');
   doc.text('NOTA FINAL',W/2,143,{align:'center'});
   doc.setFontSize(9);
-  doc.text(`${correct}/25 corretas · ${pct} · ${desc}`,W/2,152,{align:'center'});
+  doc.text(`${correct}/${QN()} corretas · ${pct} · ${desc}`,W/2,152,{align:'center'});
   // Details
   doc.setFontSize(10);doc.setTextColor(130,130,180);
-  doc.text('25 perguntas sobre: Processadores, Memória RAM, GPUs, Placas-mãe,',W/2,170,{align:'center'});
-  doc.text('Armazenamento (HDD/SSD), Arrefecimento e Periféricos de expansão',W/2,177,{align:'center'});
+  doc.text(QN()+' perguntas sobre: Processadores, Memória RAM, GPUs, Placas-mãe,',W/2,170,{align:'center'});
+  doc.text('Armazenamento (HDD/SSD), Arrefecimento e Software (sistema operativo, drivers, firmware)',W/2,177,{align:'center'});
   // Divider
   doc.setDrawColor(0,150,170);doc.setLineWidth(0.3);doc.line(30,185,W-30,185);
   // Footer
@@ -2381,14 +2488,15 @@ function mpSvg(){
     return `<g class="slot" data-slot="${id}" tabindex="0" role="button" aria-label="${MP_SLOTS[id].label}">
       <rect class="sbox" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>${lab}${ramLab}${cabLab}
       <g class="vis" style="display:none">${mpVis(id)}</g>
+      <rect class="loosemark" x="${x-4}" y="${y-4}" width="${w+8}" height="${h+8}" rx="4"/><text class="loosemark-t" x="${x+w/2}" y="${y-9}" text-anchor="middle">folga</text>
       <rect class="hit" x="${x-3}" y="${y-3}" width="${w+6}" height="${h+6}"/>
     </g>`;
   }).join('');
   return `<svg id="mpSvg" viewBox="0 0 420 470" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Interior da caixa do PC, vista lateral, com os locais onde instalar cada peça">
     <rect x="6" y="6" width="408" height="458" rx="14" fill="#080818" stroke="#2a2f3a" stroke-width="3"/>
     <rect x="6" y="40" width="22" height="160" fill="#14141f"/>
-    <text x="17" y="120" font-size="9" fill="#5a5a8a" text-anchor="middle" transform="rotate(-90 17 120)">TRASEIRA</text>
-    <text x="404" y="270" font-size="9" fill="#5a5a8a" text-anchor="middle" transform="rotate(90 404 270)">FRENTE</text>
+    <text x="17" y="120" font-size="9" fill="#8a8ac0" text-anchor="middle" transform="rotate(-90 17 120)">TRASEIRA</text>
+    <text x="404" y="270" font-size="9" fill="#8a8ac0" text-anchor="middle" transform="rotate(90 404 270)">FRENTE</text>
     <circle cx="352" cy="90" r="24" fill="#101018" stroke="#2a2f3a"/><circle cx="352" cy="170" r="24" fill="#101018" stroke="#2a2f3a"/>
     ${slots}</svg>`;
 }
@@ -2566,11 +2674,11 @@ function mpRefresh(){
   document.getElementById('mpMist').textContent=MP.level===2?`Erros: ${MP.mistakes} · Dicas: ${MP.hints}`:`Erros: ${MP.mistakes}`;
   const st=document.getElementById('mpStep');
   if(MP.phase==='ready'||MP.phase==='boot'||MP.phase==='done'){
-    st.innerHTML=`<div class="mp-step-n">Passo ${MP_ORDER.length+1} de ${MP_ORDER.length+1}</div><div class="mp-step-t">Ligar o PC</div><div class="mp-step-d">Antes de carregares no botão, confirma que o interruptor da fonte está em I (ligado) e que o cabo da tomada está ligado.</div>`;
+    st.innerHTML=`<div class="mp-step-n">Último passo</div><div class="mp-step-t">Ligar o PC</div><div class="mp-step-d">Antes de carregares no botão, confirma que o interruptor da fonte está em I (ligado) e que o cabo da tomada está ligado.</div>`;
   }else if(MP.level===1||(MP.hintFor&&MP.hintFor===mpNext())){
     st.innerHTML=mpStepText();
   }else{
-    st.innerHTML=`<div class="mp-step-n">Desafio</div><div class="mp-step-t">Monta o PC sem ajudas</div><div class="mp-step-d">Escolhe só peças compatíveis com a ficha do projeto. Numa compra real, estes limites (altura do cooler, comprimento da placa gráfica, tamanho da placa-mãe) estão nas especificações da caixa, no site do fabricante. Se precisares, usa o botão 💡 Dica: mostra o passo seguinte e conta como uma dica.</div>`;
+    st.innerHTML=`<div class="mp-step-n">Desafio</div><div class="mp-step-t">Monta o PC sem ajudas</div><div class="mp-step-d">Escolhe só peças compatíveis com a ficha do projeto (numa compra real, estes limites vêm nas especificações da caixa). O botão 💡 Dica mostra o passo seguinte e conta como dica.</div>`;
   }
   mpRenderTray();
 }
@@ -2779,8 +2887,16 @@ function mpDiag(){
   const post=document.getElementById('mpPost');
   post.classList.remove('hidden');
   const opts=ids.map(id=>`<button class="btn-s mp-diag-o" data-id="${id}">${MP_FAULTS[id].n}</button>`).join('');
-  post.innerHTML=`<div class="mp-postbox"><div class="mp-post-t">⏻ O PC não arrancou</div><p class="mp-note" style="margin:6px 0 10px"><b>O que se vê:</b> ${MP_FAULTS[bad].sym}</p><p class="mp-note" style="margin:0 0 10px">Montaste tudo, mas uma ligação ficou mal encaixada. Qual é a causa mais provável?</p><div class="res-btns" id="mpDiagOpts">${opts}</div><p class="mp-note" id="mpDiagMsg" role="status" aria-live="polite" style="margin-top:10px"></p></div>`;
+  post.innerHTML=`<div class="mp-postbox"><div class="mp-post-t">⏻ O PC não arrancou</div><p class="mp-note" style="margin:6px 0 10px"><b>O que se vê:</b> ${MP_FAULTS[bad].sym}</p><p class="mp-note" style="margin:0 0 10px">Montaste tudo, mas uma ligação ficou mal encaixada. Qual é a causa mais provável?</p><div class="res-btns" id="mpDiagOpts">${opts}</div><p style="margin:10px 0 0"><button class="btn-s" id="mpInspect" type="button">🔍 Inspecionar o interior (conta como dica)</button></p><p class="mp-note" id="mpDiagMsg" role="status" aria-live="polite" style="margin-top:10px"></p></div>`;
+  try{post.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
   vbSay('Algo falhou. Pensa no que o sintoma indica.',3500,'oops');
+  document.getElementById('mpInspect').addEventListener('click',e=>{
+    if(!MP.diag)return;
+    e.currentTarget.disabled=true;MP.hints++;mpRefresh();
+    const sl=document.querySelector('[data-slot="'+bad+'"]');if(sl)sl.classList.add('loose');
+    document.getElementById('mpDiagMsg').textContent='Há uma ligação marcada a vermelho: está com folga. Agora diz qual é a causa.';
+    vbSay('Repara na ligação marcada.',2800,'think');
+  });
   document.getElementById('mpDiagOpts').addEventListener('click',e=>{
     const b=e.target.closest('.mp-diag-o');if(!b||!MP.diag)return;
     const id=b.dataset.id,msg=document.getElementById('mpDiagMsg');
@@ -2788,7 +2904,7 @@ function mpDiag(){
       MP.diag=false;MP.diagDone=true;
       document.querySelectorAll('.mp-diag-o').forEach(x=>x.disabled=true);
       msg.textContent=MP_FAULTS[bad].fix;
-      const sl=document.querySelector('[data-slot="'+bad+'"]');if(sl){sl.classList.add('target');setTimeout(()=>sl.classList.remove('target'),2500);}
+      const sl=document.querySelector('[data-slot="'+bad+'"]');if(sl){sl.classList.remove('loose');sl.classList.add('target');setTimeout(()=>sl.classList.remove('target'),2500);}
       vbSay('Diagnóstico certo.',2500,'happy');
       setTimeout(()=>{MP.phase='ready';mpBoot();},2600);
     }else{
@@ -2823,12 +2939,24 @@ function mpBoot(){
   vbSay('A iniciar o sistema…',3000,'power');
   lines.forEach((t,i)=>setTimeout(()=>{
     const li=document.createElement('li');li.innerHTML='<span class="ok">✓</span> '+t;list.appendChild(li);
-    if(i===lines.length-1)setTimeout(mpBios,gap);
+    if(i===lines.length-1)setTimeout(mpPart2,gap);
   },gap*(i+1)));
   post.scrollIntoView&&post.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
 }
 
 /* ── BIOS/UEFI: confirmar que o hardware foi reconhecido e ativar o perfil da RAM ── */
+function mpPart2(){
+  if(MP.level===2){mpBios();return;}
+  const ov=document.createElement('div');ov.id='mpPart2';ov.className='mp-ov';
+  ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="mpPart2T">
+    <div class="mp-post-t" id="mpPart2T">O hardware está montado e a arrancar</div>
+    <p class="mp-note" style="margin:6px 0 12px;max-width:none;text-align:left">Falta a <b>Parte 2</b>, sobre software: confirmar o que a BIOS reconheceu e instalar o sistema operativo (cerca de 5 perguntas). Podes fazê-la agora ou terminar já a montagem.</p>
+    <div class="res-btns"><button class="btn-p" id="mpP2Y">Continuar para a Parte 2</button><button class="btn-s" id="mpP2N">Terminar agora</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#mpP2Y').focus();
+  ov.querySelector('#mpP2Y').addEventListener('click',()=>{ov.remove();mpBios();});
+  ov.querySelector('#mpP2N').addEventListener('click',()=>{ov.remove();mpBootOS();});
+}
 function mpBios(){
   const row=(a,b)=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid var(--border)"><span>${a}</span><b style="color:var(--text);text-align:right">${b}</b></div>`;
   mpAsk('mpBios','BIOS/UEFI — o que a placa reconheceu',
@@ -2932,5 +3060,6 @@ renderComparador();
 buildMontar();
 vbInit();
 </script>
+<script>if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
 </html>
