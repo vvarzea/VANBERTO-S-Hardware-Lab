@@ -24,7 +24,7 @@
 @font-face{font-family:'Rajdhani';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/rajdhani-latin-600-normal.woff2') format('woff2')}
 @font-face{font-family:'Rajdhani';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/rajdhani-latin-700-normal.woff2') format('woff2')}
 </style>
-<script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/jspdf.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';document.head.appendChild(s)"></script>
 <script src="libs/three.min.js"></script>
 <style>
 :root{
@@ -1201,6 +1201,21 @@ document.getElementById('modal').addEventListener('click',e=>{
   if(e.target===document.getElementById('modal')) closeModal();
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+/* Acessibilidade: o foco do teclado fica preso dentro da janela aberta (ficha ou pergunta) */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){const p2=document.getElementById('mpP2N');if(p2){e.preventDefault();p2.click();return;}}
+  if(e.key!=='Tab')return;
+  const ovs=document.querySelectorAll('.mp-ov');
+  let box=ovs.length?ovs[ovs.length-1]:null;
+  if(!box){const m=document.getElementById('modal');if(m&&m.getClientRects().length)box=m;}
+  if(!box)return;
+  const f=[...box.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled&&x.getClientRects().length);
+  if(!f.length)return;
+  const a=document.activeElement,first=f[0],last=f[f.length-1];
+  if(!box.contains(a)){e.preventDefault();first.focus();}
+  else if(e.shiftKey&&a===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&a===last){e.preventDefault();first.focus();}
+});
 document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
 
 /* =====================================================================
@@ -1245,7 +1260,12 @@ function disposeRoot(){
 
 function initRenderer(){
   if(T3.renderer) return;
-  const r=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  let r;
+  try{r=new THREE.WebGLRenderer({antialias:true,alpha:true});}
+  catch(e1){
+    try{r=new THREE.WebGLRenderer({antialias:false,alpha:true,powerPreference:'low-power'});}
+    catch(e2){const er=new Error('WebGL');er.webgl=true;throw er;}
+  }
   r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
   r.setClearColor(0x000000,0);
   T3.renderer=r;
@@ -1261,10 +1281,27 @@ function initRenderer(){
   bindStageEvents(r.domElement);
 }
 
-function mount3D(c){
+const THREE_SRC=['libs/three.min.js','https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'];
+function loadThree(done,i){
+  i=i||0;
+  if(typeof THREE!=='undefined'){done(true);return;}
+  if(i>=THREE_SRC.length){done(false);return;}
+  const sc=document.createElement('script');sc.src=THREE_SRC[i];
+  sc.onload=()=>done(typeof THREE!=='undefined');
+  sc.onerror=()=>{sc.remove();loadThree(done,i+1);};
+  document.head.appendChild(sc);
+}
+function mount3D(c,retried){
   const st=document.getElementById('stage3d'); if(!st) return;
   try{
-    if(typeof THREE==='undefined') throw new Error('Three.js não carregou');
+    if(typeof THREE==='undefined'){
+      if(!retried){
+        st.innerHTML='<div class="stage-msg">A carregar o motor 3D…</div>';
+        loadThree(ok=>{if(document.getElementById('stage3d')===st)mount3D(c,true);});
+        return;
+      }
+      const er=new Error('Three.js');er.nothree=true;throw er;
+    }
     initRenderer();
     disposeRoot();
     const built=buildModel(c.id);
@@ -1290,7 +1327,12 @@ function mount3D(c){
   }catch(err){
     console.warn('3D indisponível:',err);
     T3.ok=false;
-    st.innerHTML=`<div class="stage-fallback">${c.svg}<p>O 3D não está disponível neste dispositivo — a mostrar a vista 2D.</p></div>`;
+    const why=err&&err.nothree?'O motor 3D não carregou (ficheiro em falta ou bloqueado pela rede da escola).':
+              err&&err.webgl?'O browser não conseguiu iniciar o WebGL (a aceleração gráfica pode estar desativada).':
+              'Ocorreu um erro ao preparar o modelo.';
+    st.innerHTML=`<div class="stage-fallback">${c.svg}<p>O 3D não está disponível — a mostrar a vista 2D.<br><span style="opacity:.8">${why}</span></p><button class="cbtn" id="btnRetry3D" type="button">↻ Tentar novamente</button></div>`;
+    const rb=document.getElementById('btnRetry3D');
+    if(rb)rb.addEventListener('click',()=>{T3.renderer=null;mount3D(c,false);});
   }
 }
 
