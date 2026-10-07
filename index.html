@@ -291,6 +291,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mp-power{grid-column:1/-1;background:linear-gradient(135deg,var(--green),#00b36b);color:#04140c;border:0;border-radius:12px;padding:16px;font-family:var(--fd);font-size:1rem;font-weight:800;letter-spacing:2px;cursor:pointer}
 .mp-power span{font-size:1.3rem;margin-right:8px}
 .mp-power:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.mp-tray button{touch-action:pan-x;-webkit-user-select:none;user-select:none}
 .mp-ghost{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-50%);background:rgba(0,229,255,.18);border:1px solid var(--cyan);color:var(--text);font-family:var(--fb);font-weight:700;font-size:.9rem;padding:6px 12px;border-radius:8px;backdrop-filter:blur(4px)}
 /* peças no palco */
 .slot{cursor:pointer;outline:none}
@@ -2433,9 +2434,9 @@ const MP_PARTS={
      why:'O SO-DIMM é o formato dos portáteis: é mais curto e tem outro conector. Numa placa de desktop usa-se o formato DIMM.'}
   ],
   cooler:[
-    {id:'cooler_ok',cat:'cooler',ok:true,icon:'cooler',name:'Cooler de torre · 155 mm',sub:'Compatível com AM5',
+    {id:'cooler_ok',cat:'cooler',ok:true,icon:'cooler',name:'Cooler de CPU · 155 mm',sub:'Compatível com AM5',
      tip:'Cooler instalado! Retira o calor do processador. Se aquecer demais, o processador reduz sozinho a velocidade (thermal throttling) para se proteger.'},
-    {id:'cooler_tall',cat:'cooler',ok:false,icon:'cooler',name:'Cooler de torre · 185 mm',sub:'Compatível com AM5',
+    {id:'cooler_tall',cat:'cooler',ok:false,icon:'cooler',name:'Cooler de CPU · 185 mm',sub:'Compatível com AM5',
      why:'A tua caixa aceita coolers até 165 mm de altura. Com 185 mm, o painel lateral não fecharia.'}
   ],
   ssd:[
@@ -2816,7 +2817,7 @@ function mpSelect(uid){
 
 /* arrastar (só rato/caneta; em ecrãs tácteis usa-se tocar na peça e depois no sítio) */
 function mpDragStart(e,btn){
-  if(e.pointerType==='touch'||e.button!==0)return;
+  if(e.button!==0)return;
   const uid=btn.dataset.uid;
   MP.drag={uid,x:e.clientX,y:e.clientY,ghost:null,active:false};
   const move=ev=>{
@@ -2906,10 +2907,11 @@ function mpTryPlace(slotId){
     setTimeout(()=>{mpSay('Todas as peças estão no lugar! Falta ligar os cabos que levam energia a cada componente.','info');vbSay('Agora os cabos!',4000);},50);
   }else if(MP.phase==='cables'&&MP_CABLE_SLOTS.every(i=>MP.placed[i])){
     MP.phase='ready';MP.sel=null;
-    setTimeout(()=>{mpSay('Tudo montado e ligado! Carrega em "Ligar o PC".','info');vbSay('Está na hora de ligar!',4000,'happy');mpCableMgmt();},50);
+    setTimeout(()=>{mpSay('Tudo montado e ligado! Carrega em "Ligar o PC".','info');vbSay('Está na hora de ligar!',4000,'happy');if(!document.getElementById('mpPanel'))mpCableMgmt();},50);
   }
   mpRefresh();
   if(d.cat==='cooler'){mpPaste();return;}
+  if(d.cat==='cfp'){mpPanel();return;}
   const f=document.querySelector('#mpTray button');if(f)f.focus();
 }
 
@@ -2949,6 +2951,44 @@ function mpPaste(){
      {ok:false,t:'Ponho mais pasta por cima da que já vem, para garantir.',
       m:'Pasta a mais é pior: forma uma camada grossa que conduz mal o calor e escorre para a placa-mãe. Uma camada fina e uniforme é o ideal.'}]);
 }
+function mpPanel(){
+  if(document.getElementById('mpPanel'))return;
+  const N={pw:'POWER SW',rs:'RESET SW',pl:'POWER LED',hl:'HDD LED'};
+  const PR=[{id:'p24',p:'pl',a:2,b:4},{id:'p68',p:'pw',a:6,b:8},{id:'p13',p:'hl',a:1,b:3},{id:'p57',p:'rs',a:5,b:7}];
+  const st={sel:null,done:{},rev:{pl:Math.random()<.5,hl:Math.random()<.5}};
+  const ov=document.createElement('div');ov.id='mpPanel';ov.className='mp-ov';document.body.appendChild(ov);
+  const nt='style="margin:6px 0 10px;max-width:none;text-align:left"';
+  let msg='Escolhe uma ficha e depois o par de pinos onde ela encaixa. Consulta o manual.';
+  const led=p=>p==='pl'||p==='hl';
+  function draw(){
+    const left=Object.keys(N).filter(p=>!Object.values(st.done).includes(p));
+    ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="mpPanelT">
+      <div class="mp-post-t" id="mpPanelT">Painel frontal: liga cada ficha aos pinos certos</div>
+      <p class="mp-note" ${nt}>Os fios da frente da caixa acabam em pequenas fichas. Cada uma vai para um par de pinos do conector F_PANEL, no canto da placa-mãe.</p>
+      <details class="mp-note" ${nt}><summary><b>📖 Manual da placa · F_PANEL</b></summary>
+        <p style="margin:6px 0 0">Pinos 1 e 3: HDD LED (+ no 1, − no 3)<br>Pinos 2 e 4: POWER LED (+ no 2, − no 4)<br>Pinos 5 e 7: RESET SW<br>Pinos 6 e 8: POWER SW<br>Os botões não têm polaridade; os LED só acendem com o + no pino certo. Noutras placas a ordem pode mudar, por isso confirma sempre no manual.</p></details>
+      <div class="mp-ov-opts" id="mpPlugs">${left.map(p=>`<span><button class="btn-s" data-plug="${p}" aria-pressed="${st.sel===p}" ${st.sel===p?'style="outline:2px solid var(--cyan)"':''}>${N[p]}${led(p)?' · fio + '+(st.rev[p]?'à direita':'à esquerda'):''}</button>${led(p)?`<button class="btn-s" data-flip="${p}" aria-label="Virar a ficha ${N[p]}">⇄</button>`:''}</span>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">${PR.map(r=>`<button class="btn-s" data-pair="${r.id}" ${st.done[r.id]?'disabled':''}>Pinos ${r.a} · ${r.b}${st.done[r.id]?'<br>✓ '+N[st.done[r.id]]:''}</button>`).join('')}</div>
+      <p class="mp-note" role="status" aria-live="polite" ${nt}>${msg}</p>
+      <div class="res-btns ${left.length?'hidden':''}"><button class="btn-p" id="mpPanelOk">Continuar</button></div></div>`;
+    const f=ov.querySelector('#mpPanelOk')||ov.querySelector('[data-plug]');if(f)f.focus();
+  }
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.id==='mpPanelOk'){ov.remove();if(MP.phase==='ready')mpCableMgmt();return;}
+    if(b.dataset.flip){st.rev[b.dataset.flip]=!st.rev[b.dataset.flip];st.sel=b.dataset.flip;msg='Ficha virada. Confirma no manual onde fica o +.';draw();return;}
+    if(b.dataset.plug){st.sel=b.dataset.plug;msg='Agora escolhe o par de pinos.';draw();return;}
+    if(b.dataset.pair){
+      if(!st.sel){msg='Escolhe primeiro uma ficha.';draw();return;}
+      const r=PR.find(x=>x.id===b.dataset.pair);
+      if(r.p!==st.sel){msg='Esse par de pinos não é para a ficha '+N[st.sel]+'. Procura no manual.';if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Confirma no manual.',2500,'oops');}
+      else if(led(st.sel)&&st.rev[st.sel]){msg='Par certo, mas a ficha está ao contrário: o LED não acenderia. Vira a ficha com ⇄ para o + ficar à esquerda (pinos '+r.a+' = +).';if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Repara na polaridade.',2500,'oops');}
+      else{st.done[r.id]=st.sel;msg='✓ '+N[st.sel]+' ligado.';st.sel=null;vbSay('Boa ligação!',2000,'happy');if(Object.keys(st.done).length===4)msg='Painel frontal ligado: o botão de ligar, o reset e os LED vão funcionar.';}
+      draw();
+    }
+  });
+  draw();
+}
 function mpCableMgmt(){
   mpAsk('mpCables','Antes de fechar a caixa: arrumar os cabos',
     'O ar entra pela frente da caixa e sai por trás e por cima. Cabos soltos no meio do caminho atrapalham essa circulação e podem tocar nas ventoinhas.',
@@ -2974,8 +3014,11 @@ const MP_FAULTS={
   c24:{n:'Cabo de 24 pinos mal encaixado',sym:'Não acende nenhuma luz nem roda nenhuma ventoinha, como se o PC estivesse desligado da tomada.',fix:'O cabo de 24 pinos alimenta a placa-mãe e quase tudo o que depende dela. Solto, a placa fica sem energia. Voltaste a encaixá-lo até a patilha prender.'},
   ceps:{n:'Cabo EPS do processador solto',sym:'A fonte liga e as ventoinhas rodam, mas não aparece imagem nem se ouve o bip do teste de arranque.',fix:'Sem o cabo EPS, o processador não recebe energia e o teste de arranque nunca começa. É uma das causas mais comuns de "liga mas não dá imagem". Voltaste a encaixá-lo.'},
   cpcie:{n:'Cabo PCIe da placa gráfica solto',sym:'O PC arranca e as ventoinhas rodam, mas o monitor, ligado à placa gráfica, fica sem sinal.',fix:'A placa gráfica não tem energia suficiente e não arranca, por isso o monitor não recebe imagem. Voltaste a encaixar o cabo PCIe.'},
-  cfp:{n:'Ficha do botão de ligar (painel frontal) solta',sym:'Carregas no botão de ligar da caixa e não acontece nada, embora a fonte esteja ligada.',fix:'O botão da caixa só envia o sinal de ligar à placa-mãe se a ficha POWER SW estiver nos pinos certos. Voltaste a encaixá-la.'}
+  cfp:{n:'Ficha do botão de ligar (painel frontal) solta',sym:'Carregas no botão de ligar da caixa e não acontece nada, embora a fonte esteja ligada.',fix:'O botão da caixa só envia o sinal de ligar à placa-mãe se a ficha POWER SW estiver nos pinos certos. Voltaste a encaixá-la.'},
+  ram2:{n:'Memória RAM mal encaixada',sym:'A fonte liga e as ventoinhas rodam, mas não aparece imagem e a placa dá 3 bips curtos seguidos (carrega em "Ouvir outra vez" para os ouvires).',look:'Há uma ranhura de RAM marcada a vermelho: o módulo não está bem encaixado.',fix:'Os bips são o código de erro do teste de arranque, e muitos indicam falha de memória (o significado exato está no manual da placa). Um módulo de RAM só funciona com as duas patilhas laterais fechadas, depois de um estalido ao encaixar. Desliga da corrente, abre as patilhas, empurra o módulo com firmeza até estalar e tenta outra vez.'},
+  mobo:{n:'Espaçador em falta sob a placa-mãe',sym:'Carregas no botão de ligar e o PC nem arranca, ou arranca um instante e desliga-se logo.',look:'A placa-mãe está marcada a vermelho: há um sítio onde ela toca na chapa da caixa.',fix:'Os espaçadores mantêm a placa afastada da chapa metálica. Sem um deles, os contactos da parte de trás da placa podem tocar no metal e causar um curto-circuito, que faz o PC desligar-se por proteção ou nem arrancar (e pode estragar a placa). Desliga da corrente, tira a placa e aparafusa os espaçadores nos furos certos antes de a fixar de novo.'}
 };
+function mpBeep(n){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=MP.ac||(MP.ac=new A());if(c.state==='suspended')c.resume();for(let i=0;i<n;i++){const o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.value=1000;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime+i*.45;o.start(t);o.stop(t+.2);}}catch(e){}}
 function mpDiag(){
   MP.diag=true;
   const ids=Object.keys(MP_FAULTS);
@@ -2985,13 +3028,14 @@ function mpDiag(){
   post.classList.remove('hidden');
   const opts=ids.map(id=>`<button class="btn-s mp-diag-o" data-id="${id}">${MP_FAULTS[id].n}</button>`).join('');
   post.innerHTML=`<div class="mp-postbox"><div class="mp-post-t">⏻ O PC não arrancou</div><p class="mp-note" style="margin:6px 0 10px"><b>O que se vê:</b> ${MP_FAULTS[bad].sym}</p><p class="mp-note" style="margin:0 0 10px">Montaste tudo, mas uma ligação ficou mal encaixada. Qual é a causa mais provável?</p><div class="res-btns" id="mpDiagOpts">${opts}</div><p style="margin:10px 0 0"><button class="btn-s" id="mpInspect" type="button">🔍 Inspecionar o interior (conta como dica)</button></p><p class="mp-note" id="mpDiagMsg" role="status" aria-live="polite" style="margin-top:10px"></p></div>`;
+  if(bad==='ram2'){mpBeep(3);const pb=post.querySelector('.mp-postbox'),bt=document.createElement('button');bt.className='btn-s';bt.textContent='🔊 Ouvir outra vez';bt.onclick=()=>mpBeep(3);pb.insertBefore(bt,pb.children[2]||null);}
   try{post.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
   vbSay('Algo falhou. Pensa no que o sintoma indica.',3500,'oops');
   document.getElementById('mpInspect').addEventListener('click',e=>{
     if(!MP.diag)return;
     e.currentTarget.disabled=true;MP.hints++;mpRefresh();
     const sl=document.querySelector('[data-slot="'+bad+'"]');if(sl)sl.classList.add('loose');
-    document.getElementById('mpDiagMsg').textContent='Há uma ligação marcada a vermelho: está com folga. Agora diz qual é a causa.';
+    document.getElementById('mpDiagMsg').textContent=(MP_FAULTS[bad].look||'Há uma ligação marcada a vermelho: está com folga.')+' Agora diz qual é a causa.';
     vbSay('Repara na ligação marcada.',2800,'think');
   });
   document.getElementById('mpDiagOpts').addEventListener('click',e=>{
