@@ -386,6 +386,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 @media(max-width:560px){.sw-l{flex-direction:column;align-items:flex-start;gap:2px}.sw-l span{text-align:left}}
 .qtheme-l{display:block;font-family:var(--fc);font-size:.75rem;color:var(--muted);margin:10px 0 4px}
 select.name-input{margin-bottom:10px;text-align:left}
+.prog{width:100%;max-width:760px;margin:26px auto 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;text-align:left}
+.prog-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-family:var(--fb)}
+.prog-h b{color:var(--cyan);font-size:1rem}.prog-h span{color:var(--muted);font-size:.85rem}
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;font-family:var(--fb)}
+.prog-l{display:block;color:var(--muted);font-size:.8rem;margin-bottom:2px}
+.prog-grid b{color:var(--text);font-size:1.15rem}.prog-grid small{display:block;color:var(--muted);font-size:.8rem}
+.prog-grid .stars{color:var(--gold)}.prog-grid .off{opacity:.25}
+.prog-bar{height:6px;border-radius:3px;background:var(--border);margin-top:6px;overflow:hidden}.prog-bar i{display:block;height:100%;background:var(--cyan)}
+.prog-reset{margin-top:12px;font-size:.8rem;padding:6px 12px}
 /* ===== RODAPÉ ===== */
 .site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
 @media(max-width:600px){.site-foot{padding:18px 70px 26px}
@@ -421,7 +430,7 @@ select.name-input{margin-bottom:10px;text-align:left}
   <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores — totalmente grátis, sem registo, no browser.</p>
   <div class="hero-stats">
     <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
-    <div><div class="stat-num">35</div><div class="stat-label">Perguntas Quiz</div></div>
+    <div><div class="stat-num" id="statQ">35</div><div class="stat-label">Perguntas Quiz</div></div>
     <div><div class="stat-num">5</div><div class="stat-label">Vistas por Peça</div></div>
     <div><div class="stat-num">PDF</div><div class="stat-label">Certificado</div></div>
   </div>
@@ -430,6 +439,7 @@ select.name-input{margin-bottom:10px;text-align:left}
     <button class="btn-s" onclick="showSection('montar')">🔧 Montar o PC</button>
     <button class="btn-s" onclick="showSection('quiz')">Fazer o Quiz →</button>
   </div>
+  <div class="prog hidden" id="progCard"></div>
 </section>
 
 <!-- COMPONENTES -->
@@ -1105,6 +1115,15 @@ const QUESTIONS = [
   {cat:'Software',q:"Para que serve o TPM exigido pelo Windows 11?",opts:["Aumentar a velocidade da RAM", "Guardar chaves de segurança num chip dedicado", "Refrigerar o processador", "Ligar a placa gráfica"],ans:1,exp:"O TPM é um módulo de segurança que guarda chaves criptográficas e ajuda a proteger o arranque e a cifra do disco. O Windows 11 exige o TPM 2.0."},
   {cat:'Software',q:"Qual é a ordem correta do arranque de um PC?",opts:["Sistema operativo → POST → UEFI → ambiente de trabalho", "POST (UEFI) → procura do dispositivo de arranque → sistema operativo → ambiente de trabalho", "UEFI → ambiente de trabalho → POST → sistema operativo", "Drivers → UEFI → sistema operativo → POST"],ans:1,exp:"O firmware faz o POST, procura o dispositivo de arranque (por exemplo, o SSD), carrega o sistema operativo e este mostra o ambiente de trabalho."},
   {cat:'Software',q:"Quando é que o Windows 10 deixou de ter suporte gratuito de atualizações de segurança?",opts:["Em 14 de outubro de 2025", "Em 2015, quando foi lançado", "Em 2021, com o Windows 11", "Ainda tem suporte indefinido"],ans:0,exp:"O suporte do Windows 10 terminou a 14 de outubro de 2025. Sem atualizações de segurança, o PC fica mais exposto, por isso convém passar para o Windows 11 ou outro sistema com suporte."},
+  {cat:'Montagem',q:"Antes de começar a montar, qual é o cuidado mais importante com a eletricidade?",opts:["Desligar o PC da tomada e tocar numa parte metálica da caixa para descarregar a eletricidade estática", "Montar com a fonte ligada, para testar cada peça", "Usar luvas de lã para não deixar gordura nas peças", "Molhar as mãos para não haver estática"],ans:0,exp:"A fonte deve estar desligada da tomada e convém tocar numa parte metálica da caixa antes de pegar nas peças, para descarregar a eletricidade estática que pode danificar os componentes."},
+  {cat:'Montagem',q:"Como se alinha o processador com o socket?",opts:["Pelo lado que tiver mais pinos", "Pelo triângulo num canto do processador e do socket, pousando-o sem forçar", "Em qualquer posição, porque encaixa sempre", "Empurrando até ouvir um clique"],ans:1,exp:"O processador só encaixa numa posição, marcada por um triângulo no canto. Pousa-se sem forçar: se for preciso força, está mal alinhado e pode estragar-se."},
+  {cat:'Montagem',q:"Em que ranhuras se colocam dois módulos de RAM para usar dual channel?",opts:["Nas duas ranhuras mais próximas uma da outra", "Nas indicadas no manual da placa, normalmente a 2.ª e a 4.ª a contar do processador (A2 e B2)", "Só numa ranhura, a mais afastada do processador", "Nas ranhuras ao lado da placa gráfica"],ans:1,exp:"As placas indicam no manual as ranhuras para dual channel, normalmente A2 e B2. Assim os dois módulos trabalham em paralelo e a memória é mais rápida."},
+  {cat:'Montagem',q:"O que se faz à película de plástico na base do cooler?",opts:["Deixa-se, porque protege o processador", "Tira-se antes de montar o cooler", "Cobre-se com mais pasta térmica", "Corta-se um pedaço para deixar passar o calor"],ans:1,exp:"A película só protege o cooler durante o transporte. Se ficar, isola o calor e o processador sobreaquece."},
+  {cat:'Montagem',q:"Para que serve o cabo EPS (4+4 pinos) que sai da fonte?",opts:["Alimentar o disco rígido", "Alimentar o processador", "Ligar as ventoinhas da caixa", "Carregar as portas USB da frente"],ans:1,exp:"O cabo EPS leva a energia ao processador, através de uma ficha perto do socket. Sem ele, o PC não arranca."},
+  {cat:'Montagem',q:"O PC arranca, mas o monitor fica sem imagem e o PC tem uma placa gráfica dedicada. O que se verifica primeiro?",opts:["Se o cabo do monitor está ligado à placa gráfica (e não à placa-mãe) e se o cabo PCIe da gráfica está bem encaixado", "Se é preciso trocar o processador", "Se é preciso reinstalar o Windows", "Se a memória RAM está a mais"],ans:0,exp:"Com uma placa gráfica dedicada, o monitor liga-se a ela e não às saídas da placa-mãe. A gráfica precisa também do seu cabo de energia (PCIe) bem encaixado."},
+  {cat:'Montagem',q:"Porque se arrumam e prendem os cabos com abraçadeiras atrás da placa?",opts:["Para o PC gastar menos energia", "Para deixar o ar circular e facilitar futuras mudanças", "Para aumentar a velocidade do processador", "Para proteger contra vírus"],ans:1,exp:"Cabos soltos bloqueiam o ar, podem tocar nas ventoinhas e dificultam mexer no PC mais tarde. Passá-los por trás da placa mantém o interior fresco e organizado."},
+  {cat:'Montagem',q:"Para que serve o conector SYS_FAN (ou CHA_FAN) da placa-mãe?",opts:["Alimentar a placa gráfica", "Ligar as ventoinhas da caixa e controlar a sua velocidade", "Ligar o botão de ligar da caixa", "Ligar o disco SSD M.2"],ans:1,exp:"O SYS_FAN liga as ventoinhas da caixa à placa-mãe. Com ventoinhas de 4 pinos, a placa regula a velocidade conforme a temperatura."},
+  {cat:'Montagem',q:"Para que servem os espaçadores (standoffs) na caixa?",opts:["Para prender a fonte de alimentação", "Para manter a placa-mãe afastada da chapa metálica da caixa", "Para guiar o ar até à placa gráfica", "Para ligar a ventoinha traseira"],ans:1,exp:"Os espaçadores levantam a placa-mãe e evitam que os contactos de trás toquem na chapa metálica, o que provocaria um curto-circuito."},
 ];
 
 /* =====================================================================
@@ -1120,6 +1139,7 @@ let wrongAnswers = [];
    NAVIGATION
    ===================================================================== */
 function showSection(id){
+  if(id==='home')setTimeout(renderProgress,0);
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1166,6 +1186,7 @@ function showTab(t){
 }
 
 function openModal(id){
+  PROG.view(id);
   currentComp = COMP[id];
   const c = currentComp;
   lastFocus = document.activeElement;
@@ -1823,6 +1844,38 @@ function renderComparador(){
 /* =====================================================================
    QUIZ
    ===================================================================== */
+const PROG=(()=>{
+  const K='vb_prog_v1';
+  const blank=()=>({viewed:[],quiz:{n:0,best:0},build:{1:{n:0,stars:0},2:{n:0,stars:0}}});
+  let d=blank();
+  try{const r=JSON.parse(localStorage.getItem(K)||'null');if(r&&typeof r==='object')d=Object.assign(blank(),r);}catch(e){}
+  const save=()=>{try{localStorage.setItem(K,JSON.stringify(d));}catch(e){}};
+  return {
+    get d(){return d;},
+    view(id){if(!d.viewed.includes(id)){d.viewed.push(id);save();}},
+    quiz(pct){d.quiz.n++;d.quiz.best=Math.max(d.quiz.best,pct);save();},
+    build(l,st){const b=d.build[l]=d.build[l]||{n:0,stars:0};b.n++;b.stars=Math.max(b.stars,st);save();},
+    reset(){d=blank();save();}
+  };
+})();
+function renderProgress(){
+  const el=document.getElementById('progCard');if(!el)return;
+  const d=PROG.d,total=Object.keys(COMP).length,v=Math.min(d.viewed.length,total);
+  const any=v||d.quiz.n||d.build[1].n||d.build[2].n;
+  if(!any){el.classList.add('hidden');el.innerHTML='';return;}
+  el.classList.remove('hidden');
+  const star=n=>n?'★'.repeat(n)+'<span class="off">'+'★'.repeat(3-n)+'</span>':'—';
+  const pct=Math.round(v/total*100);
+  el.innerHTML=`<div class="prog-h"><b>O teu progresso</b><span>guardado só neste dispositivo</span></div>
+   <div class="prog-grid">
+    <div><span class="prog-l">Componentes vistos</span><b>${v} / ${total}</b><div class="prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${v}"><i style="width:${pct}%"></i></div></div>
+    <div><span class="prog-l">Melhor resultado no quiz</span><b>${d.quiz.n?d.quiz.best+'%':'—'}</b><small>${d.quiz.n?d.quiz.n+(d.quiz.n===1?' quiz feito':' quizzes feitos'):'ainda sem quiz'}</small></div>
+    <div><span class="prog-l">Montagem, Nível 1</span><b class="stars">${star(d.build[1].stars)}</b><small>${d.build[1].n?d.build[1].n+'×':'por fazer'}</small></div>
+    <div><span class="prog-l">Montagem, Nível 2</span><b class="stars">${star(d.build[2].stars)}</b><small>${d.build[2].n?d.build[2].n+'×':'por fazer'}</small></div>
+   </div>
+   <button class="btn-s prog-reset" type="button" id="progReset">Repor progresso</button>`;
+  document.getElementById('progReset').addEventListener('click',()=>{if(confirm('Apagar o teu progresso neste dispositivo?')){PROG.reset();renderProgress();}});
+}
 const QN=()=>(window._quizQ||[]).length||25;
 function quizPool(){const t=(document.getElementById('quizTheme')||{}).value||'all';return t==='all'?QUESTIONS:QUESTIONS.filter(q=>q.cat===t);}
 function quizMeta(){
@@ -1838,6 +1891,7 @@ function quizMeta(){
     Object.keys(c).filter(k=>c[k]>=4).sort((x,y)=>c[y]-c[x]).map(k=>'<option value="'+k+'">'+k+' ('+c[k]+' perguntas)</option>').join('');
   sel.addEventListener('change',quizMeta);quizMeta();
 })();
+(function(){const e=document.getElementById('statQ');if(e)e.textContent=QUESTIONS.length;renderProgress();})();
 function startQuiz(){
   playerName=document.getElementById('playerName').value.trim()||'Aluno';
   qIdx=0;qScore=0;qStreak=0;wrongAnswers=[];
@@ -1915,6 +1969,7 @@ function showResult(){
   else if(pct>=50){grade=3;desc='Suficiente 👍';col='var(--gold)'}
   else if(pct>=25){grade=2;desc='Insuficiente ⚠️';col='var(--orange)'}
   else{grade=1;desc='Insuficiente ❌';col='var(--red)'}
+  PROG.quiz(pct);
   document.getElementById('gradeBig').textContent=grade;
   document.getElementById('gradeBig').style.color=col;
   document.getElementById('gradeDesc').textContent=desc;
@@ -3070,6 +3125,7 @@ function mpBootOS(){
     MP.phase='done';
     const pen=MP.mistakes+MP.hints;
     const stars=pen<=1?3:pen<=4?2:1;
+    PROG.build(MP.level,stars);
     const m=String(Math.floor(MP.elapsed/60)).padStart(2,'0'),s=String(MP.elapsed%60).padStart(2,'0');
     document.getElementById('mpResult').innerHTML=`
       <div class="mp-win">🎉 O teu PC está pronto a usar!</div>
