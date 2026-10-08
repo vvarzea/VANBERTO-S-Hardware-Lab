@@ -2819,6 +2819,7 @@ function mpSelect(uid){
 function mpDragStart(e,btn){
   if(e.button!==0)return;
   const uid=btn.dataset.uid;
+  try{btn.releasePointerCapture(e.pointerId);}catch(_){}
   MP.drag={uid,x:e.clientX,y:e.clientY,ghost:null,active:false};
   const move=ev=>{
     const d=MP.drag;if(!d)return;
