@@ -127,6 +127,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* FICHA */
 .specs-table{width:100%;border-collapse:collapse}
+.specs-more>summary{cursor:pointer;padding:10px 4px;color:var(--cyan)}
+.simple{border-left:3px solid var(--cyan);padding-left:10px;margin-bottom:10px}
 .specs-table tr{border-bottom:1px solid var(--border)}
 .specs-table tr:last-child{border-bottom:none}
 .specs-table td{padding:11px 14px;font-size:.88rem}
@@ -191,6 +193,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .qstart-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px;font-family:var(--fc)}
 .name-input{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--fc);font-size:.9rem;padding:12px 16px;border-radius:8px;width:100%;max-width:340px;margin-bottom:24px;text-align:center}
 .name-input:focus{outline:none;border-color:var(--cyan)}
+.gl{border-bottom:1px dotted var(--cyan);cursor:help}
+.gl:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .quiz-meta{display:flex;justify-content:center;gap:32px;margin-bottom:32px;flex-wrap:wrap}
 .qmeta-item{text-align:center}
 .qmeta-num{font-family:var(--fd);font-size:1.6rem;font-weight:800;color:var(--cyan)}
@@ -419,6 +423,7 @@ select.name-input{margin-bottom:10px;text-align:left}
     <button class="nav-btn" onclick="showSection('software')">Software</button>
     <button class="nav-btn" onclick="showSection('comparador')">Comparador</button>
     <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
+    <button class="nav-btn" onclick="vbGlossAll()">📖 Glossário</button>
   </div>
 </nav>
 
@@ -428,7 +433,8 @@ select.name-input{margin-bottom:10px;text-align:left}
   <h1 class="hero-title">
     <span class="cyan">VAN</span><span class="orng">BERTO'S</span><br>Hardware Lab
   </h1>
-  <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores — totalmente grátis, sem registo, no browser.</p>
+  <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores.</p>
+  <div id="nameBox" style="margin:-24px 0 32px"></div>
   <div class="hero-stats">
     <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
     <div><div class="stat-num" id="statQ">35</div><div class="stat-label">Perguntas Quiz</div></div>
@@ -617,9 +623,9 @@ const COMP = {
       'Frequência Turbo':'até ~6 GHz',
       'Cache L3':'24 – 96 MB (os modelos X3D chegam aos 96 MB)',
       'TDP (Consumo)':'65 W – 253 W',
-      'Socket (Intel)':'LGA 1700 / LGA 1851',
+      'Socket (Intel)':'LGA 1851 (atual; o próximo, LGA 1954, ainda não saiu)',
       'Socket (AMD)':'AM5',
-      'Processo Fabrico':'Intel 7 / TSMC 3–5 nm',
+      'Processo Fabrico':'TSMC 3–5 nm (AMD e Intel atuais)',
       'Interface Memória':'DDR5 (5600 – 6400 MT/s nativos)',
       'PCIe':'PCIe 5.0 x16'
     },
@@ -634,7 +640,7 @@ const COMP = {
       {c:'#1a2a1a',n:'Substrato (PCB) + contactos LGA',d:'Base que liga o chip ao socket da placa-mãe'}
     ],
     size:{w:'40 mm',h:'40 mm',d:'~3–4 mm',wt:'< 50 g'},
-    sizeNote:'Os processadores AMD AM5 medem 40×40 mm e os Intel LGA 1700 medem 45×37,5 mm. Um processador de gama alta contém mais de 10 mil milhões de transístores numa área de poucos centímetros quadrados.',
+    sizeNote:'Os processadores AMD AM5 medem 40×40 mm e os Intel LGA 1851 medem 45×37,5 mm. Um processador de gama alta contém mais de 10 mil milhões de transístores numa área de poucos centímetros quadrados.',
     history:[
       {y:'1971',n:'Intel 4004',i:'1.º microprocessador comercial num só chip: 2 300 transístores, 740 kHz, 10 μm'},
       {y:'1993',n:'Intel Pentium',i:'3,1 milhões de transístores, 60–66 MHz, arquitetura P5'},
@@ -707,8 +713,8 @@ const COMP = {
       'USB Traseiros':'USB 2.0, 3.2 Gen 1/2, USB4 (40 Gbps); Thunderbolt 5 (80 Gbps) em algumas placas topo de gama',
       'Rede':'1G / 2,5G LAN (10G em modelos de topo)',
       'Áudio':'Codec Realtek ALC1220 ou superior',
-      'Chipset Intel':'Z790 / B760 / H770',
-      'Chipset AMD':'X670E / B650 / A620',
+      'Chipset Intel':'Z890 / B860 / H810',
+      'Chipset AMD':'X870E / X870 / B850 / B650 / A620',
       'BIOS':'UEFI com suporte Secure Boot'
     },
     specNote:'O chipset determina as funcionalidades disponíveis: overclocking (mais completo nos chipsets Z e X), número de linhas PCIe e conectividade USB/SATA. Os chipsets da série B são muito populares pela relação preço/funcionalidade.',
@@ -923,7 +929,7 @@ const COMP = {
       'Radiador (AIO)':'120 mm / 240 mm / 360 mm',
       'Base':'Cobre direto / Soldado',
       'Pasta Térmica':'Incluída ou pré-aplicada',
-      'Socket Compatível':'LGA 1700, AM5 (c/ brackets)',
+      'Socket Compatível':'AM5, LGA 1851 (suportes incluídos)',
       'Altura (Air Tower)':'135 – 170 mm'
     },
     specNote:'A pasta térmica preenche as micro-imperfeições entre a base do cooler e o IHS do processador, melhorando a transferência de calor. Só é preciso voltar a aplicá-la ao trocar de cooler ou se as temperaturas subirem (normalmente passados vários anos).',
@@ -1076,6 +1082,10 @@ const COMP = {
     svg:`<svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg"><rect width="220" height="140" rx="4" fill="#08050f"/><rect x="4" y="8" width="212" height="90" rx="3" fill="#0a0718" stroke="#8b5cf6" stroke-width="1.5"/><rect x="15" y="20" width="45" height="45" rx="3" fill="#0d0a20" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="37" cy="42" r="14" fill="#0a0820" stroke="#8b5cf6" stroke-width="1"/><circle cx="37" cy="42" r="8" fill="#0d0b22" stroke="#555" stroke-width=".5"/><circle cx="37" cy="42" r="3" fill="#8b5cf6" opacity=".6"/><text x="37" y="75" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">DAC/ADC</text><rect x="75" y="20" width="30" height="20" rx="2" fill="#0d0a20" stroke="#4a9eff" stroke-width="1"/><text x="90" y="33" text-anchor="middle" fill="#4a9eff" font-size="6" font-family="monospace">AMP</text><rect x="115" y="20" width="35" height="20" rx="2" fill="#0d0a20" stroke="#00ff88" stroke-width="1"/><text x="132" y="33" text-anchor="middle" fill="#00ff88" font-size="6" font-family="monospace">OP-AMP</text><g fill="#0d0a20" stroke="#c8a840" stroke-width="1"><circle cx="87" cy="60" r="7"/><circle cx="103" cy="60" r="7"/><circle cx="119" cy="60" r="7"/><circle cx="135" cy="60" r="7"/></g><text x="111" y="80" text-anchor="middle" fill="#c8a840" font-size="6" font-family="monospace">CAPS AUDIO</text><rect x="165" y="15" width="42" height="78" rx="2" fill="#0a0718" stroke="#444" stroke-width="1"/><g fill="#0a0818" stroke="#8b5cf6" stroke-width="1"><circle cx="186" cy="28" r="8"/><circle cx="186" cy="48" r="8"/><circle cx="186" cy="68" r="8"/><circle cx="186" cy="88" r="8"/></g><text x="186" y="30" text-anchor="middle" fill="#8b5cf6" font-size="5" font-family="monospace">OUT</text><text x="186" y="50" text-anchor="middle" fill="#8b5cf6" font-size="5" font-family="monospace">IN</text><text x="186" y="70" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">MIC</text><text x="186" y="90" text-anchor="middle" fill="#555" font-size="5" font-family="monospace">OPT</text><rect x="4" y="102" width="212" height="20" rx="2" fill="#0a0718" stroke="#8b5cf6" stroke-width="1"/><g fill="#8b5cf6" opacity=".6"><rect x="8" y="104" width="3" height="16"/><rect x="13" y="104" width="3" height="16"/><rect x="18" y="104" width="3" height="16"/><rect x="23" y="104" width="3" height="16"/></g><text x="130" y="117" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">7.1 · 32-bit · 192kHz</text><text x="110" y="133" text-anchor="middle" fill="#666" font-size="8" font-family="monospace">127 dB SNR · PCIe x1</text></svg>`
   }
 };
+/* ── Texto simples e dicas de escolha, por componente ── */
+Object.entries({'cpu': ('O cérebro do computador. Faz as contas e executa as instruções de todos os programas, milhões de vezes por segundo.', 'O socket tem de ser igual ao da placa-mãe (AM5 ou LGA 1851). Mais núcleos ajudam em tarefas pesadas, como editar vídeo; nos jogos contam também a velocidade de cada núcleo e a placa gráfica. Precisa sempre de cooler.'), 'ram': ('A secretária onde o PC pousa o que está a usar. Quanto maior a secretária, mais coisas podem estar abertas ao mesmo tempo. Quando desligas, a secretária fica vazia.', 'Tem de ser do tipo que a placa-mãe aceita (DDR5 ou DDR4) e do formato certo (DIMM em desktop, SO-DIMM em portáteis). Dois módulos iguais trabalham em dual channel, mais depressa. 16 GB chegam para a maioria; 32 GB para trabalho pesado.'), 'motherboard': ('A cidade onde moram todas as peças. Liga tudo: processador, memória, discos, placa gráfica e USB, e decide o que pode ser usado.', 'O socket tem de servir o processador, a RAM tem de ser do tipo suportado e o tamanho (ATX, mATX, ITX) tem de caber na caixa. Vê também quantas ranhuras M.2 e que portas USB precisas.'), 'gpu': ('O artista do computador. Desenha as imagens e os jogos que vês no ecrã, fazendo milhares de contas ao mesmo tempo.', 'Confirma se cabe na caixa (comprimento), a potência que a fonte tem de ter e os cabos de energia que a placa pede. Mais memória de vídeo (VRAM) ajuda em jogos e programas exigentes.'), 'psu': ('O coração elétrico do PC. Transforma a eletricidade da tomada na energia certa para cada peça.', 'Escolhe pela potência (segue a recomendada para a tua placa gráfica), pela certificação 80 PLUS (gasta menos energia) e confirma que tem os cabos que as peças pedem. Uma fonte fraca faz o PC desligar-se sozinho.'), 'hdd': ('Um armário grande e barato. Guarda muitos ficheiros, mas é lento porque tem um disco a rodar e uma agulha que lê.', 'É ótimo para guardar muita coisa a baixo preço (fotografias, filmes, cópias de segurança). Não é a melhor escolha para o sistema: para isso usa um SSD. Ocupa uma baía de 3,5" na caixa.'), 'ssd': ('Um armário rápido, sem peças a mexer. Encontra os ficheiros quase instantaneamente, por isso o PC arranca e os programas abrem muito mais depressa.', 'Se a placa-mãe tiver ranhura M.2, escolhe NVMe, muito mais rápido do que SATA. Para o sistema, 500 GB a 1 TB chega. Confirma se a placa suporta PCIe 4.0 ou 5.0 para aproveitar toda a velocidade.'), 'cooler': ('O ar condicionado do processador. Tira o calor para que o processador não aqueça de mais e abrande ou desligue.', 'Confirma que serve o teu socket, que cabe na caixa (atenção à altura!) e que aguenta o TDP do processador. Os coolers de torre são baratos e eficazes; os de água (AIO) precisam de espaço para o radiador.'), 'case_pc': ('A casa do PC. Protege as peças, deixa o ar circular e decide o que cabe lá dentro.', 'Vê se aceita o tamanho da placa-mãe, o comprimento da placa gráfica e a altura do cooler. Uma boa circulação de ar (ventoinhas à frente e atrás) mantém tudo mais fresco.'), 'nic': ('O carteiro do computador. Leva e traz informação da internet e da rede lá de casa, por cabo ou sem fios.', 'A maior parte das placas-mãe já traz rede por cabo. Só precisas de Wi-Fi se não puderes ligar um cabo; o Wi-Fi 6E ou 7 é mais rápido, mas o router também tem de ser compatível.'), 'soundcard': ('O tradutor de som. Transforma os números do computador no som que ouves nas colunas ou nos auscultadores.', 'O áudio integrado na placa-mãe chega para quase toda a gente. Uma placa dedicada só compensa para música profissional ou equipamento de som muito bom.')}).forEach(([k,v])=>{if(COMP[k]){COMP[k].simple=v[0];COMP[k].choose=v[1];}});
+function compAbout(c){return (c.simple?`<p class="simple"><b>Em palavras simples:</b> ${c.simple}</p>`:'')+`<p>${c.about}</p>`;}
+
 
 /* =====================================================================
    QUIZ — 25 QUESTIONS
@@ -1086,7 +1096,7 @@ const QUESTIONS = [
   {cat:'Memória',q:'Qual tipo de memória perde os seus dados quando o computador é desligado?',opts:['SSD NVMe','HDD SATA','ROM (BIOS)','RAM (memória principal)'],ans:3,exp:'A RAM é uma memória volátil: sem energia, os dados desaparecem. É por isso que tens de guardar os teus ficheiros antes de desligar o PC.'},
   {cat:'Armazenamento',q:'O que diferencia um SSD NVMe de um SSD SATA?',opts:['O NVMe tem mais capacidade','O NVMe é muito mais rápido (até 14 GB/s vs. ~550 MB/s)','O SATA é mais caro','O NVMe usa mais energia'],ans:1,exp:'Os SSDs NVMe usam o protocolo PCIe que oferece largura de banda muito superior: até 14 GB/s nos melhores PCIe 5.0, vs. ~550 MB/s máximos do SATA.'},
   {cat:'Energia',q:'Qual componente fornece energia elétrica a todos os outros?',opts:['Motherboard','Chipset','PSU (Fonte de Alimentação)','CMOS Battery'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
-  {cat:'Processador',q:'O que é o "socket" de uma CPU?',opts:['O ventilador do processador','O conector onde a CPU é instalada na placa-mãe','A memória cache do processador','O controlador de I/O integrado'],ans:1,exp:'O socket é o encaixe físico na placa-mãe onde o processador é instalado. Exemplos: LGA 1700 (Intel) e AM5 (AMD). CPU e socket têm de ser compatíveis.'},
+  {cat:'Processador',q:'O que é o "socket" de uma CPU?',opts:['O ventilador do processador','O conector onde a CPU é instalada na placa-mãe','A memória cache do processador','O controlador de I/O integrado'],ans:1,exp:'O socket é o encaixe físico na placa-mãe onde o processador é instalado. Exemplos: LGA 1851 (Intel) e AM5 (AMD). CPU e socket têm de ser compatíveis.'},
   {cat:'Memória',q:'O que significa DDR em memórias RAM?',opts:['Direct Data Rate','Double Data Rate','Dual Dynamic Register','Dynamic Data Ram'],ans:1,exp:'DDR = Double Data Rate — transfere dados em ambos os flancos (subida E descida) do sinal de clock, dobrando efetivamente a largura de banda.'},
   {cat:'Gráficos',q:'Qual é a função principal de uma GPU?',opts:['Gerir a memória RAM','Controlar os discos de armazenamento','Distribuir energia pelos componentes','Processar dados gráficos e renderizar imagens'],ans:3,exp:'A GPU (Graphics Processing Unit) é especializada em processamento paralelo — essencial para renderizar gráficos, mas também usada para IA e computação científica.'},
   {cat:'Processador',q:'O que é o TDP de um processador?',opts:['Temperatura mínima de funcionamento','Velocidade máxima de transferência de dados','Thermal Design Power — calor máximo que o sistema de arrefecimento deve dissipar','Total Drive Performance — desempenho de disco'],ans:2,exp:'TDP (Thermal Design Power) indica a potência de calor máxima que o cooler precisa de dissipar. Um TDP de 125W significa que o cooler deve aguentar 125 Watts de calor.'},
@@ -1260,7 +1270,7 @@ function buildTab3D(c){
       <button class="cbtn" onclick="zoom3D(1.18)">－ Zoom</button>
     </div>
     <div class="pchips" id="pchips">${chips}</div>
-    <div class="v3d-info" id="partInfo"><p>${c.about}</p></div>
+    <div class="v3d-info" id="partInfo">${compAbout(c)}</div>
   </div>`;
 }
 
@@ -1446,7 +1456,7 @@ function selectPart(i){
     if(i>=0&&c.xray[i]){
       const l=c.xray[i];
       info.innerHTML=`<div class="pi-name"><span class="ldot" style="background:${l.c};box-shadow:0 0 6px ${l.c}88"></span>${l.n}</div><p>${l.d}</p>`;
-    }else info.innerHTML=`<p>${c.about}</p>`;
+    }else info.innerHTML=compAbout(c);
   }
   document.querySelectorAll('.pchip').forEach((b,j)=>b.classList.toggle('on',j===i));
   syncBtns();
@@ -1718,7 +1728,9 @@ function buildTabFicha(c){
     rows+=`<tr><td>${k}</td><td>${v}</td></tr>`;
   });
   document.getElementById('tficha').innerHTML=`
-    <table class="specs-table">${rows}</table>
+    ${c.choose?`<div class="spec-note" style="margin:0 0 14px">🛒 <b>O que ver ao escolher:</b> ${c.choose}</div>`:''}
+    <details class="specs-more"><summary><b>Ficha técnica completa</b> (para quem quer saber mais)</summary>
+    <table class="specs-table">${rows}</table></details>
     ${c.specNote?`<div class="spec-note">💡 ${c.specNote}</div>`:''}`;
 }
 
@@ -1893,7 +1905,99 @@ function quizMeta(){
   sel.addEventListener('change',quizMeta);quizMeta();
 })();
 (function(){const e=document.getElementById('statQ');if(e)e.textContent=QUESTIONS.length;renderProgress();})();
+/* ── Nome do aluno: pedido no início, guardado só neste dispositivo ── */
+function vbGetName(){try{return(localStorage.getItem('vb_name')||'').trim();}catch(e){return '';}}
+function vbSetName(n){try{if(n)localStorage.setItem('vb_name',n);else localStorage.removeItem('vb_name');}catch(e){}}
+function vbRenderName(){
+  const box=document.getElementById('nameBox'),n=vbGetName(),inp=document.getElementById('playerName');
+  playerName=n||'Aluno';if(inp)inp.value=n;
+  if(!box)return;
+  box.textContent='';
+  if(n){
+    const p=document.createElement('p');p.className='hero-sub';p.style.cssText='margin:0 0 10px;color:var(--text);font-size:1.15rem';
+    const b=document.createElement('b');b.className='cyan';b.textContent=n;
+    p.append('Olá, ',b,'! Vamos aprender hardware.');
+    const c=document.createElement('button');c.type='button';c.className='btn-s';c.textContent='Não sou '+n;
+    c.onclick=()=>{vbSetName('');vbRenderName();const i=document.getElementById('nameHome');if(i)i.focus();};
+    box.append(p,c);
+  }else{
+    const f=document.createElement('form');f.style.cssText='display:flex;gap:10px;flex-wrap:wrap;align-items:center';
+    f.innerHTML='<input class="name-input" id="nameHome" type="text" placeholder="Como te chamas?" aria-label="O teu nome" maxlength="40" autocomplete="off" style="margin:0;max-width:260px"><button class="btn-p" type="submit">Começar</button>';
+    f.onsubmit=e=>{e.preventDefault();const v=f.querySelector('input').value.trim().slice(0,40);if(!v){f.querySelector('input').focus();return;}vbSetName(v);vbRenderName();vbSay('Olá, '+v+'!',3000,'happy');};
+    box.append(f);
+  }
+}
+vbRenderName();
+/* ── Glossário: toca num termo sublinhado para ver o que quer dizer ── */
+const GLOSS={
+ 'socket':'O encaixe da placa-mãe onde se coloca o processador. O processador e o socket têm de ser do mesmo tipo.',
+ 'AM5':'O tipo de socket das placas-mãe AMD mais recentes. Só aceita processadores AMD feitos para AM5.',
+ 'DDR5':'A geração mais recente de memória RAM. Uma placa-mãe DDR5 só aceita RAM DDR5.',
+ 'RAM':'A memória de trabalho do PC: guarda de forma temporária o que estás a usar. Quando o PC desliga, perde tudo.',
+ 'dual channel':'Usar dois módulos de RAM ao mesmo tempo, para a memória trabalhar mais depressa.',
+ 'PCIe':'A autoestrada da placa-mãe onde se ligam a placa gráfica e outras placas. x16 quer dizer que tem 16 faixas.',
+ 'M.2':'Uma ranhura pequena da placa-mãe onde encaixa um SSD em forma de barra.',
+ 'NVMe':'Um tipo de SSD muito rápido, em forma de barra, que encaixa diretamente na placa-mãe.',
+ 'SSD':'Armazenamento sem peças móveis. É muito mais rápido e silencioso do que um disco rígido.',
+ 'SATA':'Um tipo de ligação por cabo para discos e SSD, mais lenta do que a do NVMe.',
+ 'ATX':'O tamanho padrão das placas-mãe e das fontes. A caixa tem de aceitar o tamanho da placa.',
+ 'TDP':'Quanto calor produz um processador, medido em watts. Quanto maior, mais forte tem de ser o cooler.',
+ 'cooler':'O dissipador com ventoinha que tira o calor do processador. Sem ele, o processador sobreaquece.',
+ 'pasta térmica':'Uma camada fina que ajuda o calor a passar do processador para o cooler.',
+ 'EPS':'O cabo da fonte que dá energia ao processador. Liga-se junto ao socket.',
+ 'BIOS':'O programa da placa-mãe que arranca antes do sistema operativo. Nas placas modernas chama-se também UEFI.',
+ 'UEFI':'O nome moderno da BIOS: o programa da placa-mãe que arranca antes do sistema operativo.',
+ 'POST':'O teste automático que a placa-mãe faz ao ligar, para ver se as peças funcionam.'
+};
+const GLRE=new RegExp('(?<![\\wÀ-ÿ.])('+Object.keys(GLOSS).sort((a,b)=>b.length-a.length).map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(?![\\wÀ-ÿ])','i');
+const GLKEY={};Object.keys(GLOSS).forEach(k=>GLKEY[k.toLowerCase()]=k);
+const GLSKIP='button,[role=button],.cc,svg,script,style,input,select,textarea,.gl,.mp-ghost,[aria-live],[role=status],#quiz,canvas,summary,h1,h2,h3';
+function vbGlossify(root){
+  if(!root||root.nodeType!==1||root.closest(GLSKIP))return;
+  const seen=new Set(),w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),todo=[];
+  while(w.nextNode()){const n=w.currentNode;if(n.nodeValue.trim()&&!n.parentElement.closest(GLSKIP))todo.push(n);}
+  todo.forEach(n=>{
+    let t=n.nodeValue,m,frag=null,last=0;
+    const re=new RegExp(GLRE.source,'gi');
+    while((m=re.exec(t))){
+      const k=GLKEY[m[1].toLowerCase()];if(seen.has(k))continue;seen.add(k);
+      frag=frag||document.createDocumentFragment();
+      frag.append(t.slice(last,m.index));
+      const sp=document.createElement('span');sp.className='gl';sp.tabIndex=0;sp.setAttribute('role','button');sp.dataset.gl=k;sp.textContent=m[1];
+      frag.append(sp);last=m.index+m[1].length;
+    }
+    if(frag){frag.append(t.slice(last));n.replaceWith(frag);}
+  });
+}
+function vbGlossBox(html,title,opener){
+  const old=document.getElementById('vbGloss');if(old)old.remove();
+  const ov=document.createElement('div');ov.id='vbGloss';ov.className='mp-ov';
+  ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="vbGlossT" style="max-height:80vh;overflow:auto"><div class="mp-post-t" id="vbGlossT">${title}</div>${html}<div class="res-btns" style="margin-top:12px"><button class="btn-p" id="vbGlossOk">Fechar</button></div></div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.remove();document.removeEventListener('keydown',esc,true);if(opener&&opener.focus)opener.focus();};
+  const esc=e=>{if(e.key==='Escape'){e.stopPropagation();close();}};
+  document.addEventListener('keydown',esc,true);
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.id==='vbGlossOk')close();});
+  ov.querySelector('#vbGlossOk').focus();
+}
+function vbGlossAll(){
+  vbGlossBox('<dl style="margin:8px 0 0">'+Object.keys(GLOSS).sort((a,b)=>a.localeCompare(b,'pt')).map(k=>`<dt style="font-weight:700;color:var(--cyan);margin-top:8px">${vbEsc(k)}</dt><dd style="margin:2px 0 0">${vbEsc(GLOSS[k])}</dd>`).join('')+'</dl>','📖 Glossário',document.activeElement);
+}
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.gl');if(g)vbGlossBox(`<p class="mp-note" style="margin:8px 0 0;max-width:none;text-align:left">${vbEsc(GLOSS[g.dataset.gl])}</p>`,vbEsc(g.dataset.gl),g);});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('gl')){e.preventDefault();e.target.click();}});
+(function(){
+  let q=new Set(),busy=false;
+  const obs=new MutationObserver(ms=>{
+    ms.forEach(m=>m.addedNodes.forEach(n=>{const el=n.nodeType===1?n:n.parentElement;if(el)q.add(el);}));
+    if(!busy&&q.size){busy=true;requestAnimationFrame(()=>{
+      obs.disconnect();q.forEach(el=>{if(document.body.contains(el))vbGlossify(el);});q.clear();
+      obs.observe(document.body,{childList:true,subtree:true});busy=false;});}
+  });
+  document.querySelectorAll('.section,.mp-ov').forEach(vbGlossify);
+  obs.observe(document.body,{childList:true,subtree:true});
+})();
 function startQuiz(){
+  {const v=document.getElementById('playerName').value.trim();if(v&&v!==vbGetName())vbSetName(v.slice(0,40));vbRenderName();}
   playerName=document.getElementById('playerName').value.trim()||'Aluno';
   qIdx=0;qScore=0;qStreak=0;wrongAnswers=[];
   // Fisher-Yates: baralha perguntas e a ordem das opções
@@ -2042,8 +2146,7 @@ function generatePDF(){
   const today=new Date().toLocaleDateString('pt-PT',{year:'numeric',month:'long',day:'numeric'});
   doc.setFontSize(9);doc.setTextColor(80,80,120);
   doc.text(`Data: ${today}`,W/2,195,{align:'center'});
-  doc.text('VanBerto\'s Hardware Lab · Recurso Educativo Gratuito · 100% Browser',W/2,202,{align:'center'});
-  doc.text('Sem registo · Sem dados pessoais · Corre no browser',W/2,209,{align:'center'});
+  doc.text('VanBerto\'s Hardware Lab',W/2,202,{align:'center'});
   // Seal
   doc.setDrawColor(0,229,255);doc.setLineWidth(1);doc.circle(W/2,235,20);
   doc.setFontSize(7);doc.setTextColor(0,229,255);
@@ -2422,8 +2525,8 @@ const MP_PARTS={
   cpu:[
     {id:'cpu_ok',cat:'cpu',ok:true,icon:'cpu',name:'Processador AMD · socket AM5',sub:'8 núcleos · 16 threads',
      tip:'Processador instalado! É o "cérebro" do PC: executa as instruções dos programas.'},
-    {id:'cpu_lga',cat:'cpu',ok:false,icon:'cpu',name:'Processador Intel · socket LGA 1700',sub:'12.ª/13.ª/14.ª geração',
-     why:'O socket é diferente. Cada socket tem o seu número e a sua disposição de contactos: um processador LGA 1700 não encaixa num socket AM5.'}
+    {id:'cpu_lga',cat:'cpu',ok:false,icon:'cpu',name:'Processador Intel · socket LGA 1851',sub:'Core Ultra série 200S',
+     why:'O socket é diferente. Cada socket tem o seu número e a sua disposição de contactos: um processador LGA 1851 não encaixa num socket AM5.'}
   ],
   ram:[
     {id:'ram_ok',cat:'ram',ok:true,icon:'ram',name:'Memória DDR5 · 16 GB',sub:'DIMM · 288 pinos · 1,1 V',qty:2,
@@ -2488,7 +2591,7 @@ const MP_STEPS={
   hdd:['Disco rígido','Coloca-o na baia de 3,5" e fixa-o com parafusos (ou numa gaveta sem ferramentas).'],
   c24:['Cabo de 24 pinos','É a ficha larga que liga a fonte à placa-mãe e dá energia a tudo o que depende dela. Só encaixa de um lado: alinha e empurra até a patilha prender.'],
   ceps:['Cabo EPS (4+4 pinos)','Dá energia ao processador. A ficha fica sempre perto do socket, no topo da placa. Não o confundas com o cabo da placa gráfica.'],
-  cpcie:['Cabo PCIe (6+2 pinos)','Dá energia à placa gráfica. Parece-se com o EPS, mas é outro cabo: confirma a etiqueta, porque ligar o errado pode danificar peças.'],
+  cpcie:['Cabo PCIe (6+2 pinos)','Dá energia à placa gráfica. Parece-se com o EPS, mas é outro cabo: confirma a etiqueta, porque ligar o errado pode danificar peças. As placas gráficas mais potentes usam um cabo 12V-2x6 de 16 pinos; aqui usamos o PCIe 6+2.'],
   csata:['Cabo SATA de alimentação','Liga o disco rígido à fonte. Tem uma ficha achatada em forma de L e só encaixa de um lado.'],
   cdata:['Cabo SATA de dados','Liga o disco rígido a uma porta SATA da placa-mãe: por aqui passam os dados. É um cabo diferente do de energia.'],
   cfan:['Ventoinha da caixa','A ventoinha da frente da caixa tem um cabo de 3 ou 4 pinos. Liga-o ao conector SYS_FAN (ou CHA_FAN) da placa-mãe, no topo da placa. Os de 4 pinos permitem à placa regular a velocidade conforme a temperatura. Sem esta ligação, a ventoinha não roda e o ar não circula.'],
@@ -2675,7 +2778,7 @@ function mpShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(
 
 function mpStart(level){
   MP.diag=false;MP.diagDone=false;MP.fault=null;
-  MP.level=level;MP.placed={};MP.sel=null;MP.mistakes=0;MP.hints=0;MP.elapsed=0;MP.phase='parts';MP.hintFor=null;
+  MP.level=level;MP.placed={};MP.sel=null;MP.mistakes=0;MP.log=[];MP.ramAsked=0;MP.esdAsked=0;MP.hints=0;MP.elapsed=0;MP.phase='parts';MP.hintFor=null;
   let uid=0;const defs=[];
   Object.keys(MP_PARTS).forEach(cat=>{
     MP_PARTS[cat].forEach(d=>{if(level===2||d.ok)defs.push({uid:'p'+(uid++),def:d,qty:d.qty||1});});
@@ -2701,7 +2804,7 @@ function mpStart(level){
   mpTick();
   mpFicha();
   mpRefresh();
-  const first=level===1?'Vamos montar! Escolhe uma peça e toca no sítio onde ela vai.':'Desafio! Nem todas as peças servem — lê a ficha do projeto antes de escolheres.';
+  const nm=vbGetName();const first=level===1?(nm?'Vamos montar, '+nm+'! ':'Vamos montar! ')+'Escolhe uma peça e toca no sítio onde ela vai.':(nm?'Desafio, '+nm+'! ':'Desafio! ')+'Nem todas as peças servem — lê a ficha do projeto antes de escolheres.';
   mpSay(first,'info');
   vbSay('',0,'happy');
 }
@@ -2854,6 +2957,8 @@ function mpSay(text,kind){
   if(el&&tx){tx.textContent=text;el.className='mp-status '+(kind||'info');}
 }
 
+function mpMiss(t){MP.mistakes++;(MP.log||(MP.log=[])).push(t);}
+function vbEsc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function mpTryPlace(slotId){
   if(MP.phase!=='parts'&&MP.phase!=='cables')return;
   const slot=MP_SLOTS[slotId];
@@ -2868,11 +2973,10 @@ function mpTryPlace(slotId){
   const d=it.def;
   // cabo na ficha errada: erro com explicação
   if(d.isCable&&slot.cable&&d.cat!==slot.cat){
-    MP.mistakes++;
     const eps=(d.cat==='ceps'&&slot.cat==='cpcie')||(d.cat==='cpcie'&&slot.cat==='ceps');
     const msg=eps?'O cabo EPS (processador) e o cabo PCIe (placa gráfica) têm fichas parecidas, mas não são iguais — e nunca se podem trocar. Confirma o rótulo do cabo.'
       :'Esse cabo não encaixa aí: cada ficha tem uma forma e um número de pinos próprios. Confirma o rótulo do cabo.';
-    mpSay(msg,'bad');vbSay('Cuidado com os cabos!',3500,'oops');mpRefresh();return;
+    mpMiss(msg);mpSay(msg,'bad');vbSay('Cuidado com os cabos!',3500,'oops');mpRefresh();return;
   }
   if(d.cat!==slot.cat){
     mpSay(`${d.name} não vai aí. Procura ${MP_CAT_PLACE[d.cat]||'o sítio certo'}.`,'bad');
@@ -2886,7 +2990,7 @@ function mpTryPlace(slotId){
   }
   // peça incompatível
   if(!d.ok){
-    MP.mistakes++;
+    mpMiss(d.name+': '+d.why);
     mpSay(d.why,'bad');vbSay('Essa peça não é compatível!',4000,'oops');mpRefresh();return;
   }
   // regra do dual channel
@@ -2913,6 +3017,11 @@ function mpTryPlace(slotId){
   mpRefresh();
   if(d.cat==='cooler'){mpPaste();return;}
   if(d.cat==='cfp'){mpPanel();return;}
+  if(MP.level===1){
+    if(d.cat==='cpu'){mpCpuQ();return;}
+    if(d.cat==='ram'&&!MP.ramAsked){MP.ramAsked=1;mpRamQ();return;}
+    if(d.cat==='mobo'&&!MP.esdAsked){MP.esdAsked=1;mpEsdQ();return;}
+  }
   const f=document.querySelector('#mpTray button');if(f)f.focus();
 }
 
@@ -2937,9 +3046,33 @@ function mpAsk(id,title,intro,question,opts,done){
     const b=e.target.closest('button');if(!b)return;
     const o=opts[+b.dataset.i];msg.textContent=o.m;
     if(o.ok){ov.querySelectorAll('.mp-ov-opts button').forEach(x=>x.disabled=true);go.classList.remove('hidden');ov.querySelector('.mp-ov-ok').focus();vbSay('Boa escolha.',2200,'happy');}
-    else{b.disabled=true;if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Pensa nas consequências.',3000,'oops');}
+    else{b.disabled=true;if(MP.level===2){mpMiss(title+': '+o.m);mpRefresh();}vbSay('Pensa nas consequências.',3000,'oops');}
   });
   ov.querySelector('.mp-ov-ok').addEventListener('click',()=>{ov.remove();if(done){done();return;}const f=document.querySelector('#mpTray button')||document.querySelector('.mp-power');if(f)f.focus();});
+}
+function mpEsdQ(){
+  mpAsk('mpEsd','Antes de mexer nas peças: eletricidade estática',
+    'O teu corpo pode acumular eletricidade estática, como quando levas um pequeno choque ao tocar num puxador de metal. Uma descarga que nem sentes pode estragar um chip.',
+    'O que fazes antes de pegar numa peça?',
+    [{ok:true,t:'Toco numa superfície de metal sem tinta, como a chapa da caixa, para descarregar, e pego nas peças pelas bordas.',m:'É assim que se faz. Quem monta PC com frequência usa também uma pulseira antiestática. As peças pegam-se pelas bordas, sem tocar nos contactos nem nos chips.'},
+     {ok:false,t:'Pego nas peças pelos contactos dourados, porque assim seguro melhor.',m:'Os contactos e os chips são a parte mais frágil: a gordura dos dedos e a eletricidade estática estragam-nos. Pega-se sempre pelas bordas.'},
+     {ok:false,t:'Não faz diferença, uso as peças tal como vêm.',m:'Mesmo sem sentires nada, uma descarga pode danificar um chip, e às vezes o estrago só aparece mais tarde.'}]);
+}
+function mpCpuQ(){
+  mpAsk('mpCpuQ','Antes de pousar o processador',
+    'No socket AM5 os pinos ficam na placa-mãe, e são muito frágeis. O processador tem um pequeno triângulo dourado num canto, e o socket tem outro igual.',
+    'Como colocas o processador?',
+    [{ok:true,t:'Alinho os dois triângulos, pouso-o sem fazer força e só depois baixo a patilha.',m:'Certo. O processador só entra de uma forma e nunca se empurra: se não pousar com naturalidade, está mal alinhado.'},
+     {ok:false,t:'Empurro com força até ouvir um clique, para ter a certeza de que entrou.',m:'Nunca. Os pinos do socket dobram-se com muita facilidade e a placa-mãe pode ficar inutilizável. O processador pousa-se sem força.'},
+     {ok:false,t:'Encaixo-o como estiver, porque entra de qualquer lado.',m:'Só entra de uma maneira: o triângulo do processador tem de ficar no mesmo canto que o triângulo do socket.'}]);
+}
+function mpRamQ(){
+  mpAsk('mpRamQ','Encaixar a memória RAM',
+    'Cada módulo de RAM tem um entalhe na base, fora do centro. Faz com que o módulo só entre numa direção e que uma DDR5 não encaixe numa ranhura de outra geração.',
+    'Como sabes que o módulo ficou bem encaixado?',
+    [{ok:true,t:'O entalhe coincide com o da ranhura e, ao empurrar com firmeza, as patilhas laterais fecham com um estalido.',m:'É esse estalido que confirma o encaixe. Se o módulo não entrar, vira-o e confirma o entalhe.'},
+     {ok:false,t:'Se não entrar, empurro com mais força até entrar.',m:'Se não entra, está ao contrário ou é de outra geração. Com força partes o módulo ou a ranhura.'},
+     {ok:false,t:'Basta apoiá-lo na ranhura, sem fechar as patilhas.',m:'Sem as patilhas fechadas, o módulo não faz contacto: o PC não dá imagem e dá bips.'}]);
 }
 function mpPaste(){
   mpAsk('mpPaste','Antes de apertar o cooler',
@@ -2982,8 +3115,8 @@ function mpPanel(){
     if(b.dataset.pair){
       if(!st.sel){msg='Escolhe primeiro uma ficha.';draw();return;}
       const r=PR.find(x=>x.id===b.dataset.pair);
-      if(r.p!==st.sel){msg='Esse par de pinos não é para a ficha '+N[st.sel]+'. Procura no manual.';if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Confirma no manual.',2500,'oops');}
-      else if(led(st.sel)&&st.rev[st.sel]){msg='Par certo, mas a ficha está ao contrário: o LED não acenderia. Vira a ficha com ⇄ para o + ficar à esquerda (pinos '+r.a+' = +).';if(MP.level===2){MP.mistakes++;mpRefresh();}vbSay('Repara na polaridade.',2500,'oops');}
+      if(r.p!==st.sel){msg='Esse par de pinos não é para a ficha '+N[st.sel]+'. Procura no manual.';if(MP.level===2){mpMiss('Painel frontal: a ficha '+N[st.sel]+' foi ligada ao par de pinos errado. A ordem dos pinos está no manual da placa.');mpRefresh();}vbSay('Confirma no manual.',2500,'oops');}
+      else if(led(st.sel)&&st.rev[st.sel]){msg='Par certo, mas a ficha está ao contrário: o LED não acenderia. Vira a ficha com ⇄ para o + ficar à esquerda (pinos '+r.a+' = +).';if(MP.level===2){mpMiss('Painel frontal: o LED só acende com o fio + no pino certo; a ficha '+N[st.sel]+' estava ao contrário.');mpRefresh();}vbSay('Repara na polaridade.',2500,'oops');}
       else{st.done[r.id]=st.sel;msg='✓ '+N[st.sel]+' ligado.';st.sel=null;vbSay('Boa ligação!',2000,'happy');if(Object.keys(st.done).length===4)msg='Painel frontal ligado: o botão de ligar, o reset e os LED vão funcionar.';}
       draw();
     }
@@ -3050,7 +3183,7 @@ function mpDiag(){
       vbSay('Diagnóstico certo.',2500,'happy');
       setTimeout(()=>{MP.phase='ready';mpBoot();},2600);
     }else{
-      MP.mistakes++;b.disabled=true;
+      mpMiss('Diagnóstico: "'+MP_FAULTS[id].n+'" não era a causa. Neste PC a causa era: '+MP_FAULTS[bad].n.toLowerCase()+'.');b.disabled=true;
       msg.textContent='Não parece ser isso. Com "'+MP_FAULTS[id].n.toLowerCase()+'" o que se veria era: '+MP_FAULTS[id].sym.charAt(0).toLowerCase()+MP_FAULTS[id].sym.slice(1)+' Compara com o que observas.';
       vbSay('Não é essa. Compara os sintomas.',3000,'oops');
     }
@@ -3176,6 +3309,7 @@ function mpBootOS(){
       <div class="mp-win">🎉 O teu PC está pronto a usar!</div>
       <div class="mp-stars" aria-label="${stars} de 3 estrelas">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3-stars)}</span></div>
       <div class="mp-res-stats"><div><b>${m}:${s}</b><span>tempo</span></div><div><b>${MP.mistakes}</b><span>erros</span></div>${MP.level===2?`<div><b>${MP.hints}</b><span>dicas</span></div>`:''}</div>
+      ${MP.log&&MP.log.length?`<details class="mp-note" style="max-width:none;text-align:left" open><summary><b>📝 O que aprendeste com os erros</b></summary><ul style="margin:8px 0 0 18px">${[...new Set(MP.log)].map(t=>`<li style="margin-bottom:6px">${vbEsc(t)}</li>`).join('')}</ul></details>`:'<p class="mp-note"><b>Sem erros.</b> Excelente trabalho!</p>'}
       <p class="mp-note">Num PC a sério ainda configurarias a rede e as contas, e instalarias os teus programas.</p>
       <div class="res-btns">
         <button class="btn-p" onclick="mpStart(${MP.level})">Jogar outra vez</button>
