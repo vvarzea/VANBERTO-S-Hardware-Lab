@@ -1,0 +1,8 @@
+Fontes usadas no VanBerto's Hardware Lab
+========================================
+Orbitron      - The Orbitron Project Authors   - SIL Open Font License 1.1 (LICENSE-orbitron.txt)
+Fira Code     - The Fira Code Project Authors  - SIL Open Font License 1.1 (LICENSE-fira-code.txt)
+Rajdhani      - Indian Type Foundry            - SIL Open Font License 1.1 (LICENSE-rajdhani.txt)
+
+Ficheiros obtidos do pacote Fontsource (versao 5.3.0). A licenca permite usar, copiar e
+distribuir as fontes, desde que o texto da licenca acompanhe os ficheiros.
