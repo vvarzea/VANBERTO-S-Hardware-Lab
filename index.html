@@ -45,6 +45,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .logo .v{color:var(--cyan)}.logo .b{color:var(--orange)}
 .nav-links{display:flex;gap:6px}
 .nav-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--fc);font-size:.7rem;padding:6px 12px;cursor:pointer;border-radius:4px;transition:all .2s;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.nav-links{flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:1180px){.nav-gl-t{display:none}}
+@media(max-width:900px){.logo{display:none}.nav-links{width:100%;justify-content:space-between}.nav-btn{padding:6px 8px;font-size:.62rem}}
 .nav-btn:hover,.nav-btn.active{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.07)}
 
 /* SECTIONS */
@@ -401,6 +404,10 @@ select.name-input{margin-bottom:10px;text-align:left}
 .prog-bar{height:6px;border-radius:3px;background:var(--border);margin-top:6px;overflow:hidden}.prog-bar i{display:block;height:100%;background:var(--cyan)}
 .prog-reset{margin-top:12px;font-size:.8rem;padding:6px 12px}
 /* ===== RODAPÉ ===== */
+.vb-sign{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:90;max-width:calc(100vw - 190px);text-align:center;font-family:var(--fc);font-size:.72rem;letter-spacing:1px;color:var(--muted);text-shadow:0 0 6px #000,0 0 10px #000;pointer-events:none}
+@media(max-width:600px){.vb-sign{font-size:.62rem;letter-spacing:.5px;bottom:8px}}
+@media(max-width:380px){.nav-btn{padding:6px 5px;font-size:.55rem}}
+body{padding-bottom:30px}
 .site-foot{position:relative;z-index:1;text-align:center;font-family:var(--fc);font-size:.74rem;letter-spacing:1px;color:var(--muted);padding:20px 90px 28px;border-top:1px solid var(--border);background:rgba(5,5,9,.8)}
 @media(max-width:600px){.site-foot{padding:18px 70px 26px}
   .logo{display:none}.nav-links{width:100%;justify-content:space-between;gap:3px}
@@ -423,7 +430,7 @@ select.name-input{margin-bottom:10px;text-align:left}
     <button class="nav-btn" onclick="showSection('software')">Software</button>
     <button class="nav-btn" onclick="showSection('comparador')">Comparador</button>
     <button class="nav-btn" onclick="showSection('quiz')">Quiz</button>
-    <button class="nav-btn" onclick="vbGlossAll()">📖 Glossário</button>
+    <button class="nav-btn" onclick="vbGlossAll()" aria-label="Glossário">📖<span class="nav-gl-t"> Glossário</span></button>
   </div>
 </nav>
 
@@ -434,7 +441,7 @@ select.name-input{margin-bottom:10px;text-align:left}
     <span class="cyan">VAN</span><span class="orng">BERTO'S</span><br>Hardware Lab
   </h1>
   <p class="hero-sub">Explora, aprende e testa os teus conhecimentos sobre hardware de computadores.</p>
-  <div id="nameBox" style="margin:-24px 0 32px"></div>
+  <div id="nameBox" style="margin:-24px auto 32px;width:min(100%,520px);display:flex;flex-direction:column;align-items:center;text-align:center"></div>
   <div class="hero-stats">
     <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
     <div><div class="stat-num" id="statQ">35</div><div class="stat-label">Perguntas Quiz</div></div>
@@ -593,7 +600,8 @@ select.name-input{margin-bottom:10px;text-align:left}
   </div>
 </section>
 
-<footer class="site-foot">VanBerto's — © Prof.ª Vanda Várzea · Informação revista em outubro de 2026</footer>
+<div class="vb-sign" aria-hidden="true">VanBerto's — © Prof.ª Vanda Várzea</div>
+<footer class="site-foot">Informação revista em outubro de 2026</footer>
 
 <button id="sndBtn" type="button" aria-pressed="true" aria-label="Som ligado. Clica para desligar" title="Som"></button>
 
@@ -1921,7 +1929,7 @@ function vbRenderName(){
     c.onclick=()=>{vbSetName('');vbRenderName();const i=document.getElementById('nameHome');if(i)i.focus();};
     box.append(p,c);
   }else{
-    const f=document.createElement('form');f.style.cssText='display:flex;gap:10px;flex-wrap:wrap;align-items:center';
+    const f=document.createElement('form');f.style.cssText='display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;width:100%';
     f.innerHTML='<input class="name-input" id="nameHome" type="text" placeholder="Como te chamas?" aria-label="O teu nome" maxlength="40" autocomplete="off" style="margin:0;max-width:260px"><button class="btn-p" type="submit">Começar</button>';
     f.onsubmit=e=>{e.preventDefault();const v=f.querySelector('input').value.trim().slice(0,40);if(!v){f.querySelector('input').focus();return;}vbSetName(v);vbRenderName();vbSay('Olá, '+v+'!',3000,'happy');};
     box.append(f);
