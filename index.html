@@ -593,7 +593,7 @@ select.name-input{margin-bottom:10px;text-align:left}
   </div>
 </section>
 
-<footer class="site-foot">© Prof.ª Vanda Várzea · Informação revista em outubro de 2026</footer>
+<footer class="site-foot">VanBerto's — © Prof.ª Vanda Várzea · Informação revista em outubro de 2026</footer>
 
 <button id="sndBtn" type="button" aria-pressed="true" aria-label="Som ligado. Clica para desligar" title="Som"></button>
 
@@ -671,7 +671,7 @@ const COMP = {
       'Tensão DDR4':'1,2 – 1,35 V',
       'Pinos (DIMM)':'288 pinos (DDR4 e DDR5)',
       'Pinos (SO-DIMM)':'260 (DDR4) / 262 (DDR5)',
-      'Fator de Forma':'DIMM (desktop) / SO-DIMM (laptop)',
+      'Fator de Forma':'DIMM (desktop) / SO-DIMM (portátil)',
       'Canais':'Dual / Quad Channel'
     },
     specNote:'Dois módulos em Dual Channel quase duplicam a largura de banda disponível para o processador — sempre preferível a um único módulo da mesma capacidade total.',
@@ -843,7 +843,7 @@ const COMP = {
       'Velocidade Escrita':'100 – 280 MB/s',
       'Latência':'~10 ms (vs. <0,1 ms no SSD)',
       'Cache (Buffer)':'32 MB – 512 MB',
-      'Fator de Forma':'3.5" (desktop) / 2.5" (laptop)',
+      'Fator de Forma':'3,5" (desktop) / 2,5" (portátil)',
       'MTBF':'1 – 2 milhões de horas',
       'Consumo':'2 – 10 W (ativo)',
       'Tecnologia':'CMR ou SMR',
@@ -859,7 +859,7 @@ const COMP = {
       {c:'#1a1a2a',n:'Caixa Selada',d:'Invólucro metálico fechado, com ar filtrado (nalguns modelos, hélio) — as partículas de pó danificariam o disco'}
     ],
     size:{w:'101,6 mm',h:'147 mm',d:'26,1 mm',wt:'~650 g'},
-    sizeNote:'Um HDD de 3.5" (desktop) tem dimensões padronizadas de 101,6×147×26,1 mm. Os de 2.5" (portáteis) medem 69,9×100,45×9,5 mm.',
+    sizeNote:'Um HDD de 3,5" (desktop) tem dimensões padronizadas de 101,6×147×26,1 mm. Os de 2,5" (portáteis) medem 69,9×100,45×9,5 mm.',
     history:[
       {y:'1956',n:'IBM 350 (RAMAC)',i:'Primeiro HDD: cerca de 5 MB em 50 pratos de 24", do tamanho de um frigorífico'},
       {y:'1980',n:'Seagate ST-506',i:'Primeiro HDD de 5,25" para microcomputadores: 5 MB'},
@@ -876,10 +876,10 @@ const COMP = {
     id:'ssd',name:'Disco SSD',short:'SSD',
     color:'#00e5ff',tag:'Armazenamento',
     desc:'Armazenamento de estado sólido — rápido e silencioso',
-    about:'O SSD (Solid State Drive) usa memória flash NAND para armazenar dados sem partes móveis. É dramaticamente mais rápido, silencioso, mais resistente a impactos e mais leve que um HDD. Existe em formato 2.5" SATA ou M.2 NVMe (muito mais rápido).',
+    about:'O SSD (Solid State Drive) usa memória flash NAND para armazenar dados sem partes móveis. É dramaticamente mais rápido, silencioso, mais resistente a impactos e mais leve que um HDD. Existe em formato 2,5" SATA ou M.2 NVMe (muito mais rápido).',
     specs:{
       'Tipo':'NVMe PCIe 4.0/5.0 ou SATA III',
-      'Fator de Forma':'M.2 2280 / 2.5" SATA',
+      'Fator de Forma':'M.2 2280 / 2,5" SATA',
       'Leitura Seq. (NVMe)':'4 000 – 14 800 MB/s',
       'Escrita Seq. (NVMe)':'3 500 – 13 400 MB/s',
       'Leitura Seq. (SATA)':'~550 MB/s',
@@ -966,8 +966,8 @@ const COMP = {
       'GPU Max Comprimento':'350 – 420 mm',
       'Cooler Max Altura':'160 – 185 mm',
       'Radiador Frontal':'240 mm / 360 mm',
-      'Baías 3.5" (HDD)':'2 a 6 baías',
-      'Baías 2.5" (SSD)':'2 a 4 baías',
+      'Baías 3,5" (HDD)':'2 a 6 baías',
+      'Baías 2,5" (SSD)':'2 a 4 baías',
       'Porta USB Frontal':'USB 3.0 / USB-C',
       'Filtros de Pó':'Frontal, inferior, superior',
       'Material':'Aço / Alumínio / Vidro Temperado',
@@ -1083,7 +1083,7 @@ const COMP = {
   }
 };
 /* ── Texto simples e dicas de escolha, por componente ── */
-Object.entries({'cpu': ('O cérebro do computador. Faz as contas e executa as instruções de todos os programas, milhões de vezes por segundo.', 'O socket tem de ser igual ao da placa-mãe (AM5 ou LGA 1851). Mais núcleos ajudam em tarefas pesadas, como editar vídeo; nos jogos contam também a velocidade de cada núcleo e a placa gráfica. Precisa sempre de cooler.'), 'ram': ('A secretária onde o PC pousa o que está a usar. Quanto maior a secretária, mais coisas podem estar abertas ao mesmo tempo. Quando desligas, a secretária fica vazia.', 'Tem de ser do tipo que a placa-mãe aceita (DDR5 ou DDR4) e do formato certo (DIMM em desktop, SO-DIMM em portáteis). Dois módulos iguais trabalham em dual channel, mais depressa. 16 GB chegam para a maioria; 32 GB para trabalho pesado.'), 'motherboard': ('A cidade onde moram todas as peças. Liga tudo: processador, memória, discos, placa gráfica e USB, e decide o que pode ser usado.', 'O socket tem de servir o processador, a RAM tem de ser do tipo suportado e o tamanho (ATX, mATX, ITX) tem de caber na caixa. Vê também quantas ranhuras M.2 e que portas USB precisas.'), 'gpu': ('O artista do computador. Desenha as imagens e os jogos que vês no ecrã, fazendo milhares de contas ao mesmo tempo.', 'Confirma se cabe na caixa (comprimento), a potência que a fonte tem de ter e os cabos de energia que a placa pede. Mais memória de vídeo (VRAM) ajuda em jogos e programas exigentes.'), 'psu': ('O coração elétrico do PC. Transforma a eletricidade da tomada na energia certa para cada peça.', 'Escolhe pela potência (segue a recomendada para a tua placa gráfica), pela certificação 80 PLUS (gasta menos energia) e confirma que tem os cabos que as peças pedem. Uma fonte fraca faz o PC desligar-se sozinho.'), 'hdd': ('Um armário grande e barato. Guarda muitos ficheiros, mas é lento porque tem um disco a rodar e uma agulha que lê.', 'É ótimo para guardar muita coisa a baixo preço (fotografias, filmes, cópias de segurança). Não é a melhor escolha para o sistema: para isso usa um SSD. Ocupa uma baía de 3,5" na caixa.'), 'ssd': ('Um armário rápido, sem peças a mexer. Encontra os ficheiros quase instantaneamente, por isso o PC arranca e os programas abrem muito mais depressa.', 'Se a placa-mãe tiver ranhura M.2, escolhe NVMe, muito mais rápido do que SATA. Para o sistema, 500 GB a 1 TB chega. Confirma se a placa suporta PCIe 4.0 ou 5.0 para aproveitar toda a velocidade.'), 'cooler': ('O ar condicionado do processador. Tira o calor para que o processador não aqueça de mais e abrande ou desligue.', 'Confirma que serve o teu socket, que cabe na caixa (atenção à altura!) e que aguenta o TDP do processador. Os coolers de torre são baratos e eficazes; os de água (AIO) precisam de espaço para o radiador.'), 'case_pc': ('A casa do PC. Protege as peças, deixa o ar circular e decide o que cabe lá dentro.', 'Vê se aceita o tamanho da placa-mãe, o comprimento da placa gráfica e a altura do cooler. Uma boa circulação de ar (ventoinhas à frente e atrás) mantém tudo mais fresco.'), 'nic': ('O carteiro do computador. Leva e traz informação da internet e da rede lá de casa, por cabo ou sem fios.', 'A maior parte das placas-mãe já traz rede por cabo. Só precisas de Wi-Fi se não puderes ligar um cabo; o Wi-Fi 6E ou 7 é mais rápido, mas o router também tem de ser compatível.'), 'soundcard': ('O tradutor de som. Transforma os números do computador no som que ouves nas colunas ou nos auscultadores.', 'O áudio integrado na placa-mãe chega para quase toda a gente. Uma placa dedicada só compensa para música profissional ou equipamento de som muito bom.')}).forEach(([k,v])=>{if(COMP[k]){COMP[k].simple=v[0];COMP[k].choose=v[1];}});
+Object.entries({'cpu': ('O cérebro do computador. Faz as contas e executa as instruções de todos os programas, milhões de vezes por segundo.', 'O socket tem de ser igual ao da placa-mãe (AM5 ou LGA 1851). Mais núcleos ajudam em tarefas pesadas, como editar vídeo; nos jogos contam também a velocidade de cada núcleo e a placa gráfica. Precisa sempre de cooler.'), 'ram': ('A secretária onde o PC pousa o que está a usar. Quanto maior a secretária, mais coisas podem estar abertas ao mesmo tempo. Quando desligas, a secretária fica vazia.', 'Tem de ser do tipo que a placa-mãe aceita (DDR5 ou DDR4) e do formato certo (DIMM em desktop, SO-DIMM em portáteis). Dois módulos iguais trabalham em dual channel, mais depressa. 16 GB chegam para a maioria; 32 GB para trabalho pesado.'), 'motherboard': ('A cidade onde moram todas as peças. Liga tudo: processador, memória, discos, placa gráfica e USB, e decide o que pode ser usado.', 'O socket tem de servir o processador, a RAM tem de ser do tipo suportado e o tamanho (ATX, mATX, ITX) tem de caber na caixa. Vê também quantas ranhuras M.2 e que portas USB precisas.'), 'gpu': ('O artista do computador. Desenha as imagens e os jogos que vês no ecrã, a fazer milhares de contas ao mesmo tempo.', 'Confirma se cabe na caixa (comprimento), a potência que a fonte tem de ter e os cabos de energia que a placa pede. Mais memória de vídeo (VRAM) ajuda em jogos e programas exigentes.'), 'psu': ('O coração elétrico do PC. Transforma a eletricidade da tomada na energia certa para cada peça.', 'Escolhe pela potência (segue a recomendada para a tua placa gráfica), pela certificação 80 PLUS (gasta menos energia) e confirma que tem os cabos que as peças pedem. Uma fonte fraca faz o PC desligar-se sozinho.'), 'hdd': ('Um armário grande e barato. Guarda muitos ficheiros, mas é lento porque tem um disco a rodar e uma agulha que lê.', 'É ótimo para guardar muita coisa a baixo preço (fotografias, filmes, cópias de segurança). Não é a melhor escolha para o sistema: para isso usa um SSD. Ocupa uma baía de 3,5" na caixa.'), 'ssd': ('Um armário rápido, sem peças a mexer. Encontra os ficheiros quase instantaneamente, por isso o PC arranca e os programas abrem muito mais depressa.', 'Se a placa-mãe tiver ranhura M.2, escolhe NVMe, muito mais rápido do que SATA. Para o sistema, 500 GB a 1 TB chega. Confirma se a placa suporta PCIe 4.0 ou 5.0 para aproveitar toda a velocidade.'), 'cooler': ('O ar condicionado do processador. Tira o calor para que o processador não aqueça de mais e abrande ou desligue.', 'Confirma que serve o teu socket, que cabe na caixa (atenção à altura!) e que aguenta o TDP do processador. Os coolers de torre são baratos e eficazes; os de água (AIO) precisam de espaço para o radiador.'), 'case_pc': ('A casa do PC. Protege as peças, deixa o ar circular e decide o que cabe lá dentro.', 'Vê se aceita o tamanho da placa-mãe, o comprimento da placa gráfica e a altura do cooler. Uma boa circulação de ar (ventoinhas à frente e atrás) mantém tudo mais fresco.'), 'nic': ('O carteiro do computador. Leva e traz informação da internet e da rede lá de casa, por cabo ou sem fios.', 'A maior parte das placas-mãe já traz rede por cabo. Só precisas de Wi-Fi se não puderes ligar um cabo; o Wi-Fi 6E ou 7 é mais rápido, mas o router também tem de ser compatível.'), 'soundcard': ('O tradutor de som. Transforma os números do computador no som que ouves nas colunas ou nos auscultadores.', 'O áudio integrado na placa-mãe chega para quase toda a gente. Uma placa dedicada só compensa para música profissional ou equipamento de som muito bom.')}).forEach(([k,v])=>{if(COMP[k]){COMP[k].simple=v[0];COMP[k].choose=v[1];}});
 function compAbout(c){return (c.simple?`<p class="simple"><b>Em palavras simples:</b> ${c.simple}</p>`:'')+`<p>${c.about}</p>`;}
 
 
@@ -1093,9 +1093,9 @@ function compAbout(c){return (c.simple?`<p class="simple"><b>Em palavras simples
 const QUESTIONS = [
   {cat:'Processador',q:'Qual é o componente principal responsável pelo processamento de dados num computador?',opts:['Memória RAM','GPU (placa gráfica)','CPU (processador)','Disco SSD'],ans:2,exp:'A CPU (Central Processing Unit) é o "cérebro" do computador. É ela que executa as instruções dos programas e processa todos os dados.'},
   {cat:'Processador',q:'O que significa a sigla CPU?',opts:['Central Power Unit','Core Processing Utility','Central Processing Unit','Computer Primary Unit'],ans:2,exp:'CPU = Central Processing Unit — Unidade Central de Processamento. É o termo técnico oficial para o processador.'},
-  {cat:'Memória',q:'Qual tipo de memória perde os seus dados quando o computador é desligado?',opts:['SSD NVMe','HDD SATA','ROM (BIOS)','RAM (memória principal)'],ans:3,exp:'A RAM é uma memória volátil: sem energia, os dados desaparecem. É por isso que tens de guardar os teus ficheiros antes de desligar o PC.'},
+  {cat:'Memória',q:'Que tipo de memória perde os seus dados quando o computador é desligado?',opts:['SSD NVMe','HDD SATA','ROM (BIOS)','RAM (memória principal)'],ans:3,exp:'A RAM é uma memória volátil: sem energia, os dados desaparecem. É por isso que tens de guardar os teus ficheiros antes de desligar o PC.'},
   {cat:'Armazenamento',q:'O que diferencia um SSD NVMe de um SSD SATA?',opts:['O NVMe tem mais capacidade','O NVMe é muito mais rápido (até 14 GB/s vs. ~550 MB/s)','O SATA é mais caro','O NVMe usa mais energia'],ans:1,exp:'Os SSDs NVMe usam o protocolo PCIe que oferece largura de banda muito superior: até 14 GB/s nos melhores PCIe 5.0, vs. ~550 MB/s máximos do SATA.'},
-  {cat:'Energia',q:'Qual componente fornece energia elétrica a todos os outros?',opts:['Motherboard','Chipset','PSU (Fonte de Alimentação)','CMOS Battery'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
+  {cat:'Energia',q:'Que componente fornece energia elétrica a todos os outros?',opts:['Motherboard','Chipset','PSU (Fonte de Alimentação)','CMOS Battery'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
   {cat:'Processador',q:'O que é o "socket" de uma CPU?',opts:['O ventilador do processador','O conector onde a CPU é instalada na placa-mãe','A memória cache do processador','O controlador de I/O integrado'],ans:1,exp:'O socket é o encaixe físico na placa-mãe onde o processador é instalado. Exemplos: LGA 1851 (Intel) e AM5 (AMD). CPU e socket têm de ser compatíveis.'},
   {cat:'Memória',q:'O que significa DDR em memórias RAM?',opts:['Direct Data Rate','Double Data Rate','Dual Dynamic Register','Dynamic Data Ram'],ans:1,exp:'DDR = Double Data Rate — transfere dados em ambos os flancos (subida E descida) do sinal de clock, dobrando efetivamente a largura de banda.'},
   {cat:'Gráficos',q:'Qual é a função principal de uma GPU?',opts:['Gerir a memória RAM','Controlar os discos de armazenamento','Distribuir energia pelos componentes','Processar dados gráficos e renderizar imagens'],ans:3,exp:'A GPU (Graphics Processing Unit) é especializada em processamento paralelo — essencial para renderizar gráficos, mas também usada para IA e computação científica.'},
@@ -1109,7 +1109,7 @@ const QUESTIONS = [
   {cat:'Motherboard',q:'Qual é o fator de forma de placa-mãe mais comum em computadores desktop?',opts:['Mini-ITX (17×17 cm)','Micro-ATX (24×24 cm)','ATX (30,5×24,4 cm)','E-ATX (30,5×33 cm)'],ans:2,exp:'ATX (Advanced Technology eXtended) é o fator de forma mais comum. Define o tamanho (305×244 mm), a posição dos parafusos e a localização do conector de energia.'},
   {cat:'Memória',q:'O que é memória ECC (Error-Correcting Code)?',opts:['Memória mais rápida para gaming','Memória que deteta e corrige automaticamente erros de bit','Extended Cache Controller — gere a cache L3','Enhanced Clock Cycle — overclock automático'],ans:1,exp:'ECC RAM usa bits adicionais de verificação para detetar e corrigir erros de memória de 1 bit em tempo real. Essencial em servidores e workstations onde a integridade de dados é crítica.'},
   {cat:'Gráficos',q:'O que é VRAM?',opts:['Memória virtual do sistema operativo','Virtual RAM — extensão da RAM no SSD','Memória de vídeo dedicada integrada na GPU','Variante de RAM para overclocking'],ans:2,exp:'VRAM (Video RAM) é memória de alta velocidade integrada na placa gráfica, usada para guardar texturas, framebuffers e dados de render. Mais VRAM = suporte para texturas de maior resolução.'},
-  {cat:'Armazenamento',q:'Qual unidade mede a velocidade de rotação de um HDD?',opts:['GHz (Gigahertz)','MB/s (Megabytes por segundo)','RPM — Rotações Por Minuto','kbps (Kilobits por segundo)'],ans:2,exp:'RPM (Rotações Por Minuto) mede a velocidade de rotação dos pratos do HDD. Um HDD de 7200 RPM é mais rápido que um de 5400 RPM, com menor latência de acesso.'},
+  {cat:'Armazenamento',q:'Que unidade mede a velocidade de rotação de um HDD?',opts:['GHz (Gigahertz)','MB/s (Megabytes por segundo)','RPM — Rotações Por Minuto','kbps (Kilobits por segundo)'],ans:2,exp:'RPM (Rotações Por Minuto) mede a velocidade de rotação dos pratos do HDD. Um HDD de 7200 RPM é mais rápido que um de 5400 RPM, com menor latência de acesso.'},
   {cat:'Arrefecimento',q:'Qual é a função de um cooler de CPU?',opts:['Arrefecer a memória RAM','Arrefecer a placa gráfica GPU','Dissipar o calor gerado pelo processador para evitar sobreaquecimento','Ventilar a fonte de alimentação'],ans:2,exp:'O cooler de CPU dissipa o calor produzido pelo processador. Sem arrefecimento adequado, a CPU ativa o thermal throttling (reduz frequência automaticamente) ou pode danificar-se.'},
   {cat:'Motherboard',q:'O que é uma placa de som onboard (integrada)?',opts:['Placa PCIe dedicada de alto desempenho','Coluna USB externa','Interface MIDI para instrumentos','Chip de áudio soldado diretamente na placa-mãe'],ans:3,exp:'Áudio onboard significa que o codec de áudio (ex.: Realtek ALC1220) está integrado na própria placa-mãe, sem necessidade de placa adicional. Suficiente para uso geral.'},
   {cat:'Memória',q:'O que é a memória virtual?',opts:['Memória RAM adicional instalável por software','Cache do processador','Memória dedicada da GPU','Espaço em disco rígido/SSD utilizado como extensão da RAM'],ans:3,exp:'A memória virtual (swap/page file) usa espaço no disco como extensão da RAM quando esta está cheia. É muito mais lenta que a RAM real — o PC fica lento quando a usa ativamente.'},
