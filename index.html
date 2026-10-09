@@ -2540,20 +2540,38 @@ const MP_DEP_MSG={
 };
 
 const MP_SCEN=[
-  {n:1,caixa:'Mid Tower',cooler:{ok:155,bad:185,max:165},gpu:{ok:310,bad:380,max:350},psu:{ok:750,bad:350,min:650}},
-  {n:2,caixa:'Mid Tower',cooler:{ok:150,bad:175,max:160},gpu:{ok:290,bad:340,max:320},psu:{ok:850,bad:550,min:750}},
-  {n:3,caixa:'Mid Tower compacta',cooler:{ok:145,bad:170,max:155},gpu:{ok:270,bad:330,max:300},psu:{ok:650,bad:450,min:550}}
+  {n:1,brief:'Estudante: usa o PC para os trabalhos da escola e para jogar. Quer guardar jogos e fotografias, por isso precisa de pelo menos 1 TB de SSD.',price:{mobo:190,cpu:230,gpu:480,psu:110},plat:{brand:'AMD',sock:'AM5',chip:'B650',sub:'8 núcleos · 16 threads',bios:'8 núcleos'},caixa:'Mid Tower',cooler:{ok:155,bad:185,max:165},gpu:{ok:310,bad:380,max:350},psu:{ok:750,bad:350,min:650}},
+  {n:2,brief:'Criador de vídeos: edita vídeos em casa e precisa de pelo menos 1 TB de SSD para os projetos.',price:{mobo:190,cpu:230,gpu:430,psu:140},plat:{brand:'AMD',sock:'AM5',chip:'B650',sub:'8 núcleos · 16 threads',bios:'8 núcleos'},caixa:'Mid Tower',cooler:{ok:150,bad:175,max:160},gpu:{ok:290,bad:340,max:320},psu:{ok:850,bad:550,min:750}},
+  {n:3,brief:'Família: quer um PC compacto para a sala, para trabalho e jogos leves, com pelo menos 1 TB de SSD.',price:{mobo:190,cpu:230,gpu:380,psu:90},plat:{brand:'AMD',sock:'AM5',chip:'B650',sub:'8 núcleos · 16 threads',bios:'8 núcleos'},caixa:'Mid Tower compacta',cooler:{ok:145,bad:170,max:155},gpu:{ok:270,bad:330,max:300},psu:{ok:650,bad:450,min:550}},
+  {n:4,brief:'Jovem programador: programa durante a semana e joga ao fim de semana. Precisa de pelo menos 1 TB de SSD.',price:{mobo:200,cpu:320,gpu:460,psu:110},plat:{brand:'Intel',sock:'LGA 1851',chip:'B860',sub:'Core Ultra série 200S · 20 núcleos',bios:'20 núcleos'},caixa:'Mid Tower',cooler:{ok:155,bad:180,max:160},gpu:{ok:300,bad:360,max:330},psu:{ok:750,bad:450,min:650}}
 ];
 function mpApplyScen(sc){
   MP.scen=sc;
   const P=id=>Object.values(MP_PARTS).flat().find(d=>d.id===id);
   const set=(id,name,why)=>{const d=P(id);if(!d)return;d.name=name;if(why)d.why=why;};
+  const pl=sc.plat,ot=pl.brand==='AMD'?MP_SCEN[3].plat:MP_SCEN[0].plat;
+  set('mobo_ok','Placa-mãe ATX · '+pl.sock+' · DDR5');set('mobo_eatx','Placa-mãe E-ATX · '+pl.sock+' · DDR5');
+  const mo=P('mobo_ok');if(mo)mo.sub='Chipset '+pl.chip+' · 305×244 mm';
+  set('cpu_ok','Processador '+pl.brand+' · socket '+pl.sock);const co=P('cpu_ok');if(co)co.sub=pl.sub;
+  set('cpu_lga','Processador '+ot.brand+' · socket '+ot.sock,'O socket é diferente. Cada socket tem o seu número e a sua disposição de contactos: um processador '+ot.sock+' não encaixa num socket '+pl.sock+'.');const cl=P('cpu_lga');if(cl)cl.sub=ot.sub;
+  ['cooler_ok','cooler_tall'].forEach(i=>{const d=P(i);if(d)d.sub='Compatível com '+pl.sock;});
+  const PRC={mobo_ok:sc.price.mobo,mobo_eatx:330,cpu_ok:sc.price[ 'cpu'],cpu_lga:ot===MP_SCEN[3].plat?320:230,ram_ok:70,ram_ddr4:50,ram_sodimm:60,cooler_ok:40,cooler_tall:60,ssd_ok:90,ssd_small:55,ssd_big:170,gpu_ok:sc.price.gpu,gpu_long:sc.price.gpu+90,psu_ok:sc.price.psu,psu_low:40,hdd_ok:60};
+  Object.keys(PRC).forEach(id=>{const d=P(id);if(d)d.price=PRC[id];});
+  const bud=mpBudget(sc),tot=bud-60;
+  set('ssd_small','SSD M.2 NVMe · 500 GB','O cliente pediu pelo menos 1 TB de SSD. Com 500 GB ficava cheio depressa.');
+  set('ssd_big','SSD M.2 NVMe · 2 TB','Com um SSD de 2 TB o total passava para '+(tot-90+170)+' €, acima do orçamento de '+bud+' €. O cliente só pediu 1 TB, por isso não precisas de gastar mais.');
   set('cooler_ok','Cooler de CPU · '+sc.cooler.ok+' mm');
   set('cooler_tall','Cooler de CPU · '+sc.cooler.bad+' mm','A tua caixa aceita coolers até '+sc.cooler.max+' mm de altura. Com '+sc.cooler.bad+' mm, o painel lateral não fecharia.');
   set('gpu_ok','Placa gráfica · '+sc.gpu.ok+' mm');
   set('gpu_long','Placa gráfica · '+sc.gpu.bad+' mm','A tua caixa aceita placas gráficas até '+sc.gpu.max+' mm de comprimento. Com '+sc.gpu.bad+' mm, a placa bateria nas ventoinhas da frente.');
   set('psu_ok','Fonte ATX · '+sc.psu.ok+' W');
   set('psu_low','Fonte ATX · '+sc.psu.bad+' W','A placa gráfica deste projeto pede uma fonte de, pelo menos, '+sc.psu.min+' W. Com '+sc.psu.bad+' W, o PC desligava-se (ou nem arrancava) quando o processador e a placa gráfica trabalhassem a sério.');
+}
+function mpBudget(sc){return 330+sc.price.mobo+sc.price.cpu+sc.price.gpu+sc.price.psu+60;}
+function mpSpend(){
+  const all=Object.values(MP_PARTS).flat();let t=0;
+  Object.keys(MP.placed).forEach(sid=>{const d=all.find(x=>x.id===MP.placed[sid]);if(d&&d.price&&!d.isCable)t+=d.price;});
+  return t;
 }
 function mpPickScen(){
   const pool=MP_SCEN.filter(x=>!MP.scen||x.n!==MP.scen.n);
@@ -2588,7 +2606,9 @@ const MP_PARTS={
   ],
   ssd:[
     {id:'ssd_ok',cat:'ssd',ok:true,icon:'ssd',name:'SSD M.2 NVMe · 1 TB',sub:'M.2 2280 · PCIe',
-     tip:'SSD instalado! Sem partes móveis, é muito mais rápido e silencioso do que um HDD.'}
+     tip:'SSD instalado! Sem partes móveis, é muito mais rápido e silencioso do que um HDD.'},
+    {id:'ssd_small',cat:'ssd',ok:false,icon:'ssd',name:'SSD M.2 NVMe · 500 GB',sub:'M.2 2280 · PCIe',why:''},
+    {id:'ssd_big',cat:'ssd',ok:false,icon:'ssd',name:'SSD M.2 NVMe · 2 TB',sub:'M.2 2280 · PCIe',why:''}
   ],
   gpu:[
     {id:'gpu_ok',cat:'gpu',ok:true,icon:'gpu',name:'Placa gráfica · 310 mm',sub:'PCIe x16 · 3 ventoinhas',
@@ -2624,7 +2644,7 @@ const MP_CABLES=[
    tip:'Ventoinha da caixa ligada: já faz circular ar fresco pelo interior.'}
 ];
 const MP_STEPS={
-  mobo:['Placa-mãe','Pousa-a na caixa, com os furos alinhados com os espaçadores (pilares metálicos) e fixa-a com os parafusos. Se a placa não trouxer já a chapa das portas traseiras (I/O shield), coloca-a antes, no recorte da caixa.'],
+  mobo:['Placa-mãe','Pousa-a na caixa, com os furos alinhados com os espaçadores (pilares metálicos) e fixa-a com os parafusos. Se a placa não trouxer já a chapa das portas traseiras (I/O shield), coloca-a antes, no recorte da caixa. Dica de profissional: quem monta com frequência instala primeiro o processador, a RAM, o SSD e o cooler na placa-mãe, ainda fora da caixa, porque há mais espaço e luz para ver os encaixes. Aqui montamos já dentro da caixa para veres a ordem.'],
   cpu:['Processador','Levanta a alavanca do socket. O processador tem um triângulo num canto: alinha-o com a marca igual no socket e pousa-o sem forçar, ele assenta sozinho. Baixa a alavanca.'],
   ram2:['Memória RAM (1.º módulo)','Usa as ranhuras 2 e 4, contando a partir do processador (A2 e B2). Assim a memória trabalha em dual channel. Abre as patilhas, alinha o entalhe do módulo com o da ranhura e pressiona com os dois polegares até ouvires um clique.'],
   ram4:['Memória RAM (2.º módulo)','Repete na ranhura 4. Com dois módulos iguais nas ranhuras certas, o processador acede à memória por dois caminhos ao mesmo tempo.'],
@@ -2848,13 +2868,13 @@ function mpLesson(title,steps,endLabel){
 function mpLessonParts(){
   const sc=MP_SCEN[0];mpApplyScen(sc);
   const L={mobo:'Placa-mãe',cpu:'Processador',ram:'Memória RAM',cooler:'Cooler',gpu:'Placa gráfica',psu:'Fonte de alimentação',ssd:'SSD',hdd:'Disco rígido'};
-  const R={mobo:'Cabe na caixa (que aceita até ATX) e é a que define o resto: socket AM5 e memória DDR5.',cpu:'Tem de ter o mesmo socket da placa-mãe: AM5.',ram:'A placa-mãe é DDR5, por isso a RAM é DDR5, e no formato DIMM, o dos computadores de secretária.',cooler:'Tem '+sc.cooler.ok+' mm de altura e a caixa aceita até '+sc.cooler.max+' mm: cabe e o painel lateral fecha.',gpu:'Tem '+sc.gpu.ok+' mm de comprimento e a caixa aceita até '+sc.gpu.max+' mm: cabe.',psu:'Tem '+sc.psu.ok+' W e a placa gráfica pede pelo menos '+sc.psu.min+' W: chega, com folga.',ssd:'Só há esta opção. O SSD NVMe M.2 encaixa diretamente na placa-mãe e é rápido: é onde fica o sistema.',hdd:'Só há esta opção. O disco de 3,5" guarda muita coisa a baixo preço.'};
-  const steps=[{t:'Primeiro lê a ficha do projeto',h:`<p>Antes de escolheres qualquer peça, vê o que a caixa e o projeto pedem. Este é um <b>exemplo</b>: no desafio os números mudam de jogo para jogo, por isso lê sempre a ficha.</p><ul><li><b>Caixa:</b> ${sc.caixa}, aceita placas-mãe até ATX</li><li><b>Espaço:</b> placa gráfica até ${sc.gpu.max} mm e cooler até ${sc.cooler.max} mm de altura</li><li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, ${sc.psu.min} W</li></ul><p>Para cada peça, pergunta-te três coisas: <b>Encaixa?</b> (socket, tipo de memória) <b>Cabe?</b> (tamanho da caixa) <b>Tem energia?</b> (fonte).</p>`}];
+  const R={mobo:'Cabe na caixa (que aceita até ATX) e é a que define o resto: socket AM5 e memória DDR5.',cpu:'Tem de ter o mesmo socket da placa-mãe: AM5. No desafio pode aparecer uma base Intel LGA 1851, e a regra é a mesma: o socket tem de ser igual.',ram:'A placa-mãe é DDR5, por isso a RAM é DDR5, e no formato DIMM, o dos computadores de secretária.',cooler:'Tem '+sc.cooler.ok+' mm de altura e a caixa aceita até '+sc.cooler.max+' mm: cabe e o painel lateral fecha.',gpu:'Tem '+sc.gpu.ok+' mm de comprimento e a caixa aceita até '+sc.gpu.max+' mm: cabe.',psu:'Tem '+sc.psu.ok+' W e a placa gráfica pede pelo menos '+sc.psu.min+' W: chega, com folga.',ssd:'Chega para o que o cliente pediu (pelo menos 1 TB) e cabe no orçamento. Encaixa diretamente na placa-mãe (M.2 NVMe) e é onde fica o sistema.',hdd:'Só há esta opção. O disco de 3,5" guarda muita coisa a baixo preço.'};
+  const steps=[{t:'Primeiro lê a ficha do projeto',h:`<p>Antes de escolheres qualquer peça, vê o que a caixa e o projeto pedem. Este é um <b>exemplo</b>: no desafio os números mudam de jogo para jogo, e a plataforma também pode mudar (AMD AM5 ou Intel LGA 1851), por isso lê sempre a ficha.</p><ul><li><b>Caixa:</b> ${sc.caixa}, aceita placas-mãe até ATX</li><li><b>Espaço:</b> placa gráfica até ${sc.gpu.max} mm e cooler até ${sc.cooler.max} mm de altura</li><li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, ${sc.psu.min} W</li><li><b>Cliente:</b> ${sc.brief}</li><li><b>Orçamento:</b> ${mpBudget(sc)} € (preços de exemplo)</li></ul><p>Para cada peça, pergunta-te quatro coisas: <b>Encaixa?</b> (socket, tipo de memória) <b>Cabe?</b> (tamanho da caixa) <b>Tem energia?</b> (fonte) <b>Serve o cliente?</b> (o que ele pediu e o orçamento).</p>`}];
   Object.keys(L).forEach(cat=>{
     const opts=MP_PARTS[cat]||[];
     steps.push({t:L[cat],h:`<p>Estas são as opções que aparecem no desafio:</p>`+opts.map(d=>`<div style="margin:8px 0;padding:10px 12px;border:1px solid ${d.ok?'var(--cyan)':'var(--border)'};border-radius:10px"><b>${d.ok?'✔ Esta serve':'✖ Esta não serve'}:</b> ${d.name}${d.sub?' <span style="opacity:.7">· '+d.sub+'</span>':''}<br>${d.ok?R[cat]:d.why}</div>`).join('')});
   });
-  steps.push({t:'Resumo: o PC certo',h:`<p>Neste exemplo: placa-mãe ATX AM5 DDR5 · processador AMD AM5 · RAM DDR5 de 16 GB · cooler de ${sc.cooler.ok} mm · placa gráfica de ${sc.gpu.ok} mm · fonte de ${sc.psu.ok} W · SSD NVMe de 1 TB · disco de 3,5".</p><p>No desafio os limites da caixa e da fonte mudam, mas o método é sempre o mesmo: <b>Encaixa? Cabe? Tem energia?</b> Quase todos os erros de escolha caem numa destas três.</p>`});
+  steps.push({t:'Resumo: o PC certo',h:`<p>Neste exemplo: placa-mãe ATX AM5 DDR5 · processador AMD AM5 · RAM DDR5 de 16 GB · cooler de ${sc.cooler.ok} mm · placa gráfica de ${sc.gpu.ok} mm · fonte de ${sc.psu.ok} W · SSD NVMe de 1 TB · disco de 3,5".</p><p>No desafio os limites da caixa e da fonte mudam, mas o método é sempre o mesmo: <b>Encaixa? Cabe? Tem energia? Serve o cliente?</b> Quase todos os erros de escolha caem numa destas quatro.</p>`});
   mpLesson('ESCOLHER AS PEÇAS',steps,'🧩 Experimentar o Nível 2');
 }
 function mpLessonFaults(){
@@ -3008,8 +3028,9 @@ function mpFicha(){
       <li><b>Caixa:</b> ${sc.caixa} — aceita placas-mãe até ATX</li>
       <li><b>Espaço:</b> placa gráfica até ${sc.gpu.max} mm · cooler até ${sc.cooler.max} mm de altura</li>
       <li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, ${sc.psu.min} W</li>
-      <li><b>Placa-mãe:</b> ${b?'socket AM5 · memória DDR5':'ainda por instalar'}</li>
-    </ul>`;
+      <li><b>Placa-mãe:</b> ${b?'socket '+sc.plat.sock+' · memória DDR5':'ainda por instalar'}</li>
+      ${MP.level===2?`<li><b>Cliente:</b> ${sc.brief}</li><li><b>Orçamento:</b> ${mpBudget(sc)} € · gasto até agora: <b>${mpSpend()} €</b></li>`:''}
+    </ul>${MP.level===2?'<div style="font-size:.72rem;opacity:.7;margin-top:6px">Preços de exemplo: na vida real mudam muito de loja para loja e de mês para mês. A caixa e os cabos já estão incluídos.</div>':''}`;
 }
 
 function mpNext(){
@@ -3033,6 +3054,7 @@ function mpStepText(){
 
 function mpRefresh(){
   const svg=document.getElementById('mpSvg');if(!svg)return;
+  if(MP.level===2&&document.getElementById('mpFicha'))mpFicha();
   const cablePhase=MP.phase!=='parts';
   const sel=MP.sel?MP.sel.def:null;
   const nextSlot=MP.level===1?mpNext():null;
@@ -3070,6 +3092,13 @@ function mpRefresh(){
   mpRenderTray();
 }
 
+function mpIconSvg(d){
+  let v=COMP[d.icon].svg;
+  if(d.icon==='ssd')v=v.replace('1 TB NVMe PCIe 4.0 · 7400 MB/s',((d.name.match(/(\d+ (?:TB|GB))/)||[0,'1 TB'])[1])+' NVMe PCIe 4.0');
+  if(d.icon==='psu')v=v.replace('850W · 80+ GOLD',((d.name.match(/(\d+) W/)||[0,'850'])[1])+'W · 80+ '+(/Bronze/i.test(d.sub||'')?'BRONZE':'GOLD'));
+  if(d.icon==='hdd')v=v.replace('4 TB · 7200 RPM · SATA',((d.name.match(/(\d+ TB)/)||[0,'2 TB'])[1])+' · 7200 RPM · SATA');
+  return v;
+}
 function mpRenderTray(){
   const tr=document.getElementById('mpTray');
   if(MP.phase==='ready'){
@@ -3081,10 +3110,10 @@ function mpRenderTray(){
   const nextCat=next?MP_SLOTS[next].cat:null;
   tr.innerHTML=MP.tray.map(it=>{
     const d=it.def;
-    const ic=d.icon?uniq(COMP[d.icon].svg):'<span class="mp-cabic">'+(d.cat==='c24'?'⚡':d.cat==='ceps'?'🔌':d.cat==='cpcie'?'🔌':'🔌')+'</span>';
+    const ic=d.icon?uniq(mpIconSvg(d)):'<span class="mp-cabic">'+(d.cat==='c24'?'⚡':d.cat==='ceps'?'🔌':d.cat==='cpcie'?'🔌':'🔌')+'</span>';
     const on=MP.sel&&MP.sel.uid===it.uid;
     return `<button class="mp-card${on?' on':''}${nextCat&&nextCat===d.cat?' rec':''}" data-uid="${it.uid}" aria-pressed="${on}">
-      <span class="mp-ic">${ic}</span><span class="mp-nm">${d.name}</span><span class="mp-sub">${d.sub}</span>${it.qty>1?`<span class="mp-q">×${it.qty}</span>`:''}</button>`;
+      <span class="mp-ic">${ic}</span><span class="mp-nm">${d.name}</span><span class="mp-sub">${d.sub}${MP.level===2&&d.price?' · '+d.price+' €'+(it.qty>1?' cada':''):''}</span>${it.qty>1?`<span class="mp-q">×${it.qty}</span>`:''}</button>`;
   }).join('');
   tr.querySelectorAll('.mp-card').forEach(b=>{
     b.addEventListener('click',()=>{if(MP.dragged){MP.dragged=false;return;}mpSelect(b.dataset.uid);});
@@ -3274,8 +3303,8 @@ function mpPaste(){
 }
 function mpPanel(){
   if(document.getElementById('mpPanel'))return;
-  const N={pw:'POWER SW',rs:'RESET SW',pl:'POWER LED',hl:'HDD LED'};
-  const PR=[{id:'p24',p:'pl',a:2,b:4},{id:'p68',p:'pw',a:6,b:8},{id:'p13',p:'hl',a:1,b:3},{id:'p57',p:'rs',a:5,b:7}];
+  const N={pw:'POWER SW',rs:'RESET SW',pl:'POWER LED',hl:'HDD LED',us:'USB 3.0 DA FRENTE',au:'ÁUDIO HD DA FRENTE'};
+  const PR=[{id:'p24',p:'pl',a:2,b:4},{id:'p68',p:'pw',a:6,b:8},{id:'p13',p:'hl',a:1,b:3},{id:'p57',p:'rs',a:5,b:7},{id:'pusb',p:'us',lab:'USB3_1'},{id:'paud',p:'au',lab:'AAFP'}];
   const st={sel:null,done:{},rev:{pl:Math.random()<.5,hl:Math.random()<.5}};
   const ov=document.createElement('div');ov.id='mpPanel';ov.className='mp-ov';document.body.appendChild(ov);
   const nt='style="margin:6px 0 10px;max-width:none;text-align:left"';
@@ -3284,12 +3313,12 @@ function mpPanel(){
   function draw(){
     const left=Object.keys(N).filter(p=>!Object.values(st.done).includes(p));
     ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="mpPanelT">
-      <div class="mp-post-t" id="mpPanelT">Painel frontal: liga cada ficha aos pinos certos</div>
-      <p class="mp-note" ${nt}>Os fios da frente da caixa acabam em pequenas fichas. Cada uma vai para um par de pinos do conector F_PANEL, no canto da placa-mãe.</p>
+      <div class="mp-post-t" id="mpPanelT">Painel frontal: liga cada ficha ao sítio certo</div>
+      <p class="mp-note" ${nt}>Os fios da frente da caixa acabam em pequenas fichas. Os fios do botão e dos LED vão para pares de pinos do conector F_PANEL; os cabos USB e de áudio têm conectores próprios na placa-mãe.</p>
       <details class="mp-note" ${nt}><summary><b>📖 Manual da placa · F_PANEL</b></summary>
-        <p style="margin:6px 0 0">Pinos 1 e 3: HDD LED (+ no 1, − no 3)<br>Pinos 2 e 4: POWER LED (+ no 2, − no 4)<br>Pinos 5 e 7: RESET SW<br>Pinos 6 e 8: POWER SW<br>Os botões não têm polaridade; os LED só acendem com o + no pino certo. Noutras placas a ordem pode mudar, por isso confirma sempre no manual.</p></details>
+        <p style="margin:6px 0 0">Pinos 1 e 3: HDD LED (+ no 1, − no 3)<br>Pinos 2 e 4: POWER LED (+ no 2, − no 4)<br>Pinos 5 e 7: RESET SW<br>Pinos 6 e 8: POWER SW<br>Os botões não têm polaridade; os LED só acendem com o + no pino certo.<br>Conector USB3_1: portas USB 3.0 da frente (ficha larga, só encaixa de um lado).<br>Conector AAFP: áudio HD da frente, para auscultadores e microfone.<br>Noutras placas a ordem pode mudar, por isso confirma sempre no manual.</p></details>
       <div class="mp-ov-opts" id="mpPlugs">${left.map(p=>`<span><button class="btn-s" data-plug="${p}" aria-pressed="${st.sel===p}" ${st.sel===p?'style="outline:2px solid var(--cyan)"':''}>${N[p]}${led(p)?' · fio + '+(st.rev[p]?'à direita':'à esquerda'):''}</button>${led(p)?`<button class="btn-s" data-flip="${p}" aria-label="Virar a ficha ${N[p]}">⇄</button>`:''}</span>`).join('')}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">${PR.map(r=>`<button class="btn-s" data-pair="${r.id}" ${st.done[r.id]?'disabled':''}>Pinos ${r.a} · ${r.b}${st.done[r.id]?'<br>✓ '+N[st.done[r.id]]:''}</button>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">${PR.map(r=>`<button class="btn-s" data-pair="${r.id}" ${st.done[r.id]?'disabled':''}>${r.lab?'Conector '+r.lab:'Pinos '+r.a+' · '+r.b}${st.done[r.id]?'<br>✓ '+N[st.done[r.id]]:''}</button>`).join('')}</div>
       <p class="mp-note" role="status" aria-live="polite" ${nt}>${msg}</p>
       <div class="res-btns ${left.length?'hidden':''}"><button class="btn-p" id="mpPanelOk">Continuar</button></div></div>`;
     const f=ov.querySelector('#mpPanelOk')||ov.querySelector('[data-plug]');if(f)f.focus();
@@ -3302,9 +3331,9 @@ function mpPanel(){
     if(b.dataset.pair){
       if(!st.sel){msg='Escolhe primeiro uma ficha.';draw();return;}
       const r=PR.find(x=>x.id===b.dataset.pair);
-      if(r.p!==st.sel){msg='Esse par de pinos não é para a ficha '+N[st.sel]+'. Procura no manual.';if(MP.level===2){mpMiss('Painel frontal: a ficha '+N[st.sel]+' foi ligada ao par de pinos errado. A ordem dos pinos está no manual da placa.');mpRefresh();}vbSay('Confirma no manual.',2500,'oops');}
+      if(r.p!==st.sel){msg='Esse '+(r.lab?'conector':'par de pinos')+' não é para a ficha '+N[st.sel]+'. Procura no manual.';if(MP.level===2){mpMiss('Painel frontal: a ficha '+N[st.sel]+' foi ligada ao par de pinos errado. A ordem dos pinos está no manual da placa.');mpRefresh();}vbSay('Confirma no manual.',2500,'oops');}
       else if(led(st.sel)&&st.rev[st.sel]){msg='Par certo, mas a ficha está ao contrário: o LED não acenderia. Vira a ficha com ⇄ para o + ficar à esquerda (pinos '+r.a+' = +).';if(MP.level===2){mpMiss('Painel frontal: o LED só acende com o fio + no pino certo; a ficha '+N[st.sel]+' estava ao contrário.');mpRefresh();}vbSay('Repara na polaridade.',2500,'oops');}
-      else{st.done[r.id]=st.sel;msg='✓ '+N[st.sel]+' ligado.';st.sel=null;vbSay('Boa ligação!',2000,'happy');if(Object.keys(st.done).length===4)msg='Painel frontal ligado: o botão de ligar, o reset e os LED vão funcionar.';}
+      else{st.done[r.id]=st.sel;msg='✓ '+N[st.sel]+' ligado.';st.sel=null;vbSay('Boa ligação!',2000,'happy');if(Object.keys(st.done).length===6)msg='Painel frontal ligado: o botão de ligar, o reset, os LED, as portas USB e o áudio da frente vão funcionar.';}
       draw();
     }
   });
@@ -3388,7 +3417,7 @@ function mpBoot(){
   const lines=[
     'Fonte de alimentação — tensões de +12 V, +5 V e +3,3 V presentes',
     'Placa-mãe — a UEFI iniciou o teste de arranque (POST)',
-    'Processador AMD (AM5) — detetado',
+    'Processador '+(MP.scen||MP_SCEN[0]).plat.brand+' ('+(MP.scen||MP_SCEN[0]).plat.sock+') — detetado',
     'Memória — 32 GB DDR5 detetados, em dual channel (2 × 16 GB)',
     'Placa gráfica — detetada no slot PCIe x16',
     'Armazenamento — SSD NVMe de 1 TB e disco rígido de 2 TB detetados',
@@ -3424,7 +3453,7 @@ function mpBios(){
   mpAsk('mpBios','BIOS/UEFI — o que a placa reconheceu',
     `A BIOS/UEFI é o programa da placa-mãe que mostra o hardware detetado. Se uma peça não aparece aqui, algo ficou mal encaixado ou ligado.
      <div style="margin-top:8px;font-family:var(--fc);font-size:.82rem;color:var(--muted)">
-       ${row('Processador','AMD · socket AM5 · 8 núcleos')}
+       ${row('Processador',(MP.scen||MP_SCEN[0]).plat.brand+' · socket '+(MP.scen||MP_SCEN[0]).plat.sock+' · '+(MP.scen||MP_SCEN[0]).plat.bios)}
        ${row('Memória','32 GB DDR5 (2 × 16 GB) · <span style="color:var(--orange)">4800 MT/s</span>')}
        ${row('Armazenamento','NVMe 1 TB · SATA 2 TB')}
        ${row('Temperatura do processador','38 °C')}
@@ -3455,7 +3484,7 @@ const MP_INSTALL=[
   o:[{ok:true,t:'O TPM 2.0 e o Secure Boot estão desativados na BIOS. Vou ativá-los (o TPM aparece como fTPM na AMD ou PTT na Intel).',
       m:'Certo. Em muitas placas novas estas opções vêm desligadas de fábrica. Ativam-se na BIOS e o instalador passa a aceitar o PC.'},
      {ok:false,t:'O processador é demasiado antigo.',
-      m:'Aqui o processador é recente (AM5). Quase todo o hardware atual cumpre este requisito, por isso a causa é outra.'},
+      m:'Aqui o processador é recente ('+(MP.scen||MP_SCEN[0]).plat.sock+'). Quase todo o hardware atual cumpre este requisito, por isso a causa é outra.'},
      {ok:false,t:'Faltam mais de 32 GB de RAM.',
       m:'O Windows 11 precisa de apenas 4 GB. Com 32 GB há memória de sobra.'}]},
  {t:'Instalar o sistema (3/4): onde instalar',
