@@ -1,4 +1,4 @@
-const CACHE='vanberto-hardware-lab-v16';
+const CACHE='vanberto-hardware-lab-v20';
 const CORE=['./','index.html','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png','libs/three.min.js','libs/jspdf.umd.min.js'];
 const FONTS=['fonts/orbitron-latin-400-normal.woff2', 'fonts/orbitron-latin-600-normal.woff2', 'fonts/orbitron-latin-800-normal.woff2', 'fonts/orbitron-latin-900-normal.woff2', 'fonts/fira-code-latin-300-normal.woff2', 'fonts/fira-code-latin-400-normal.woff2', 'fonts/fira-code-latin-500-normal.woff2', 'fonts/rajdhani-latin-400-normal.woff2', 'fonts/rajdhani-latin-600-normal.woff2', 'fonts/rajdhani-latin-700-normal.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.allSettled(FONTS.map(f=>c.add(f)));}).then(()=>self.skipWaiting()));});

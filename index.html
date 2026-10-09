@@ -269,6 +269,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mp-lvl-d{font-family:var(--fb);font-size:.95rem;color:var(--muted);line-height:1.4}
 .mp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
 .mp-sp{flex:1}
+.mp-demo-bar{background:var(--card);border:1px solid var(--cyan);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.mp-demo-n{font-family:var(--fc);font-size:.7rem;letter-spacing:1px;color:var(--cyan)}
+.mp-demo-t{font-weight:700;font-size:1.15rem;margin:3px 0 5px}
+.mp-demo-d{line-height:1.55}
+.mp-demo-c{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.mp-demo-on .mp-tray,.mp-demo-on #mpStep,.mp-demo-on #mpFicha,.mp-demo-on #mpStatus{display:none}
+.mp-demo-on .mp-grid{grid-template-columns:1fr;justify-items:center}
+.mp-demo-on .mp-bar .cbtn[onclick^="mpStart"]{display:none}
 .mp-chip{font-family:var(--fc);font-size:.68rem;letter-spacing:1px;color:var(--cyan);border:1px solid var(--border);background:var(--card);border-radius:20px;padding:5px 12px}
 .mp-grid{display:grid;gap:12px;grid-template-columns:minmax(0,460px) minmax(0,1fr);grid-template-areas:"stage step" "stage status" "stage tray" "stage ficha";align-items:start}
 .mp-step{grid-area:step;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--cyan);border-radius:10px;padding:12px 14px}
@@ -600,7 +608,7 @@ body{padding-bottom:30px}
   </div>
 </section>
 
-<div class="vb-sign" aria-hidden="true">VanBerto's — © Prof.ª Vanda Várzea</div>
+<div class="vb-sign" aria-hidden="true">© Prof.ª Vanda Várzea</div>
 <footer class="site-foot">Informação revista em outubro de 2026</footer>
 
 <button id="sndBtn" type="button" aria-pressed="true" aria-label="Som ligado. Clica para desligar" title="Som"></button>
@@ -2531,6 +2539,26 @@ const MP_DEP_MSG={
   psu:'Primeiro instala a fonte de alimentação.',gpu:'Primeiro instala a placa gráfica.',hdd:'Primeiro instala o disco rígido.'
 };
 
+const MP_SCEN=[
+  {n:1,caixa:'Mid Tower',cooler:{ok:155,bad:185,max:165},gpu:{ok:310,bad:380,max:350},psu:{ok:750,bad:350,min:650}},
+  {n:2,caixa:'Mid Tower',cooler:{ok:150,bad:175,max:160},gpu:{ok:290,bad:340,max:320},psu:{ok:850,bad:550,min:750}},
+  {n:3,caixa:'Mid Tower compacta',cooler:{ok:145,bad:170,max:155},gpu:{ok:270,bad:330,max:300},psu:{ok:650,bad:450,min:550}}
+];
+function mpApplyScen(sc){
+  MP.scen=sc;
+  const P=id=>Object.values(MP_PARTS).flat().find(d=>d.id===id);
+  const set=(id,name,why)=>{const d=P(id);if(!d)return;d.name=name;if(why)d.why=why;};
+  set('cooler_ok','Cooler de CPU · '+sc.cooler.ok+' mm');
+  set('cooler_tall','Cooler de CPU · '+sc.cooler.bad+' mm','A tua caixa aceita coolers até '+sc.cooler.max+' mm de altura. Com '+sc.cooler.bad+' mm, o painel lateral não fecharia.');
+  set('gpu_ok','Placa gráfica · '+sc.gpu.ok+' mm');
+  set('gpu_long','Placa gráfica · '+sc.gpu.bad+' mm','A tua caixa aceita placas gráficas até '+sc.gpu.max+' mm de comprimento. Com '+sc.gpu.bad+' mm, a placa bateria nas ventoinhas da frente.');
+  set('psu_ok','Fonte ATX · '+sc.psu.ok+' W');
+  set('psu_low','Fonte ATX · '+sc.psu.bad+' W','A placa gráfica deste projeto pede uma fonte de, pelo menos, '+sc.psu.min+' W. Com '+sc.psu.bad+' W, o PC desligava-se (ou nem arrancava) quando o processador e a placa gráfica trabalhassem a sério.');
+}
+function mpPickScen(){
+  const pool=MP_SCEN.filter(x=>!MP.scen||x.n!==MP.scen.n);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 const MP_PARTS={
   mobo:[
     {id:'mobo_ok',cat:'mobo',ok:true,icon:'motherboard',name:'Placa-mãe ATX · AM5 · DDR5',sub:'Chipset B650 · 305×244 mm',
@@ -2676,7 +2704,7 @@ function mpVis(id){
       <rect x="34" y="350" width="190" height="96" rx="4" fill="#1e2230" stroke="#ffd700" stroke-width="1.5"/>
       ${mpFan(84,398,34,7,'#2a8f5a','#ffd700','mp-fan')}
       <text x="158" y="392" font-size="12" fill="#ffd700" font-weight="700" text-anchor="middle">PSU</text>
-      <text x="158" y="408" font-size="10" fill="#c8ccd6" text-anchor="middle">750 W</text>
+      <text x="158" y="408" font-size="10" fill="#c8ccd6" text-anchor="middle">${(MP.scen||MP_SCEN[0]).psu.ok} W</text>
       <text x="158" y="422" font-size="8" fill="#8a93a6" text-anchor="middle">80 PLUS Gold</text>`;
     case 'hdd':return `
       <rect x="236" y="350" width="160" height="96" rx="4" fill="#8f98a5" stroke="#c8ccd6" stroke-width="1.5"/>
@@ -2748,6 +2776,7 @@ function buildMontar(){
         </div>
       </details>
       <div class="mp-levels">
+        <button class="mp-lvl" onclick="mpDemoChoose()"><span class="mp-lvl-n">▶ DEMONSTRAÇÕES</span><span class="mp-lvl-t">Vê como se faz</span><span class="mp-lvl-d">Montar passo a passo, escolher as peças certas e resolver avarias, com as respostas explicadas. Não contam pontos.</span></button>
         <button class="mp-lvl" onclick="mpStart(1)"><span class="mp-lvl-n">NÍVEL 1</span><span class="mp-lvl-t">Montagem guiada</span><span class="mp-lvl-d">Passo a passo: mostra-te onde e como instalar cada peça, pela ordem certa.</span></button>
         <button class="mp-lvl" onclick="mpStart(2)"><span class="mp-lvl-n">NÍVEL 2</span><span class="mp-lvl-t">Desafio de compatibilidade</span><span class="mp-lvl-d">Sem ajudas. Há peças que não servem — lê a ficha do projeto e escolhe as certas. No fim, se o PC não arrancar, tens de descobrir porquê.</span></button>
       </div>
@@ -2782,7 +2811,146 @@ function buildMontar(){
   });
 }
 
+/* ── Demonstração: a montagem completa do Nível 1, passo a passo ── */
+let MP_DEMO_MS=9000;
+/* ── Lições: escolher as peças certas e resolver avarias (com as respostas explicadas) ── */
+function mpLesson(title,steps,endLabel){
+  if(document.getElementById('mpLesson'))return;
+  const opener=document.activeElement;let k=0;
+  const ov=document.createElement('div');ov.id='mpLesson';ov.className='mp-ov';document.body.appendChild(ov);
+  const close=()=>{ov.remove();if(opener&&opener.focus)opener.focus();};
+  const last=steps.length-1;
+  function draw(){
+    const st=steps[k];
+    ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="mpLessonT" style="width:min(720px,94vw);max-height:88vh;overflow:auto;text-align:left">
+      <div class="mp-demo-n">${title} · PASSO ${k+1} DE ${steps.length}</div>
+      <div class="mp-demo-t" id="mpLessonT">${st.t}</div>
+      <div class="mp-demo-d" aria-live="polite">${st.h}</div>
+      <div class="mp-demo-c">${st.x||''}<button class="cbtn" data-l="prev" ${k===0?'disabled':''}>◀ Anterior</button>${k<last?'<button class="cbtn" data-l="next">Seguinte ▶</button>':`<button class="cbtn" data-l="go">${endLabel}</button><button class="cbtn" data-l="again">↺ Ver outra vez</button>`}<button class="cbtn" data-l="close">✕ Fechar</button></div></div>`;
+    const f=ov.querySelector(k<last?'[data-l="next"]':'[data-l="go"]');if(f)f.focus();
+  }
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.beep)mpBeep(3);
+    else if(b.dataset.l==='next'){k=Math.min(last,k+1);draw();}
+    else if(b.dataset.l==='prev'){k=Math.max(0,k-1);draw();}
+    else if(b.dataset.l==='again'){k=0;draw();}
+    else if(b.dataset.l==='close'||e.target===ov)close();
+    else if(b.dataset.l==='go'){ov.remove();mpStart(2);}
+  });
+  ov.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.stopPropagation();close();}
+    else if(e.key==='ArrowRight'&&k<last){k++;draw();}
+    else if(e.key==='ArrowLeft'&&k>0){k--;draw();}
+  });
+  draw();
+}
+function mpLessonParts(){
+  const sc=MP_SCEN[0];mpApplyScen(sc);
+  const L={mobo:'Placa-mãe',cpu:'Processador',ram:'Memória RAM',cooler:'Cooler',gpu:'Placa gráfica',psu:'Fonte de alimentação',ssd:'SSD',hdd:'Disco rígido'};
+  const R={mobo:'Cabe na caixa (que aceita até ATX) e é a que define o resto: socket AM5 e memória DDR5.',cpu:'Tem de ter o mesmo socket da placa-mãe: AM5.',ram:'A placa-mãe é DDR5, por isso a RAM é DDR5, e no formato DIMM, o dos computadores de secretária.',cooler:'Tem '+sc.cooler.ok+' mm de altura e a caixa aceita até '+sc.cooler.max+' mm: cabe e o painel lateral fecha.',gpu:'Tem '+sc.gpu.ok+' mm de comprimento e a caixa aceita até '+sc.gpu.max+' mm: cabe.',psu:'Tem '+sc.psu.ok+' W e a placa gráfica pede pelo menos '+sc.psu.min+' W: chega, com folga.',ssd:'Só há esta opção. O SSD NVMe M.2 encaixa diretamente na placa-mãe e é rápido: é onde fica o sistema.',hdd:'Só há esta opção. O disco de 3,5" guarda muita coisa a baixo preço.'};
+  const steps=[{t:'Primeiro lê a ficha do projeto',h:`<p>Antes de escolheres qualquer peça, vê o que a caixa e o projeto pedem. Este é um <b>exemplo</b>: no desafio os números mudam de jogo para jogo, por isso lê sempre a ficha.</p><ul><li><b>Caixa:</b> ${sc.caixa}, aceita placas-mãe até ATX</li><li><b>Espaço:</b> placa gráfica até ${sc.gpu.max} mm e cooler até ${sc.cooler.max} mm de altura</li><li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, ${sc.psu.min} W</li></ul><p>Para cada peça, pergunta-te três coisas: <b>Encaixa?</b> (socket, tipo de memória) <b>Cabe?</b> (tamanho da caixa) <b>Tem energia?</b> (fonte).</p>`}];
+  Object.keys(L).forEach(cat=>{
+    const opts=MP_PARTS[cat]||[];
+    steps.push({t:L[cat],h:`<p>Estas são as opções que aparecem no desafio:</p>`+opts.map(d=>`<div style="margin:8px 0;padding:10px 12px;border:1px solid ${d.ok?'var(--cyan)':'var(--border)'};border-radius:10px"><b>${d.ok?'✔ Esta serve':'✖ Esta não serve'}:</b> ${d.name}${d.sub?' <span style="opacity:.7">· '+d.sub+'</span>':''}<br>${d.ok?R[cat]:d.why}</div>`).join('')});
+  });
+  steps.push({t:'Resumo: o PC certo',h:`<p>Neste exemplo: placa-mãe ATX AM5 DDR5 · processador AMD AM5 · RAM DDR5 de 16 GB · cooler de ${sc.cooler.ok} mm · placa gráfica de ${sc.gpu.ok} mm · fonte de ${sc.psu.ok} W · SSD NVMe de 1 TB · disco de 3,5".</p><p>No desafio os limites da caixa e da fonte mudam, mas o método é sempre o mesmo: <b>Encaixa? Cabe? Tem energia?</b> Quase todos os erros de escolha caem numa destas três.</p>`});
+  mpLesson('ESCOLHER AS PEÇAS',steps,'🧩 Experimentar o Nível 2');
+}
+function mpLessonFaults(){
+  const steps=[{t:'O PC não arranca: e agora?',h:`<p>Não se trocam peças ao acaso. Segue três passos:</p><ol><li><b>Observa:</b> o que vês e ouves? Luzes, ventoinhas, bips, imagem no ecrã.</li><li><b>Inspeciona:</b> que ligação ou peça pode estar mal encaixada?</li><li><b>Corrige e testa:</b> resolve uma coisa de cada vez e tenta ligar.</li></ol><p>Muitas avarias de quem monta pela primeira vez são só um cabo ou um módulo mal encaixado.</p>`}];
+  Object.keys(MP_FAULTS).forEach(id=>{
+    const f=MP_FAULTS[id];
+    steps.push({t:f.n,x:id==='ram2'?'<button class="cbtn" data-beep="1">🔊 Ouvir os bips</button>':'',h:`<p><b>👀 O que vês ou ouves</b><br>${f.sym.replace(/ \(carrega em[^)]*\)/,'')}</p><p><b>🔎 Onde procurar</b><br>${f.look||'Na inspeção do jogo, a ligação suspeita fica marcada a vermelho. Num PC a sério, confirma se a ficha está bem encaixada: deves sentir ou ouvir a patilha a prender.'}</p><p><b>✅ Causa e solução</b><br>${f.fix.replace('Voltaste a','Volta a')}</p>`});
+  });
+  steps.push({t:'Resumo',h:`<p>A maior parte das avarias de montagem são <b>ligações soltas</b>. Antes de culpares uma peça, verifica os cabos, as ranhuras da RAM e a fixação da placa-mãe. E lembra-te: desliga sempre da corrente antes de mexer.</p>`});
+  mpLesson('AVARIAS',steps,'🔎 Experimentar o Nível 2');
+}
+function mpDemoChoose(){
+  if(document.getElementById('mpDemoMenu'))return;
+  const opener=document.activeElement;
+  const ov=document.createElement('div');ov.id='mpDemoMenu';ov.className='mp-ov';
+  ov.innerHTML=`<div class="mp-ov-box" role="dialog" aria-modal="true" aria-labelledby="mpDemoMenuT" style="width:min(520px,94vw);text-align:left">
+    <div class="mp-post-t" id="mpDemoMenuT">Que demonstração queres ver?</div>
+    <div class="mp-levels" style="grid-template-columns:1fr;margin-top:12px">
+      <button class="mp-lvl" data-k="montar"><span class="mp-lvl-t">🔧 Montar passo a passo</span><span class="mp-lvl-d">Vê o PC a ser montado, peça a peça, pela ordem real.</span></button>
+      <button class="mp-lvl" data-k="pecas"><span class="mp-lvl-t">🧩 Escolher as peças certas</span><span class="mp-lvl-d">Quais as peças que servem e porque é que as outras não servem.</span></button>
+      <button class="mp-lvl" data-k="avarias"><span class="mp-lvl-t">🔎 O PC não arranca: e agora?</span><span class="mp-lvl-d">As avarias mais comuns: o que se vê, onde procurar e como resolver.</span></button>
+    </div><div class="res-btns" style="margin-top:12px"><button class="cbtn" data-k="x">✕ Fechar</button></div></div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ov.remove();};
+  ov.querySelector('button').focus();
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('button[data-k]');if(!b&&e.target!==ov)return;
+    const k=b?b.dataset.k:'x';close();
+    if(k==='montar')mpDemo();else if(k==='pecas')mpLessonParts();else if(k==='avarias')mpLessonFaults();else if(opener&&opener.focus)opener.focus();
+  });
+  ov.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close();if(opener&&opener.focus)opener.focus();}});
+}
+function mpDemoDef(cat){const all=Object.values(MP_PARTS).flat().concat(MP_CABLES);return all.find(d=>d.cat===cat&&(d.ok!==false));}
+function mpDemoReset(){
+  clearTimeout(MP.demoT);MP.demo=false;MP.demoAuto=false;
+  const g=document.getElementById('mpGame');if(g)g.classList.remove('mp-demo-on');
+  const b=document.getElementById('mpDemoBar');if(b)b.remove();
+  ['mpTime','mpMist'].forEach(i=>{const e=document.getElementById(i);if(e)e.style.display='';});
+}
+function mpDemo(){
+  mpStart(1);
+  document.querySelectorAll('.mp-ov').forEach(o=>o.remove());
+  clearInterval(MP.tick);MP.tick=0;
+  MP.demo=true;MP.demoAuto=false;MP.level=3;MP.tray=[];MP.sel=null;
+  const g=document.getElementById('mpGame');g.classList.add('mp-demo-on');
+  document.getElementById('mpLvlTag').textContent='DEMONSTRAÇÃO';
+  ['mpTime','mpMist'].forEach(i=>document.getElementById(i).style.display='none');
+  document.getElementById('mpHintBtn').classList.add('hidden');
+  const bar=document.createElement('div');bar.id='mpDemoBar';bar.className='mp-demo-bar';bar.setAttribute('role','region');bar.setAttribute('aria-label','Demonstração da montagem');bar.setAttribute('aria-live','polite');
+  g.querySelector('.mp-bar').after(bar);
+  bar.addEventListener('click',e=>{
+    const b=e.target.closest('button[data-d]');if(!b)return;
+    const a=b.dataset.d,n=MP_ORDER.length;
+    if(a==='next')mpDemoGo(MP.demoI+1);
+    else if(a==='prev')mpDemoGo(MP.demoI-1);
+    else if(a==='auto'){MP.demoAuto=!MP.demoAuto;mpDemoGo(MP.demoI);}
+    else if(a==='restart'){MP.demoAuto=false;mpDemoGo(0);}
+    else if(a==='lvl1')mpStart(1);
+    else if(a==='exit')mpMenu();
+  });
+  mpDemoGo(0);
+}
+function mpDemoGo(k){
+  if(!MP.demo)return;
+  clearTimeout(MP.demoT);
+  const n=MP_ORDER.length;k=Math.max(0,Math.min(n,k));MP.demoI=k;
+  MP.placed={};
+  for(let i=0;i<=Math.min(k,n-1);i++){const id=MP_ORDER[i],d=mpDemoDef(MP_SLOTS[id].cat);if(d)MP.placed[id]=d.id;}
+  MP.phase=MP_PART_SLOTS.every(i=>MP.placed[i])?'cables':'parts';
+  mpRefresh();
+  document.getElementById('mpProg').textContent=`${Math.min(k+1,n)} / ${n} passos`;
+  const svg=document.getElementById('mpSvg');
+  svg.querySelectorAll('.slot.target').forEach(e=>e.classList.remove('target'));
+  const bar=document.getElementById('mpDemoBar');
+  const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let html;
+  if(k<n){
+    const id=MP_ORDER[k],[t,d]=MP_STEPS[id],g=svg.querySelector('[data-slot="'+id+'"]');if(g)g.classList.add('target');
+    html=`<div class="mp-demo-n">DEMONSTRAÇÃO · PASSO ${k+1} DE ${n}</div><div class="mp-demo-t">${t}</div><div class="mp-demo-d">${d}</div>
+      <div class="mp-demo-c"><button class="cbtn" data-d="prev" ${k===0?'disabled':''}>◀ Anterior</button><button class="cbtn" data-d="next">Seguinte ▶</button>${RM?'':`<button class="cbtn" data-d="auto">${MP.demoAuto?'⏸ Pausa':'⏵ Automático'}</button>`}<button class="cbtn" data-d="exit">✕ Sair</button></div>`;
+  }else{
+    MP.demoAuto=false;
+    html=`<div class="mp-demo-n">DEMONSTRAÇÃO · FIM</div><div class="mp-demo-t">Montagem concluída!</div><div class="mp-demo-d">Viste os ${n} passos pela ordem real. Agora é a tua vez: no Nível 1 és tu a escolher as peças, com ajuda em cada passo. Depois de tudo ligado, só falta carregar no botão de ligar.</div>
+      <div class="mp-demo-c"><button class="cbtn" data-d="lvl1">🔧 Tentar o Nível 1</button><button class="cbtn" data-d="prev">◀ Anterior</button><button class="cbtn" data-d="restart">↺ Ver outra vez</button><button class="cbtn" data-d="exit">✕ Sair</button></div>`;
+  }
+  bar.innerHTML=html;
+  const f=bar.querySelector('[data-d="'+(k<n?'next':'lvl1')+'"]');if(f)f.focus({preventScroll:true});
+  if(MP.demoAuto&&k<n&&!RM)MP.demoT=setTimeout(()=>mpDemoGo(MP.demoI+1),MP_DEMO_MS);
+}
+document.addEventListener('keydown',e=>{
+  if(!MP.demo||document.querySelector('.mp-ov')||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||''))return;
+  if(e.key==='ArrowRight'){e.preventDefault();mpDemoGo(MP.demoI+1);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();mpDemoGo(MP.demoI-1);}
+});
 function mpMenu(){
+  if(MP.demo)mpDemoReset();
   clearInterval(MP.tick);MP.phase='idle';MP.level=0;
   document.getElementById('mpMenu').classList.remove('hidden');
   document.getElementById('mpGame').classList.add('hidden');
@@ -2793,6 +2961,8 @@ function mpMenu(){
 function mpShuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function mpStart(level){
+  if(MP.demo)mpDemoReset();
+  mpApplyScen(level===2?mpPickScen():MP_SCEN[0]);
   MP.diag=false;MP.diagDone=false;MP.fault=null;
   MP.level=level;MP.placed={};MP.sel=null;MP.mistakes=0;MP.log=[];MP.ramAsked=0;MP.esdAsked=0;MP.hints=0;MP.elapsed=0;MP.phase='parts';MP.hintFor=null;
   let uid=0;const defs=[];
@@ -2832,12 +3002,12 @@ function mpTick(){
 }
 
 function mpFicha(){
-  const b=MP.placed.mobo;
-  document.getElementById('mpFicha').innerHTML=`<div class="mp-ficha-t">📋 Ficha do projeto</div>
+  const b=MP.placed.mobo,sc=MP.scen||MP_SCEN[0];
+  document.getElementById('mpFicha').innerHTML=`<div class="mp-ficha-t">📋 Ficha do projeto${MP.level===2?' · projeto '+sc.n:''}</div>
     <ul>
-      <li><b>Caixa:</b> Mid Tower — aceita placas-mãe até ATX</li>
-      <li><b>Espaço:</b> placa gráfica até 350 mm · cooler até 165 mm de altura</li>
-      <li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, 650 W</li>
+      <li><b>Caixa:</b> ${sc.caixa} — aceita placas-mãe até ATX</li>
+      <li><b>Espaço:</b> placa gráfica até ${sc.gpu.max} mm · cooler até ${sc.cooler.max} mm de altura</li>
+      <li><b>Energia:</b> a placa gráfica pede uma fonte de, pelo menos, ${sc.psu.min} W</li>
       <li><b>Placa-mãe:</b> ${b?'socket AM5 · memória DDR5':'ainda por instalar'}</li>
     </ul>`;
 }
@@ -2976,6 +3146,7 @@ function mpSay(text,kind){
 function mpMiss(t){MP.mistakes++;(MP.log||(MP.log=[])).push(t);}
 function vbEsc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function mpTryPlace(slotId){
+  if(MP.demo)return;
   if(MP.phase!=='parts'&&MP.phase!=='cables')return;
   const slot=MP_SLOTS[slotId];
   if(!slot)return;
