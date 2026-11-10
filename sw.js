@@ -1,12 +1,23 @@
-const CACHE='vanberto-hardware-lab-v22';
-const CORE=['./','index.html','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png','libs/three.min.js','libs/jspdf.umd.min.js'];
-const FONTS=['fonts/orbitron-latin-400-normal.woff2', 'fonts/orbitron-latin-600-normal.woff2', 'fonts/orbitron-latin-800-normal.woff2', 'fonts/orbitron-latin-900-normal.woff2', 'fonts/fira-code-latin-300-normal.woff2', 'fonts/fira-code-latin-400-normal.woff2', 'fonts/fira-code-latin-500-normal.woff2', 'fonts/rajdhani-latin-400-normal.woff2', 'fonts/rajdhani-latin-600-normal.woff2', 'fonts/rajdhani-latin-700-normal.woff2'];
+const CACHE='vanberto-hardware-lab-v23';
+const CORE=['./','index.html','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png','logo-nav.png','logo-hero.png','libs/three.min.js','libs/jspdf.umd.min.js'];
+const FONTS=['fonts/fredoka-latin-wght-normal.woff2','fonts/nunito-latin-400-normal.woff2','fonts/nunito-latin-600-normal.woff2','fonts/nunito-latin-700-normal.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.allSettled(FONTS.map(f=>c.add(f)));}).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim()));});
-// Abre logo da cache e atualiza em segundo plano. Só ficheiros do próprio jogo (fontes incluídas).
+// Página principal: rede primeiro (as alterações aparecem logo); se estiver sem ligação ou lenta (>3 s), usa a cópia guardada.
+// Restantes ficheiros: abrem logo da cache e atualizam em segundo plano. Só ficheiros do próprio jogo.
 self.addEventListener('fetch',e=>{
-  const r=e.request;
-  if(r.method!=='GET'||new URL(r.url).origin!==location.origin)return;
+  const r=e.request,u=new URL(r.url);
+  if(r.method!=='GET'||u.origin!==location.origin)return;
+  const isPage=r.mode==='navigate'||u.pathname.endsWith('/')||u.pathname.endsWith('/index.html');
+  if(isPage){
+    e.respondWith(caches.open(CACHE).then(c=>{
+      const net=fetch(r).then(res=>{if(res.ok)c.put(r,res.clone());return res;});
+      const cached=()=>c.match(r,{ignoreSearch:true}).then(h=>h||c.match('index.html'));
+      const slow=new Promise((_,rej)=>setTimeout(rej,3000));
+      return Promise.race([net,slow]).catch(()=>cached().then(h=>h||net));
+    }));
+    return;
+  }
   e.respondWith(caches.open(CACHE).then(c=>c.match(r,{ignoreSearch:true}).then(hit=>{
     const net=fetch(r).then(res=>{if(res.ok)c.put(r,res.clone());return res;}).catch(()=>hit);
     return hit||net;
