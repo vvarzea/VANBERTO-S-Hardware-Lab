@@ -1,6 +1,6 @@
-const CACHE='vanberto-hardware-lab-v23';
-const CORE=['./','index.html','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png','logo-nav.png','logo-hero.png','libs/three.min.js','libs/jspdf.umd.min.js'];
-const FONTS=['fonts/fredoka-latin-wght-normal.woff2','fonts/nunito-latin-400-normal.woff2','fonts/nunito-latin-600-normal.woff2','fonts/nunito-latin-700-normal.woff2'];
+const CACHE='vanberto-hardware-lab-v25';
+const CORE=['./','index.html','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png','libs/three.min.js','libs/jspdf.umd.min.js'];
+const FONTS=['logo-hero.png','fonts/fredoka-latin-wght-normal.woff2','fonts/nunito-latin-400-normal.woff2','fonts/nunito-latin-600-normal.woff2','fonts/nunito-latin-700-normal.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.allSettled(FONTS.map(f=>c.add(f)));}).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim()));});
 // Página principal: rede primeiro (as alterações aparecem logo); se estiver sem ligação ou lenta (>3 s), usa a cópia guardada.

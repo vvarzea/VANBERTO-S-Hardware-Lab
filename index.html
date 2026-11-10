@@ -435,7 +435,12 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 @keyframes heroBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-1.5deg)}}
 
 /* barra */
-#nav{background:#fff;backdrop-filter:none;border-bottom:3px solid var(--ink);padding:5px 16px}
+#nav{background:#fff;backdrop-filter:none;border-bottom:3px solid var(--ink);padding:8px 16px;justify-content:center}
+.section{padding-top:72px}
+#home{justify-content:flex-start;padding-top:72px}
+#home.active{min-height:0}
+.site-foot{padding:12px 20px 46px}
+@media(min-width:760px){.site-foot{text-align:left;padding:10px 20px 10px 64px}}
 .logo{display:flex;align-items:center}
 .logo img{height:46px;width:auto;display:block}
 .nav-btn{background:#fff;border:2.5px solid var(--ink);color:var(--ink);border-radius:999px;font-family:var(--fd);font-weight:600;font-size:.88rem;letter-spacing:.2px;text-transform:none;padding:5px 14px;box-shadow:0 3px 0 var(--ink);transition:transform .12s,box-shadow .12s,background .12s}
@@ -447,7 +452,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 .layer:focus-visible,.cc:focus-visible,.pchip:focus-visible,.cbtn:focus-visible,.nav-btn:focus-visible,.gl:focus-visible,#sndBtn:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 
 /* início */
-.hero-logo{width:min(380px,78vw);height:auto;display:block;margin:0 auto 4px;animation:heroBob 4s ease-in-out infinite}
+.hero-logo{width:min(330px,72vw);height:auto;display:block;margin:0 auto 0;animation:heroBob 4s ease-in-out infinite}
 .hero-title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .hero-badge{background:#fff;color:var(--ink);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);font-family:var(--fd);font-weight:600;font-size:.82rem;letter-spacing:.5px;animation:none;margin-bottom:14px}
 .hero-sub{color:var(--muted);font-size:1.08rem;font-weight:700;margin-bottom:34px}
@@ -678,9 +683,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="logo" onclick="showSection('home')">
-    <img src="logo-nav.png" width="144" height="96" alt="VanBerto's Hardware Lab">
-  </div>
+
   <div class="nav-links">
     <button class="nav-btn active" onclick="showSection('home')">Home</button>
     <button class="nav-btn" onclick="showSection('componentes')">Componentes</button>
@@ -695,7 +698,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 <!-- HERO -->
 <section id="home" class="section active">
   <div class="hero-badge">🔬 LABORATÓRIO INTERATIVO DE HARDWARE</div>
-  <img class="hero-logo" src="logo-hero.png" width="520" height="346" alt="">
+  <img class="hero-logo" src="logo-hero.png" width="450" height="342" alt="" onerror="this.style.display='none'">
   <h1 class="hero-title">
     <span class="cyan">VAN</span><span class="orng">BERTO'S</span><br>Hardware Lab
   </h1>
@@ -860,7 +863,6 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 </section>
 
 <div class="vb-sign" aria-hidden="true">© Prof.ª Vanda Várzea</div>
-<footer class="site-foot">Informação revista em outubro de 2026</footer>
 
 <button id="sndBtn" type="button" aria-pressed="true" aria-label="Som ligado. Clica para desligar" title="Som"></button>
 
