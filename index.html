@@ -2,13 +2,17 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VanBerto's — Hardware Lab</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#fff8e7">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hardware Lab">
 <meta name="description" content="VanBerto's Hardware Lab: explora componentes em 3D, monta um PC e testa o que sabes sobre hardware e software.">
 <style>
@@ -678,14 +682,119 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 .comp-grid .cc:nth-child(11){animation-delay:0.50s}
 .comp-grid .cc:nth-child(12){animation-delay:0.55s}
 </style>
+
+<style>
+/* ===== Versão para telemóvel (afinações finais) ===== */
+:root{--navh:64px}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button,.cc,.pchip,.cbtn,.nav-btn,select,summary{touch-action:manipulation}
+input,select,textarea{font-size:16px}
+#nav{padding-top:max(8px,env(safe-area-inset-top));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+section.section{padding-top:calc(var(--navh) + 16px) !important;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+section.section:not(#home){padding-bottom:110px}
+@media(max-width:900px){
+  #nav{display:block;padding-bottom:8px}
+  #nav .nav-links{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;width:100%;padding-bottom:3px}
+  #nav .nav-btn{min-height:42px;padding:4px 2px;font-size:.8rem;line-height:1.1;text-align:center;white-space:nowrap;box-shadow:0 3px 0 var(--ink)}
+  #nav .nav-btn:nth-child(-n+3){grid-column:span 4}
+  #nav .nav-btn:nth-child(4){grid-column:span 3}
+  #nav .nav-btn:nth-child(5){grid-column:span 4}
+  #nav .nav-btn:nth-child(6){grid-column:span 3}
+  #nav .nav-btn:nth-child(7){grid-column:span 2}
+}
+@media(max-width:380px){#nav .nav-btn{font-size:.72rem}}
+@media(max-width:600px){
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;margin-left:auto;margin-right:auto}
+  .hero-stats>div{min-width:0;padding:8px 6px}
+  .hero-btns{width:100%}
+  .hero-btns .btn-p,.hero-btns .btn-s{width:100%;max-width:320px}
+  .comp-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stage3d{height:min(340px,48vh)}
+  .hero-vb-bubble{max-width:150px;font-size:.78rem}
+  #home.active{padding-bottom:120px}
+}
+@media(max-height:480px) and (orientation:landscape){
+  .hero-vb-bubble{display:none}
+  section.section{min-height:0}
+}
+</style>
+<script>
+(function(){
+  function ajustar(){var n=document.getElementById('nav');if(n)document.documentElement.style.setProperty('--navh',n.offsetHeight+'px');}
+  window.addEventListener('load',ajustar);
+  window.addEventListener('resize',ajustar);
+  window.addEventListener('orientationchange',function(){setTimeout(ajustar,200)});
+  if('ResizeObserver' in window){document.addEventListener('DOMContentLoaded',function(){var n=document.getElementById('nav');if(n)new ResizeObserver(ajustar).observe(n);ajustar();});}
+})();
+</script>
+<script>
+/* Em ecrãs tácteis, "clica" passa a "toca" */
+(function(){
+  if(!window.matchMedia||!matchMedia('(pointer:coarse)').matches)return;
+  var mapa=[[/\bCLICA\b/g,'TOCA'],[/\bClica\b/g,'Toca'],[/\bclica\b/g,'toca'],[/\bClicar\b/g,'Tocar'],[/\bclicar\b/g,'tocar'],[/\bCLICAR\b/g,'TOCAR'],[/\bRODA \/ PINÇA\b/g,'PINÇA']];
+  function varrer(raiz){
+    var w=document.createTreeWalker(raiz,NodeFilter.SHOW_TEXT,null),n,lista=[];
+    while((n=w.nextNode())){var p=n.parentNode&&n.parentNode.nodeName;if(p==='SCRIPT'||p==='STYLE')continue;if(/clica|CLICA|Clica|clicar|Clicar|CLICAR|RODA \/ PIN/.test(n.nodeValue))lista.push(n);}
+    lista.forEach(function(x){var v=x.nodeValue;mapa.forEach(function(m){v=v.replace(m[0],m[1]);});if(v!==x.nodeValue)x.nodeValue=v;});
+  }
+  var agendado=false;
+  function agendar(){if(agendado)return;agendado=true;requestAnimationFrame(function(){agendado=false;varrer(document.body);});}
+  document.addEventListener('DOMContentLoaded',function(){varrer(document.body);new MutationObserver(agendar).observe(document.body,{childList:true,subtree:true});});
+})();
+</script>
+
+<style>
+/* Menu: a barra de cima desaparece; fica só um botão que abre o painel */
+#nav{display:none !important}
+:root{--navh:0px}
+section.section{padding-top:72px !important}
+#menuBtn{position:fixed;top:max(10px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));z-index:300;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 16px;background:#fff;border:2.5px solid var(--ink);border-radius:999px;box-shadow:0 3px 0 var(--ink);color:var(--ink);font-family:var(--fd);font-weight:700;font-size:.95rem;cursor:pointer}
+#menuBtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+#menuPanel{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(30,27,75,.55)}
+#menuPanel.open{display:flex}
+#menuPanel .mp-box{width:100%;max-width:380px;max-height:92vh;overflow:auto;background:var(--bg);border:3px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:16px}
+#menuPanel .mp-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-family:var(--fd);font-weight:700;font-size:1.15rem;color:var(--ink)}
+#menuPanel .mp-x{width:44px;height:44px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;box-shadow:0 3px 0 var(--ink);font-size:1.1rem;cursor:pointer;color:var(--ink)}
+#menuPanel .mp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#menuPanel .mp-it{min-height:56px;padding:8px 10px;background:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:0 3px 0 var(--ink);color:var(--ink);font-family:var(--fd);font-weight:700;font-size:1rem;cursor:pointer;touch-action:manipulation}
+#menuPanel .mp-it.on{background:var(--sun)}
+#menuPanel .mp-it:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+</style>
 </head>
 <body>
 
 <!-- NAV -->
+<button id="menuBtn" type="button" aria-haspopup="dialog" aria-controls="menuPanel">☰ Menu</button>
+<div id="menuPanel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="mp-box">
+    <div class="mp-top"><span>Menu</span><button class="mp-x" type="button" aria-label="Fechar">✕</button></div>
+    <div class="mp-grid">
+      <button class="mp-it" data-s="home">🏠 Início</button>
+      <button class="mp-it" data-s="componentes">🧩 Componentes</button>
+      <button class="mp-it" data-s="montar">🔧 Montar PC</button>
+      <button class="mp-it" data-s="software">💾 Software</button>
+      <button class="mp-it" data-s="comparador">⚖️ Comparador</button>
+      <button class="mp-it" data-s="quiz">🧠 Quiz</button>
+      <button class="mp-it" data-s="glossario" style="grid-column:span 2">📖 Glossário</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var b=document.getElementById('menuBtn'),p=document.getElementById('menuPanel');
+  function abrir(){var at=document.querySelector('.section.active');var id=at?at.id:'';p.querySelectorAll('.mp-it').forEach(function(x){x.classList.toggle('on',x.dataset.s===id)});p.classList.add('open');var f=p.querySelector('.mp-it.on')||p.querySelector('.mp-it');f&&f.focus();}
+  function fechar(){p.classList.remove('open');b.focus();}
+  b.addEventListener('click',abrir);
+  p.addEventListener('click',function(e){if(e.target===p||e.target.closest('.mp-x'))return fechar();var it=e.target.closest('.mp-it');if(!it)return;p.classList.remove('open');if(it.dataset.s==='glossario')vbGlossAll();else showSection(it.dataset.s);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&p.classList.contains('open'))fechar();});
+})();
+</script>
+
 <nav id="nav">
 
   <div class="nav-links">
-    <button class="nav-btn active" onclick="showSection('home')">Home</button>
+    <button class="nav-btn active" onclick="showSection('home')">Início</button>
     <button class="nav-btn" onclick="showSection('componentes')">Componentes</button>
     <button class="nav-btn" onclick="showSection('montar')">Montar PC</button>
     <button class="nav-btn" onclick="showSection('software')">Software</button>
@@ -706,7 +815,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
   <div id="nameBox" style="margin:-24px auto 32px;width:min(100%,520px);display:flex;flex-direction:column;align-items:center;text-align:center"></div>
   <div class="hero-stats">
     <div><div class="stat-num">11</div><div class="stat-label">Componentes 3D</div></div>
-    <div><div class="stat-num" id="statQ">35</div><div class="stat-label">Perguntas Quiz</div></div>
+    <div><div class="stat-num" id="statQ">35</div><div class="stat-label">Perguntas no quiz</div></div>
     <div><div class="stat-num">5</div><div class="stat-label">Vistas por Peça</div></div>
     <div><div class="stat-num">PDF</div><div class="stat-label">Certificado</div></div>
   </div>
@@ -795,7 +904,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
 <section id="comparador" class="section">
   <div class="inner">
     <div class="sec-header">
-      <h2 class="sec-title">Comparador <span class="accent">Lado a Lado</span></h2>
+      <h2 class="sec-title">Comparador <span class="accent">lado a lado</span></h2>
       <p class="sec-sub">Seleciona dois componentes para comparar as suas especificações</p>
     </div>
     <div class="comp-sel-row">
@@ -821,13 +930,13 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
       <div class="quiz-meta">
         <div class="qmeta-item"><div class="qmeta-num" id="qMetaN">25</div><div class="qmeta-label">Perguntas</div></div>
         <div class="qmeta-item"><div class="qmeta-num">4</div><div class="qmeta-label">Opções cada</div></div>
-        <div class="qmeta-item"><div class="qmeta-num">1–5</div><div class="qmeta-label">Escala nota</div></div>
+        <div class="qmeta-item"><div class="qmeta-num">1–5</div><div class="qmeta-label">Escala da nota</div></div>
       </div>
       <label for="quizTheme" class="qtheme-l">Tema</label>
       <select id="quizTheme" class="name-input" aria-label="Tema do quiz"></select>
       <input class="name-input" id="playerName" type="text" placeholder="O teu nome (para o certificado)" maxlength="40">
       <br>
-      <button class="btn-p" onclick="startQuiz()">Começar Quiz →</button>
+      <button class="btn-p" onclick="startQuiz()">Começar o quiz →</button>
     </div>
     <div id="quizGame" class="hidden">
       <div class="qprog">
@@ -855,7 +964,7 @@ body::before{background-image:radial-gradient(rgba(234,88,12,.16) 1.6px,transpar
       </div>
       <div class="res-btns">
         <button class="btn-p" onclick="generatePDF()">📄 Certificado PDF</button>
-        <button class="btn-s" onclick="restartQuiz()">Repetir Quiz</button>
+        <button class="btn-s" onclick="restartQuiz()">Repetir o quiz</button>
       </div>
       <div id="wrongList" class="wrong-list hidden"></div>
     </div>
@@ -918,7 +1027,7 @@ const COMP = {
       {y:'2002',n:'Intel Pentium 4 (Northwood)',i:'55 milhões de transístores, até 3,4 GHz, Hyper-Threading nos modelos de topo'},
       {y:'2006',n:'Intel Core 2 Duo (Conroe)',i:'Dois núcleos, 65 nm, muito mais eficiente em termos de energia'},
       {y:'2011',n:'Intel Sandy Bridge',i:'GPU integrada, 32 nm, maior IPC (instruções por ciclo), ring bus'},
-      {y:'2017',n:'AMD Ryzen 1000 (Zen)',i:'8 núcleos, 14 nm — reacendeu a concorrência com a Intel nos processadores de desktop'},
+      {y:'2017',n:'AMD Ryzen 1000 (Zen)',i:'8 núcleos, 14 nm — reacendeu a concorrência com a Intel nos processadores de secretária'},
       {y:'2022',n:'Intel Core i9-13900K',i:'24 núcleos (8 P + 16 E), Intel 7, até 5,8 GHz, suporta DDR5 e DDR4'},
       {y:'2024',n:'AMD Ryzen 9 9950X',i:'16 núcleos Zen 5, TSMC 4 nm, até 5,7 GHz em Boost'},
       {y:'2026',n:'Próxima geração (Zen 6 / Nova Lake)',i:'Ainda por lançar em outubro de 2026. A AMD mantém o socket AM5 no Zen 6 e a Intel prepara o Nova Lake com novo socket; chegada prevista para o início de 2027'}
@@ -970,7 +1079,7 @@ const COMP = {
   },
 
   motherboard:{
-    id:'motherboard',name:'Placa-Mãe',short:'Motherboard',
+    id:'motherboard',name:'Placa-mãe',short:'Placa-mãe',
     color:'#ffd700',tag:'Placa Principal',
     desc:'Placa central que liga todos os componentes',
     about:'A placa-mãe é a espinha dorsal do computador. Liga e permite a comunicação entre todos os componentes: CPU, RAM, GPU, armazenamento e periféricos. Contém o chipset, que gere as conexões, e determina que processadores e memórias são suportados.',
@@ -1098,7 +1207,7 @@ const COMP = {
       {y:'2022',n:'ATX 3.0 + conector de 16 pinos',i:'Conector de até 600 W para placas gráficas, usado pela RTX 4090 (450 W)'},
       {y:'2024',n:'ATX 3.1 + conector 12V-2x6',i:'Revisão da norma com o conector 12V-2x6, de encaixe mais seguro, usado nas placas gráficas atuais'}
     ],
-    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="psuGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1600"/><stop offset="100%" stop-color="#0a0d00"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#psuGrad)"/><rect x="10" y="10" width="200" height="160" rx="4" fill="#111100" stroke="#ffd700" stroke-width="1.5"/><rect x="160" y="20" width="42" height="140" rx="3" fill="#0a0a00" stroke="#333" stroke-width="1"/><g fill="none" stroke="#444" stroke-width=".8"><line x1="164" y1="30" x2="198" y2="30"/><line x1="164" y1="38" x2="198" y2="38"/><line x1="164" y1="46" x2="198" y2="46"/><line x1="164" y1="54" x2="198" y2="54"/><line x1="164" y1="62" x2="198" y2="62"/><line x1="164" y1="70" x2="198" y2="70"/><line x1="164" y1="78" x2="198" y2="78"/><line x1="164" y1="86" x2="198" y2="86"/><line x1="164" y1="94" x2="198" y2="94"/><line x1="164" y1="102" x2="198" y2="102"/><line x1="164" y1="110" x2="198" y2="110"/><line x1="164" y1="118" x2="198" y2="118"/><line x1="164" y1="126" x2="198" y2="126"/><line x1="164" y1="134" x2="198" y2="134"/><line x1="164" y1="142" x2="198" y2="142"/><line x1="164" y1="150" x2="198" y2="150"/></g><text x="181" y="167" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">FAN</text><circle cx="90" cy="90" r="50" fill="#0d0d00" stroke="#ffd700" stroke-width="1.5"/><circle cx="90" cy="90" r="40" fill="#0a0a00" stroke="#444" stroke-width="1"/><circle cx="90" cy="90" r="8" fill="#1a1a00" stroke="#ffd700" stroke-width="1.5"/><g stroke="#ffd700" stroke-width="1.5" fill="none" opacity=".5"><line x1="90" y1="50" x2="90" y2="60"/><line x1="90" y1="120" x2="90" y2="130"/><line x1="50" y1="90" x2="60" y2="90"/><line x1="120" y1="90" x2="130" y2="90"/><line x1="62" y1="62" x2="69" y2="69"/><line x1="111" y1="111" x2="118" y2="118"/><line x1="118" y1="62" x2="111" y2="69"/><line x1="69" y1="111" x2="62" y2="118"/></g><rect x="20" y="20" width="24" height="16" rx="2" fill="#1a1600" stroke="#ffd700" stroke-width="1"/><text x="32" y="31" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">ON</text><rect x="20" y="42" width="60" height="16" rx="2" fill="#0d0d00" stroke="#444" stroke-width="1"/><text x="50" y="53" text-anchor="middle" fill="#888" font-size="6" font-family="monospace">100-240V~</text><text x="90" y="162" text-anchor="middle" fill="#ffd700" font-size="9" font-family="monospace" font-weight="bold">850W · 80+ GOLD</text></svg>`
+    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="psuGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1600"/><stop offset="100%" stop-color="#0a0d00"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#psuGrad)"/><rect x="10" y="10" width="200" height="160" rx="4" fill="#111100" stroke="#ffd700" stroke-width="1.5"/><rect x="160" y="20" width="42" height="140" rx="3" fill="#0a0a00" stroke="#333" stroke-width="1"/><g fill="none" stroke="#444" stroke-width=".8"><line x1="164" y1="30" x2="198" y2="30"/><line x1="164" y1="38" x2="198" y2="38"/><line x1="164" y1="46" x2="198" y2="46"/><line x1="164" y1="54" x2="198" y2="54"/><line x1="164" y1="62" x2="198" y2="62"/><line x1="164" y1="70" x2="198" y2="70"/><line x1="164" y1="78" x2="198" y2="78"/><line x1="164" y1="86" x2="198" y2="86"/><line x1="164" y1="94" x2="198" y2="94"/><line x1="164" y1="102" x2="198" y2="102"/><line x1="164" y1="110" x2="198" y2="110"/><line x1="164" y1="118" x2="198" y2="118"/><line x1="164" y1="126" x2="198" y2="126"/><line x1="164" y1="134" x2="198" y2="134"/><line x1="164" y1="142" x2="198" y2="142"/><line x1="164" y1="150" x2="198" y2="150"/></g><text x="181" y="167" text-anchor="middle" fill="#555" font-size="6" font-family="monospace">VENT.</text><circle cx="90" cy="90" r="50" fill="#0d0d00" stroke="#ffd700" stroke-width="1.5"/><circle cx="90" cy="90" r="40" fill="#0a0a00" stroke="#444" stroke-width="1"/><circle cx="90" cy="90" r="8" fill="#1a1a00" stroke="#ffd700" stroke-width="1.5"/><g stroke="#ffd700" stroke-width="1.5" fill="none" opacity=".5"><line x1="90" y1="50" x2="90" y2="60"/><line x1="90" y1="120" x2="90" y2="130"/><line x1="50" y1="90" x2="60" y2="90"/><line x1="120" y1="90" x2="130" y2="90"/><line x1="62" y1="62" x2="69" y2="69"/><line x1="111" y1="111" x2="118" y2="118"/><line x1="118" y1="62" x2="111" y2="69"/><line x1="69" y1="111" x2="62" y2="118"/></g><rect x="20" y="20" width="24" height="16" rx="2" fill="#1a1600" stroke="#ffd700" stroke-width="1"/><text x="32" y="31" text-anchor="middle" fill="#ffd700" font-size="6" font-family="monospace">ON</text><rect x="20" y="42" width="60" height="16" rx="2" fill="#0d0d00" stroke="#444" stroke-width="1"/><text x="50" y="53" text-anchor="middle" fill="#888" font-size="6" font-family="monospace">100-240V~</text><text x="90" y="162" text-anchor="middle" fill="#ffd700" font-size="9" font-family="monospace" font-weight="bold">850W · 80+ GOLD</text></svg>`
   },
 
   hdd:{
@@ -1136,11 +1245,11 @@ const COMP = {
       {y:'1980',n:'Seagate ST-506',i:'Primeiro HDD de 5,25" para microcomputadores: 5 MB'},
       {y:'1983',n:'Rodime RO352',i:'Primeiro HDD de 3,5": 10 MB'},
       {y:'2003',n:'SATA (Serial ATA)',i:'Interface em série que substitui o PATA (IDE); chegam os primeiros discos SATA'},
-      {y:'2011',n:'HDDs de 4 TB',i:'Capacidades de vários terabytes tornam-se comuns nos discos de desktop'},
+      {y:'2011',n:'HDDs de 4 TB',i:'Capacidades de vários terabytes tornam-se comuns nos discos de secretária'},
       {y:'2019',n:'Seagate Exos 2X14 (Mach.2)',i:'14 TB com dois atuadores independentes para maior desempenho'},
       {y:'2025',n:'Tecnologia HAMR (Seagate Mozaic)',i:'Gravação magnética assistida por calor: um laser aquece o prato e permite discos de mais de 30 TB. Em 2026 já há modelos de 44 TB para centros de dados'}
     ],
-    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hddGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0820"/><stop offset="100%" stop-color="#05050f"/></linearGradient><linearGradient id="platGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#333"/><stop offset="50%" stop-color="#888"/><stop offset="100%" stop-color="#444"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#hddGrad)"/><rect x="8" y="8" width="204" height="164" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="60" fill="url(#platGrad)" stroke="#555" stroke-width="2"/><circle cx="110" cy="85" r="48" fill="url(#platGrad)" stroke="#444" stroke-width="1" opacity=".6"/><circle cx="110" cy="85" r="36" fill="url(#platGrad)" stroke="#333" stroke-width="1" opacity=".5"/><circle cx="110" cy="85" r="18" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="6" fill="#333"/><circle cx="110" cy="85" r="2" fill="#8b5cf6"/><line x1="110" y1="25" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="50" y1="85" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="68" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="152" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><rect x="14" y="20" width="50" height="14" rx="2" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1"/><line x1="39" y1="34" x2="80" y2="75" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="82" cy="77" r="3" fill="#8b5cf6"/><text x="38" y="30" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">READ HEAD</text><rect x="155" y="150" width="50" height="12" rx="2" fill="#0d0b1e" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840"><rect x="158" y="153" width="3" height="6"/><rect x="163" y="153" width="3" height="6"/><rect x="168" y="153" width="3" height="6"/><rect x="173" y="153" width="3" height="6"/><rect x="178" y="153" width="3" height="6"/></g><text x="110" y="168" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">4 TB · 7200 RPM · SATA</text></svg>`
+    svg:`<svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hddGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0820"/><stop offset="100%" stop-color="#05050f"/></linearGradient><linearGradient id="platGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#333"/><stop offset="50%" stop-color="#888"/><stop offset="100%" stop-color="#444"/></linearGradient></defs><rect width="220" height="180" rx="4" fill="url(#hddGrad)"/><rect x="8" y="8" width="204" height="164" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="60" fill="url(#platGrad)" stroke="#555" stroke-width="2"/><circle cx="110" cy="85" r="48" fill="url(#platGrad)" stroke="#444" stroke-width="1" opacity=".6"/><circle cx="110" cy="85" r="36" fill="url(#platGrad)" stroke="#333" stroke-width="1" opacity=".5"/><circle cx="110" cy="85" r="18" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="110" cy="85" r="6" fill="#333"/><circle cx="110" cy="85" r="2" fill="#8b5cf6"/><line x1="110" y1="25" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="50" y1="85" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="68" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><line x1="152" y1="43" x2="110" y2="85" stroke="#8b5cf6" stroke-width="1" opacity=".3"/><rect x="14" y="20" width="50" height="14" rx="2" fill="#1a1a2a" stroke="#8b5cf6" stroke-width="1"/><line x1="39" y1="34" x2="80" y2="75" stroke="#8b5cf6" stroke-width="1.5"/><circle cx="82" cy="77" r="3" fill="#8b5cf6"/><text x="38" y="30" text-anchor="middle" fill="#8b5cf6" font-size="6" font-family="monospace">CABEÇA</text><rect x="155" y="150" width="50" height="12" rx="2" fill="#0d0b1e" stroke="#c8a840" stroke-width="1"/><g fill="#c8a840"><rect x="158" y="153" width="3" height="6"/><rect x="163" y="153" width="3" height="6"/><rect x="168" y="153" width="3" height="6"/><rect x="173" y="153" width="3" height="6"/><rect x="178" y="153" width="3" height="6"/></g><text x="110" y="168" text-anchor="middle" fill="#8b5cf6" font-size="9" font-family="monospace" font-weight="bold">4 TB · 7200 RPM · SATA</text></svg>`
   },
 
   ssd:{
@@ -1216,7 +1325,7 @@ const COMP = {
     sizeNote:'Coolers de torre dupla, como o Noctua NH-D15, medem 150 mm de largura, 165 mm de altura e 161 mm de profundidade. Verifica sempre se cabe na tua caixa e se não interfere com os slots de RAM.',
     history:[
       {y:'Anos 90',n:'Cooler de origem (stock) Intel/AMD',i:'Simples: alumínio + ventoinha — suficiente para processadores de baixo TDP'},
-      {y:'Anos 2000',n:'Torres com heatpipes',i:'As heatpipes de cobre chegam aos coolers de desktop — grande salto na capacidade de dissipar calor'},
+      {y:'Anos 2000',n:'Torres com heatpipes',i:'As heatpipes de cobre chegam aos coolers de secretária — grande salto na capacidade de dissipar calor'},
       {y:'2006',n:'Thermalright Ultra-120',i:'Um dos coolers de torre que marcaram o início dos coolers de alto desempenho a ar'},
       {y:'2009',n:'AIO Liquid Coolers',i:'Corsair H50 populariza a refrigeração líquida all-in-one'},
       {y:'2014',n:'Noctua NH-D15',i:'Referência entre os coolers a ar de torre dupla'},
@@ -1227,13 +1336,13 @@ const COMP = {
   },
 
   case_pc:{
-    id:'case_pc',name:'Caixa (Case)',short:'Case',
+    id:'case_pc',name:'Caixa',short:'Caixa',
     color:'#e2e2ff',tag:'Estrutura',
     desc:'Aloja e protege todos os componentes internos',
     about:'A case (caixa ou chassi) é a estrutura que aloja e protege todos os componentes do computador. Determina os fatores de forma suportados (ATX, mATX, ITX), o número de baías disponíveis e o fluxo de ar interno. Tem também impacto na estética e no ruído do sistema.',
     specs:{
-      'Fator de Forma':'Full Tower / Mid Tower / Mini-ITX',
-      'Motherboards':'ATX / Micro-ATX / Mini-ITX',
+      'Fator de Forma':'Torre grande / Torre média / Mini-ITX',
+      'Placas-mãe':'ATX / Micro-ATX / Mini-ITX',
       'GPU Max Comprimento':'350 – 420 mm',
       'Cooler Max Altura':'160 – 185 mm',
       'Radiador Frontal':'240 mm / 360 mm',
@@ -1255,7 +1364,7 @@ const COMP = {
       {c:'#1a1a2a',n:'Gestão de Cabos',d:'Espaço traseiro para organizar cabos — temperatura e estética melhoram'}
     ],
     size:{w:'~210 mm',h:'~480 mm',d:'~440 mm',wt:'~7–12 kg'},
-    sizeNote:'Uma case Mid Tower típica mede ~210×480×440 mm. Full Towers podem ultrapassar 250×600 mm. Mini-ITX são drasticamente mais compactas mas limitam componentes.',
+    sizeNote:'Uma caixa de torre média mede, em geral, ~210×480×440 mm. as torres grandes podem ultrapassar 250×600 mm. Mini-ITX são drasticamente mais compactas mas limitam componentes.',
     history:[
       {y:'1981',n:'IBM PC (5150)',i:'Caixa desktop horizontal, com unidade de disquetes na frente'},
       {y:'Anos 80–90',n:'Caixas em torre',i:'As caixas verticais ganham espaço — mais fáceis de expandir'},
@@ -1269,7 +1378,7 @@ const COMP = {
   },
 
   nic:{
-    id:'nic',name:'Placa de Rede',short:'NIC',
+    id:'nic',name:'Placa de Rede',short:'Rede',
     color:'#00ff88',tag:'Conectividade',
     desc:'Liga o computador a redes locais e à internet',
     about:'A NIC (Network Interface Card) permite ao computador comunicar em redes locais (LAN) e aceder à internet. A maioria das placas-mãe inclui uma NIC integrada (onboard). Placas dedicadas oferecem maior velocidade (2,5G/10G) ou funcionalidades Wi-Fi 6E/7.',
@@ -1312,7 +1421,7 @@ const COMP = {
   },
 
   soundcard:{
-    id:'soundcard',name:'Placa de Som',short:'Sound',
+    id:'soundcard',name:'Placa de Som',short:'Som',
     color:'#8b5cf6',tag:'Áudio',
     desc:'Processa e reproduz áudio de alta qualidade',
     about:'A placa de som converte sinais digitais em áudio analógico (DAC) e vice-versa (ADC). As placas-mãe modernas incluem chips de áudio integrados (onboard) como o Realtek ALC1220. Placas dedicadas oferecem DACs de alta qualidade, melhor relação sinal-ruído e funcionalidades profissionais.',
@@ -1354,7 +1463,7 @@ const COMP = {
   }
 };
 /* ── Texto simples e dicas de escolha, por componente ── */
-Object.entries({'cpu': ('O cérebro do computador. Faz as contas e executa as instruções de todos os programas, milhões de vezes por segundo.', 'O socket tem de ser igual ao da placa-mãe (AM5 ou LGA 1851). Mais núcleos ajudam em tarefas pesadas, como editar vídeo; nos jogos contam também a velocidade de cada núcleo e a placa gráfica. Precisa sempre de cooler.'), 'ram': ('A secretária onde o PC pousa o que está a usar. Quanto maior a secretária, mais coisas podem estar abertas ao mesmo tempo. Quando desligas, a secretária fica vazia.', 'Tem de ser do tipo que a placa-mãe aceita (DDR5 ou DDR4) e do formato certo (DIMM em desktop, SO-DIMM em portáteis). Dois módulos iguais trabalham em dual channel, mais depressa. 16 GB chegam para a maioria; 32 GB para trabalho pesado.'), 'motherboard': ('A cidade onde moram todas as peças. Liga tudo: processador, memória, discos, placa gráfica e USB, e decide o que pode ser usado.', 'O socket tem de servir o processador, a RAM tem de ser do tipo suportado e o tamanho (ATX, mATX, ITX) tem de caber na caixa. Vê também quantas ranhuras M.2 e que portas USB precisas.'), 'gpu': ('O artista do computador. Desenha as imagens e os jogos que vês no ecrã, a fazer milhares de contas ao mesmo tempo.', 'Confirma se cabe na caixa (comprimento), a potência que a fonte tem de ter e os cabos de energia que a placa pede. Mais memória de vídeo (VRAM) ajuda em jogos e programas exigentes.'), 'psu': ('O coração elétrico do PC. Transforma a eletricidade da tomada na energia certa para cada peça.', 'Escolhe pela potência (segue a recomendada para a tua placa gráfica), pela certificação 80 PLUS (gasta menos energia) e confirma que tem os cabos que as peças pedem. Uma fonte fraca faz o PC desligar-se sozinho.'), 'hdd': ('Um armário grande e barato. Guarda muitos ficheiros, mas é lento porque tem um disco a rodar e uma agulha que lê.', 'É ótimo para guardar muita coisa a baixo preço (fotografias, filmes, cópias de segurança). Não é a melhor escolha para o sistema: para isso usa um SSD. Ocupa uma baía de 3,5" na caixa.'), 'ssd': ('Um armário rápido, sem peças a mexer. Encontra os ficheiros quase instantaneamente, por isso o PC arranca e os programas abrem muito mais depressa.', 'Se a placa-mãe tiver ranhura M.2, escolhe NVMe, muito mais rápido do que SATA. Para o sistema, 500 GB a 1 TB chega. Confirma se a placa suporta PCIe 4.0 ou 5.0 para aproveitar toda a velocidade.'), 'cooler': ('O ar condicionado do processador. Tira o calor para que o processador não aqueça de mais e abrande ou desligue.', 'Confirma que serve o teu socket, que cabe na caixa (atenção à altura!) e que aguenta o TDP do processador. Os coolers de torre são baratos e eficazes; os de água (AIO) precisam de espaço para o radiador.'), 'case_pc': ('A casa do PC. Protege as peças, deixa o ar circular e decide o que cabe lá dentro.', 'Vê se aceita o tamanho da placa-mãe, o comprimento da placa gráfica e a altura do cooler. Uma boa circulação de ar (ventoinhas à frente e atrás) mantém tudo mais fresco.'), 'nic': ('O carteiro do computador. Leva e traz informação da internet e da rede lá de casa, por cabo ou sem fios.', 'A maior parte das placas-mãe já traz rede por cabo. Só precisas de Wi-Fi se não puderes ligar um cabo; o Wi-Fi 6E ou 7 é mais rápido, mas o router também tem de ser compatível.'), 'soundcard': ('O tradutor de som. Transforma os números do computador no som que ouves nas colunas ou nos auscultadores.', 'O áudio integrado na placa-mãe chega para quase toda a gente. Uma placa dedicada só compensa para música profissional ou equipamento de som muito bom.')}).forEach(([k,v])=>{if(COMP[k]){COMP[k].simple=v[0];COMP[k].choose=v[1];}});
+Object.entries({'cpu': ('O cérebro do computador. Faz as contas e executa as instruções de todos os programas, milhões de vezes por segundo.', 'O socket tem de ser igual ao da placa-mãe (AM5 ou LGA 1851). Mais núcleos ajudam em tarefas pesadas, como editar vídeo; nos jogos contam também a velocidade de cada núcleo e a placa gráfica. Precisa sempre de cooler.'), 'ram': ('A secretária onde o PC pousa o que está a usar. Quanto maior a secretária, mais coisas podem estar abertas ao mesmo tempo. Quando desligas, a secretária fica vazia.', 'Tem de ser do tipo que a placa-mãe aceita (DDR5 ou DDR4) e do formato certo (DIMM em computadores de secretária, SO-DIMM em portáteis). Dois módulos iguais trabalham em dual channel, mais depressa. 16 GB chegam para a maioria; 32 GB para trabalho pesado.'), 'motherboard': ('A cidade onde moram todas as peças. Liga tudo: processador, memória, discos, placa gráfica e USB, e decide o que pode ser usado.', 'O socket tem de servir o processador, a RAM tem de ser do tipo suportado e o tamanho (ATX, mATX, ITX) tem de caber na caixa. Vê também quantas ranhuras M.2 e que portas USB precisas.'), 'gpu': ('O artista do computador. Desenha as imagens e os jogos que vês no ecrã, a fazer milhares de contas ao mesmo tempo.', 'Confirma se cabe na caixa (comprimento), a potência que a fonte tem de ter e os cabos de energia que a placa pede. Mais memória de vídeo (VRAM) ajuda em jogos e programas exigentes.'), 'psu': ('O coração elétrico do PC. Transforma a eletricidade da tomada na energia certa para cada peça.', 'Escolhe pela potência (segue a recomendada para a tua placa gráfica), pela certificação 80 PLUS (gasta menos energia) e confirma que tem os cabos que as peças pedem. Uma fonte fraca faz o PC desligar-se sozinho.'), 'hdd': ('Um armário grande e barato. Guarda muitos ficheiros, mas é lento porque tem um disco a rodar e uma agulha que lê.', 'É ótimo para guardar muita coisa a baixo preço (fotografias, filmes, cópias de segurança). Não é a melhor escolha para o sistema: para isso usa um SSD. Ocupa uma baía de 3,5" na caixa.'), 'ssd': ('Um armário rápido, sem peças a mexer. Encontra os ficheiros quase instantaneamente, por isso o PC arranca e os programas abrem muito mais depressa.', 'Se a placa-mãe tiver ranhura M.2, escolhe NVMe, muito mais rápido do que SATA. Para o sistema, 500 GB a 1 TB chega. Confirma se a placa suporta PCIe 4.0 ou 5.0 para aproveitar toda a velocidade.'), 'cooler': ('O ar condicionado do processador. Tira o calor para que o processador não aqueça de mais e abrande ou desligue.', 'Confirma que serve o teu socket, que cabe na caixa (atenção à altura!) e que aguenta o TDP do processador. Os coolers de torre são baratos e eficazes; os de água (AIO) precisam de espaço para o radiador.'), 'case_pc': ('A casa do PC. Protege as peças, deixa o ar circular e decide o que cabe lá dentro.', 'Vê se aceita o tamanho da placa-mãe, o comprimento da placa gráfica e a altura do cooler. Uma boa circulação de ar (ventoinhas à frente e atrás) mantém tudo mais fresco.'), 'nic': ('O carteiro do computador. Leva e traz informação da internet e da rede lá de casa, por cabo ou sem fios.', 'A maior parte das placas-mãe já traz rede por cabo. Só precisas de Wi-Fi se não puderes ligar um cabo; o Wi-Fi 6E ou 7 é mais rápido, mas o router também tem de ser compatível.'), 'soundcard': ('O tradutor de som. Transforma os números do computador no som que ouves nas colunas ou nos auscultadores.', 'O áudio integrado na placa-mãe chega para quase toda a gente. Uma placa dedicada só compensa para música profissional ou equipamento de som muito bom.')}).forEach(([k,v])=>{if(COMP[k]){COMP[k].simple=v[0];COMP[k].choose=v[1];}});
 function compAbout(c){return (c.simple?`<p class="simple"><b>Em palavras simples:</b> ${c.simple}</p>`:'')+`<p>${c.about}</p>`;}
 
 
@@ -1366,7 +1475,7 @@ const QUESTIONS = [
   {cat:'Processador',q:'O que significa a sigla CPU?',opts:['Central Power Unit','Core Processing Utility','Central Processing Unit','Computer Primary Unit'],ans:2,exp:'CPU = Central Processing Unit — Unidade Central de Processamento. É o termo técnico oficial para o processador.'},
   {cat:'Memória',q:'Que tipo de memória perde os seus dados quando o computador é desligado?',opts:['SSD NVMe','HDD SATA','ROM (BIOS)','RAM (memória principal)'],ans:3,exp:'A RAM é uma memória volátil: sem energia, os dados desaparecem. É por isso que tens de guardar os teus ficheiros antes de desligar o PC.'},
   {cat:'Armazenamento',q:'O que diferencia um SSD NVMe de um SSD SATA?',opts:['O NVMe tem mais capacidade','O NVMe é muito mais rápido (até 14 GB/s vs. ~550 MB/s)','O SATA é mais caro','O NVMe usa mais energia'],ans:1,exp:'Os SSDs NVMe usam o protocolo PCIe que oferece largura de banda muito superior: até 14 GB/s nos melhores PCIe 5.0, vs. ~550 MB/s máximos do SATA.'},
-  {cat:'Energia',q:'Que componente fornece energia elétrica a todos os outros?',opts:['Motherboard','Chipset','PSU (Fonte de Alimentação)','CMOS Battery'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
+  {cat:'Energia',q:'Que componente fornece energia elétrica a todos os outros?',opts:['Placa-mãe','Chipset','PSU (Fonte de Alimentação)','Pilha CMOS'],ans:2,exp:'A PSU (Power Supply Unit) converte a corrente AC da tomada em DC nas tensões certas (+12V, +5V, +3,3V) para alimentar todos os componentes.'},
   {cat:'Processador',q:'O que é o "socket" de uma CPU?',opts:['O ventilador do processador','O conector onde a CPU é instalada na placa-mãe','A memória cache do processador','O controlador de I/O integrado'],ans:1,exp:'O socket é o encaixe físico na placa-mãe onde o processador é instalado. Exemplos: LGA 1851 (Intel) e AM5 (AMD). CPU e socket têm de ser compatíveis.'},
   {cat:'Memória',q:'O que significa DDR em memórias RAM?',opts:['Direct Data Rate','Double Data Rate','Dual Dynamic Register','Dynamic Data Ram'],ans:1,exp:'DDR = Double Data Rate — transfere dados em ambos os flancos (subida E descida) do sinal de clock, dobrando efetivamente a largura de banda.'},
   {cat:'Gráficos',q:'Qual é a função principal de uma GPU?',opts:['Gerir a memória RAM','Controlar os discos de armazenamento','Distribuir energia pelos componentes','Processar dados gráficos e renderizar imagens'],ans:3,exp:'A GPU (Graphics Processing Unit) é especializada em processamento paralelo — essencial para renderizar gráficos, mas também usada para IA e computação científica.'},
@@ -1374,15 +1483,15 @@ const QUESTIONS = [
   {cat:'Armazenamento',q:'Que tecnologia usa pratos magnéticos rotativos para armazenar dados?',opts:['SSD SATA','NVMe M.2','Flash NAND','HDD (Disco Rígido)'],ans:3,exp:'O HDD (Hard Disk Drive) usa pratos metálicos que giram a 5400–7200 RPM com uma cabeça de leitura/escrita magnética — tecnologia com cerca de 70 anos.'},
   {cat:'Armazenamento',q:'O que é NVMe?',opts:['Non-Volatile Memory Express — protocolo para SSDs rápidos via PCIe','New Video Memory Extension','Network Virtual Media','Next Version Memory Express'],ans:0,exp:'NVMe (Non-Volatile Memory Express) é um protocolo de comunicação otimizado para memória flash. Usa PCIe em vez de SATA, reduzindo dramaticamente a latência.'},
   {cat:'Avançado',q:'O que é overclocking?',opts:['Reduzir a frequência do processador para poupar energia','Atualizar o BIOS da placa-mãe','Aumentar a frequência acima dos valores de fábrica para mais desempenho','Desligar núcleos inativos automaticamente'],ans:2,exp:'Overclocking é forçar o componente (CPU, GPU, RAM) a funcionar a frequências superiores ao padrão de fábrica. Aumenta o desempenho mas gera mais calor e pode reduzir a longevidade.'},
-  {cat:'Motherboard',q:'Qual é a função do BIOS/UEFI?',opts:['Gerir a memória RAM','Acelerar a GPU durante os jogos','Formatar o disco de armazenamento','Firmware que inicializa o hardware e arranca o sistema operativo'],ans:3,exp:'O BIOS/UEFI é o firmware gravado num chip da placa-mãe. É o primeiro software a executar quando ligas o PC — deteta os componentes e passa controlo ao sistema operativo.'},
+  {cat:'Placa-mãe',q:'Qual é a função do BIOS/UEFI?',opts:['Gerir a memória RAM','Acelerar a GPU durante os jogos','Formatar o disco de armazenamento','Firmware que inicializa o hardware e arranca o sistema operativo'],ans:3,exp:'O BIOS/UEFI é o firmware gravado num chip da placa-mãe. É o primeiro software a executar quando ligas o PC — deteta os componentes e passa controlo ao sistema operativo.'},
   {cat:'Processador',q:'O que é a cache de CPU?',opts:['Memória lenta para guardar ficheiros temporários','Memória ultrarrápida integrada no próprio processador','Disco virtual criado pelo sistema operativo','Ventilador interno do processador'],ans:1,exp:'A cache é memória integrada no die do processador (L1, L2, L3) com latências de nanosegundos. É muito mais rápida que a RAM e guarda dados frequentemente usados.'},
-  {cat:'Motherboard',q:'O que significa PCIe?',opts:['Peripheral Component Interconnect Express','Primary Computer Interface Extended','Parallel Core Integration Express','Personal Computer Internet Express'],ans:0,exp:'PCIe (Peripheral Component Interconnect Express) é o padrão de barramento série de alta velocidade para ligação de GPUs, SSDs NVMe, placas de rede e outros componentes à placa-mãe.'},
-  {cat:'Motherboard',q:'Qual é o fator de forma de placa-mãe mais comum em computadores desktop?',opts:['Mini-ITX (17×17 cm)','Micro-ATX (24×24 cm)','ATX (30,5×24,4 cm)','E-ATX (30,5×33 cm)'],ans:2,exp:'ATX (Advanced Technology eXtended) é o fator de forma mais comum. Define o tamanho (305×244 mm), a posição dos parafusos e a localização do conector de energia.'},
+  {cat:'Placa-mãe',q:'O que significa PCIe?',opts:['Peripheral Component Interconnect Express','Primary Computer Interface Extended','Parallel Core Integration Express','Personal Computer Internet Express'],ans:0,exp:'PCIe (Peripheral Component Interconnect Express) é o padrão de barramento série de alta velocidade para ligação de GPUs, SSDs NVMe, placas de rede e outros componentes à placa-mãe.'},
+  {cat:'Placa-mãe',q:'Qual é o fator de forma de placa-mãe mais comum em computadores de secretária?',opts:['Mini-ITX (17×17 cm)','Micro-ATX (24×24 cm)','ATX (30,5×24,4 cm)','E-ATX (30,5×33 cm)'],ans:2,exp:'ATX (Advanced Technology eXtended) é o fator de forma mais comum. Define o tamanho (305×244 mm), a posição dos parafusos e a localização do conector de energia.'},
   {cat:'Memória',q:'O que é memória ECC (Error-Correcting Code)?',opts:['Memória mais rápida para gaming','Memória que deteta e corrige automaticamente erros de bit','Extended Cache Controller — gere a cache L3','Enhanced Clock Cycle — overclock automático'],ans:1,exp:'ECC RAM usa bits adicionais de verificação para detetar e corrigir erros de memória de 1 bit em tempo real. Essencial em servidores e workstations onde a integridade de dados é crítica.'},
   {cat:'Gráficos',q:'O que é VRAM?',opts:['Memória virtual do sistema operativo','Virtual RAM — extensão da RAM no SSD','Memória de vídeo dedicada integrada na GPU','Variante de RAM para overclocking'],ans:2,exp:'VRAM (Video RAM) é memória de alta velocidade integrada na placa gráfica, usada para guardar texturas, framebuffers e dados de render. Mais VRAM = suporte para texturas de maior resolução.'},
   {cat:'Armazenamento',q:'Que unidade mede a velocidade de rotação de um HDD?',opts:['GHz (Gigahertz)','MB/s (Megabytes por segundo)','RPM — Rotações Por Minuto','kbps (Kilobits por segundo)'],ans:2,exp:'RPM (Rotações Por Minuto) mede a velocidade de rotação dos pratos do HDD. Um HDD de 7200 RPM é mais rápido que um de 5400 RPM, com menor latência de acesso.'},
   {cat:'Arrefecimento',q:'Qual é a função de um cooler de CPU?',opts:['Arrefecer a memória RAM','Arrefecer a placa gráfica GPU','Dissipar o calor gerado pelo processador para evitar sobreaquecimento','Ventilar a fonte de alimentação'],ans:2,exp:'O cooler de CPU dissipa o calor produzido pelo processador. Sem arrefecimento adequado, a CPU ativa o thermal throttling (reduz frequência automaticamente) ou pode danificar-se.'},
-  {cat:'Motherboard',q:'O que é uma placa de som onboard (integrada)?',opts:['Placa PCIe dedicada de alto desempenho','Coluna USB externa','Interface MIDI para instrumentos','Chip de áudio soldado diretamente na placa-mãe'],ans:3,exp:'Áudio onboard significa que o codec de áudio (ex.: Realtek ALC1220) está integrado na própria placa-mãe, sem necessidade de placa adicional. Suficiente para uso geral.'},
+  {cat:'Placa-mãe',q:'O que é uma placa de som onboard (integrada)?',opts:['Placa PCIe dedicada de alto desempenho','Coluna USB externa','Interface MIDI para instrumentos','Chip de áudio soldado diretamente na placa-mãe'],ans:3,exp:'Áudio onboard significa que o codec de áudio (ex.: Realtek ALC1220) está integrado na própria placa-mãe, sem necessidade de placa adicional. Suficiente para uso geral.'},
   {cat:'Memória',q:'O que é a memória virtual?',opts:['Memória RAM adicional instalável por software','Cache do processador','Memória dedicada da GPU','Espaço em disco rígido/SSD utilizado como extensão da RAM'],ans:3,exp:'A memória virtual (swap/page file) usa espaço no disco como extensão da RAM quando esta está cheia. É muito mais lenta que a RAM real — o PC fica lento quando a usa ativamente.'},
   {cat:'Energia',q:'O que indica a certificação 80 PLUS Gold numa fonte de alimentação?',opts:['A fonte tem 80 W de potência máxima','A fonte é dourada por fora','A fonte tem pelo menos 90% de eficiência energética a 50% de carga (rede de 115 V)','A fonte tem 80 conectores de alimentação'],ans:2,exp:'80 PLUS Gold certifica uma eficiência de, pelo menos, 87% a 20% e a 100% de carga, e de 90% a 50% de carga (valores para rede de 115 V). Menos calor gerado e menor fatura de eletricidade.'},
   {cat:'Processador',q:'Qual é a função dos núcleos de eficiência (E-cores) nos processadores Intel de 12.ª geração em diante?',opts:['Substituir os P-cores para poupar energia','Tratar tarefas em segundo plano com menor consumo, libertando P-cores para tarefas principais','Controlar exclusivamente a memória RAM','Gerir as ligações PCIe'],ans:1,exp:'Os E-cores (Efficiency cores) são núcleos mais simples e energeticamente eficientes, ideais para tarefas em background. Os P-cores (Performance cores) ficam disponíveis para aplicações exigentes.'},
@@ -1398,7 +1507,7 @@ const QUESTIONS = [
   {cat:'Software',q:"Qual é a ordem correta do arranque de um PC?",opts:["Sistema operativo → POST → UEFI → ambiente de trabalho", "POST (UEFI) → procura do dispositivo de arranque → sistema operativo → ambiente de trabalho", "UEFI → ambiente de trabalho → POST → sistema operativo", "Drivers → UEFI → sistema operativo → POST"],ans:1,exp:"O firmware faz o POST, procura o dispositivo de arranque (por exemplo, o SSD), carrega o sistema operativo e este mostra o ambiente de trabalho."},
   {cat:'Software',q:"Quando é que o Windows 10 deixou de ter suporte gratuito de atualizações de segurança?",opts:["Em 14 de outubro de 2025", "Em 2015, quando foi lançado", "Em 2021, com o Windows 11", "Ainda tem suporte indefinido"],ans:0,exp:"O suporte do Windows 10 terminou a 14 de outubro de 2025. Sem atualizações de segurança, o PC fica mais exposto, por isso convém passar para o Windows 11 ou outro sistema com suporte."},
   {cat:'Montagem',q:"Antes de começar a montar, qual é o cuidado mais importante com a eletricidade?",opts:["Desligar o PC da tomada e tocar numa parte metálica da caixa para descarregar a eletricidade estática", "Montar com a fonte ligada, para testar cada peça", "Usar luvas de lã para não deixar gordura nas peças", "Molhar as mãos para não haver estática"],ans:0,exp:"A fonte deve estar desligada da tomada e convém tocar numa parte metálica da caixa antes de pegar nas peças, para descarregar a eletricidade estática que pode danificar os componentes."},
-  {cat:'Montagem',q:"Como se alinha o processador com o socket?",opts:["Pelo lado que tiver mais pinos", "Pelo triângulo num canto do processador e do socket, pousando-o sem forçar", "Em qualquer posição, porque encaixa sempre", "Empurrando até ouvir um clique"],ans:1,exp:"O processador só encaixa numa posição, marcada por um triângulo no canto. Pousa-se sem forçar: se for preciso força, está mal alinhado e pode estragar-se."},
+  {cat:'Montagem',q:"Como se alinha o processador com o socket?",opts:["Pelo lado que tiver mais pinos", "Pelo triângulo num canto do processador e do socket, pousando-o sem forçar", "Em qualquer posição, porque encaixa sempre", "A empurrar até ouvir um clique"],ans:1,exp:"O processador só encaixa numa posição, marcada por um triângulo no canto. Pousa-se sem forçar: se for preciso força, está mal alinhado e pode estragar-se."},
   {cat:'Montagem',q:"Em que ranhuras se colocam dois módulos de RAM para usar dual channel?",opts:["Nas duas ranhuras mais próximas uma da outra", "Nas indicadas no manual da placa, normalmente a 2.ª e a 4.ª a contar do processador (A2 e B2)", "Só numa ranhura, a mais afastada do processador", "Nas ranhuras ao lado da placa gráfica"],ans:1,exp:"As placas indicam no manual as ranhuras para dual channel, normalmente A2 e B2. Assim os dois módulos trabalham em paralelo e a memória é mais rápida."},
   {cat:'Montagem',q:"O que se faz à película de plástico na base do cooler?",opts:["Deixa-se, porque protege o processador", "Tira-se antes de montar o cooler", "Cobre-se com mais pasta térmica", "Corta-se um pedaço para deixar passar o calor"],ans:1,exp:"A película só protege o cooler durante o transporte. Se ficar, isola o calor e o processador sobreaquece."},
   {cat:'Montagem',q:"Para que serve o cabo EPS (4+4 pinos) que sai da fonte?",opts:["Alimentar o disco rígido", "Alimentar o processador", "Ligar as ventoinhas da caixa", "Carregar as portas USB da frente"],ans:1,exp:"O cabo EPS leva a energia ao processador, através de uma ficha perto do socket. Sem ele, o PC não arranca."},
@@ -1544,7 +1653,7 @@ function buildTab3D(c){
     <div class="ctrls">
       <button class="cbtn" id="btnSpin" onclick="toggleSpin()">⟳ Auto-Rodar</button>
       <button class="cbtn" id="btnExplode" onclick="toggleExplode()">✦ Explodir</button>
-      <button class="cbtn" onclick="resetView()">⊙ Reset</button>
+      <button class="cbtn" onclick="resetView()">⊙ Repor</button>
       <button class="cbtn" onclick="zoom3D(.85)">＋ Zoom</button>
       <button class="cbtn" onclick="zoom3D(1.18)">－ Zoom</button>
     </div>
@@ -2851,7 +2960,7 @@ const MP_PARTS={
     {id:'ram_ddr4',cat:'ram',ok:false,icon:'ram',name:'Memória DDR4 · 16 GB',sub:'DIMM · 288 pinos · 1,2 V',qty:2,
      why:'A placa é DDR5. A DDR4 e a DDR5 têm o entalhe do conector em posições diferentes, por isso não encaixam — e a tensão também é diferente.'},
     {id:'ram_sodimm',cat:'ram',ok:false,icon:'ram',name:'Memória DDR5 SO-DIMM · 16 GB',sub:'SO-DIMM · 262 pinos',qty:2,
-     why:'O SO-DIMM é o formato dos portáteis: é mais curto e tem outro conector. Numa placa de desktop usa-se o formato DIMM.'}
+     why:'O SO-DIMM é o formato dos portáteis: é mais curto e tem outro conector. Numa placa de computador de secretária usa-se o formato DIMM.'}
   ],
   cooler:[
     {id:'cooler_ok',cat:'cooler',ok:true,icon:'cooler',name:'Cooler de CPU · 155 mm',sub:'Compatível com AM5',
